@@ -1,0 +1,33 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="80" x2="900" y2="940" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B1020"/>
+      <stop offset="1" stop-color="#131C36"/>
+    </linearGradient>
+    <linearGradient id="mane" x1="290" y1="270" x2="720" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#62E6FF"/>
+      <stop offset="0.5" stop-color="#7F8DFF"/>
+      <stop offset="1" stop-color="#FF7AC8"/>
+    </linearGradient>
+    <filter id="glow" x="120" y="120" width="800" height="800" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+
+  <g filter="url(#glow)">
+    <path d="M308 726C296 644 311 555 362 486C417 411 498 364 592 354C649 348 696 359 739 385C692 411 668 438 661 474C654 510 669 542 702 566C664 628 610 678 539 709C462 743 385 750 308 726Z" fill="#F7F4FF"/>
+    <path d="M590 354C662 324 736 331 804 381C748 394 705 423 679 470C652 519 656 565 690 609C670 650 636 688 588 721C600 660 588 619 552 598C517 577 473 583 420 615C385 603 353 583 326 556C337 506 357 466 386 437C443 379 511 351 590 354Z" fill="url(#mane)"/>
+    <path d="M388 454C428 417 473 395 522 389C475 433 461 476 479 518C496 559 535 585 596 596C562 631 522 651 477 656C428 661 383 646 344 611C333 556 347 504 388 454Z" fill="#F7F4FF"/>
+    <path d="M528 438C548 438 564 454 564 474C564 494 548 510 528 510C508 510 492 494 492 474C492 454 508 438 528 438Z" fill="#111A33"/>
+    <circle cx="516" cy="464" r="7" fill="#FFFFFF"/>
+    <path d="M589 541C570 552 549 560 526 563C534 541 548 526 568 517C580 511 593 510 607 514C603 525 597 534 589 541Z" fill="#EDE6FF"/>
+    <path d="M452 393L489 324L533 386" fill="#F7F4FF"/>
+    <path d="M452 393L489 324L533 386" stroke="#D9D1FF" stroke-width="10" stroke-linejoin="round"/>
+  </g>
+</svg>
