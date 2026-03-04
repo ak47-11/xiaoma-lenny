@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>社区中心 | xiaoma.cyou</title>
+  <link rel="stylesheet" href="/css/community.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div>
+        <span class="pill">Community Beta</span>
+        <h1>三角洲讨论社区 + 充电社区</h1>
+        <p>可爱统一画风，支持发帖、点赞、评论、收藏与图文视频动态。</p>
+      </div>
+      <a class="back" href="/">返回首页</a>
+    </header>
+
+    <section class="switcher">
+      <button class="tab active" data-tab="delta">三角洲讨论社区</button>
+      <button class="tab" data-tab="charge">充电社区</button>
+    </section>
+
+    <section class="layout">
+      <article class="composer card" id="composerArea"></article>
+
+      <article class="feed card">
+        <div class="feed-top">
+          <h2 id="feedTitle">三角洲热帖</h2>
+          <select id="sortBy">
+            <option value="hot">按热度</option>
+            <option value="latest">按最新</option>
+          </select>
+        </div>
+        <div id="feedList" class="feed-list"></div>
+      </article>
+
+      <aside class="side card">
+        <h3>热门话题</h3>
+        <div id="topics" class="topics"></div>
+        <hr />
+        <h3>社区提示</h3>
+        <ul>
+          <li>文明发言，拒绝人身攻击</li>
+          <li>攻略建议带标签便于检索</li>
+          <li>视频建议附 1 句摘要</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+
+  <template id="postTemplate">
+    <div class="post">
+      <div class="post-head">
+        <div>
+          <b class="post-title"></b>
+          <div class="meta"></div>
+        </div>
+        <span class="chip post-topic"></span>
+      </div>
+      <p class="post-content"></p>
+      <div class="media"></div>
+      <div class="actions">
+        <button class="act like-btn">❤ <span>0</span></button>
+        <button class="act comment-toggle">💬 评论</button>
+        <button class="act collect-btn">⭐ 收藏</button>
+      </div>
+      <div class="comment-box hidden">
+        <div class="comment-list"></div>
+        <form class="comment-form">
+          <input type="text" maxlength="200" placeholder="写下你的评论" required />
+          <button type="submit">发送</button>
+        </form>
+      </div>
+    </div>
+  </template>
+
+  <script src="/js/community.js"></script>
+</body>
+</html>

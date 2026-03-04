@@ -5,155 +5,609 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>登录 | xiaoma.cyou</title>
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f7f9fc;
+      --text: #0f1419;
+      --muted: #5f6b7a;
+      --line: #dde3ec;
+      --line-strong: #bdc8d8;
+      --x-blue: #1d9bf0;
+      --tesla-red: #e82127;
+      --ok: #0b8a5a;
+      --err: #bf1d18;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       min-height: 100vh;
-      margin: 0;
+      font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 500px at -10% 10%, rgba(29, 155, 240, 0.11), transparent 70%),
+        radial-gradient(800px 360px at 110% 90%, rgba(232, 33, 39, 0.09), transparent 70%),
+        linear-gradient(180deg, #f8fafd 0%, #eef2f7 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: min(1040px, 100%);
+      min-height: min(700px, calc(100vh - 48px));
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 28px;
+      box-shadow: 0 28px 90px rgba(31, 52, 87, 0.18);
+      backdrop-filter: blur(10px);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      overflow: hidden;
+      animation: rise 0.6s ease;
+    }
+
+    .hero {
+      position: relative;
+      padding: 52px;
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(246, 250, 255, 0.86)),
+        repeating-linear-gradient(120deg, rgba(26, 41, 61, 0.03) 0 2px, transparent 2px 14px);
+      border-right: 1px solid rgba(188, 201, 220, 0.42);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 26px;
+    }
+
+    .brand-tag {
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .hero h1 {
+      margin-top: 18px;
+      font-family: "Sora", "IBM Plex Sans", sans-serif;
+      font-size: clamp(30px, 4.5vw, 42px);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 strong { color: var(--x-blue); }
+    .hero h1 span { color: var(--tesla-red); }
+
+    .hero p {
+      margin-top: 16px;
+      max-width: 480px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 12px;
+      max-width: 420px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #2f3f54;
+    }
+
+    .feature-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(160deg, var(--x-blue), var(--tesla-red));
+    }
+
+    .panel {
+      background: var(--surface);
+      padding: 38px 30px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .panel h2 {
+      font-family: "Sora", "IBM Plex Sans", sans-serif;
+      font-size: 26px;
+      margin-bottom: 2px;
+    }
+
+    .sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .social-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .btn {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      min-height: 46px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); border-color: var(--line-strong); }
+    .btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+    .btn.primary { border: none; background: #0f1419; color: #fff; }
+    .btn.primary:hover { background: #1c2733; }
+    .btn.secondary { border-color: #cfd8e4; background: #f9fbfd; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #7a8798;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 6px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-top: 1px solid var(--line);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 4px;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .tab {
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      min-height: 36px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6c7a8c;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: var(--text);
+      background: #fff;
+      box-shadow: 0 8px 16px rgba(24, 39, 61, 0.09);
+    }
+
+    .form-panel { display: none; margin-top: 4px; }
+    .form-panel.active { display: block; animation: fade 0.2s ease; }
+
+    .field { margin-top: 10px; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #5f6c7d;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 12px;
+      border: 1px solid #ccd6e3;
+      background: #fff;
+      padding: 0 14px;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .field input::placeholder { color: #9aa7b8; }
+
+    .field input:focus {
+      border-color: var(--x-blue);
+      box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.17);
+    }
+
+    .inline-row {
+      margin: 10px 2px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #5e6c7d;
+      font-size: 12px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle input { accent-color: #111; }
+
+    .link-btn {
+      border: none;
+      background: transparent;
+      color: var(--x-blue);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .actions {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .status {
+      min-height: 44px;
+      border: 1px solid #d8e1ec;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 11px 12px;
+      color: #55667a;
+      font-size: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-    }
-    .card {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      padding: 40px;
-      border-radius: 20px;
-      width: 360px;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    h1 { text-align: center; margin-bottom: 30px; }
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(0,0,0,0.3);
-      color: #fff;
-      font-size: 15px;
-      box-sizing: border-box;
-    }
-    input::placeholder { color: rgba(255,255,255,0.5); }
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      background: linear-gradient(90deg, #00d4ff, #7c3aed);
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 15px;
-    }
-    button:hover { opacity: 0.9; }
-    .links {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 16px;
-      font-size: 13px;
-    }
-    a { color: #00d4ff; text-decoration: none; }
-    #msg {
-      margin-top: 16px;
-      padding: 12px;
-      border-radius: 8px;
       text-align: center;
-      font-size: 13px;
-      display: none;
+      margin-top: 4px;
     }
-    #msg.error { display: block; background: rgba(255,0,0,0.2); }
-    #msg.success { display: block; background: rgba(0,255,0,0.2); }
+
+    .status.ok {
+      color: var(--ok);
+      border-color: rgba(11, 138, 90, 0.28);
+      background: rgba(11, 138, 90, 0.08);
+    }
+
+    .status.err {
+      color: var(--err);
+      border-color: rgba(191, 29, 24, 0.3);
+      background: rgba(191, 29, 24, 0.08);
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 960px) {
+      .shell {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .hero {
+        padding: 32px 24px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(188, 201, 220, 0.42);
+      }
+
+      .hero p { max-width: none; }
+      .panel { padding: 28px 20px 22px; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>账号登录</h1>
-    <input type="email" id="email" placeholder="邮箱地址" />
-    <input type="password" id="password" placeholder="密码" />
-    <button id="loginBtn">登录</button>
-    <div class="links">
-      <a href="#" id="forgotLink">忘记密码？</a>
-      <a href="#" id="registerLink">注册账号</a>
-    </div>
-    <div id="msg"></div>
-  </div>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="brand-tag">Xiaoma ID</div>
+        <h1><strong>快速登录</strong>，像推特一样直接，<span>像特斯拉一样克制</span></h1>
+        <p>支持邮箱密码、邮箱/手机号验证码登录，以及社交账号授权。你可以继续使用已有账号，无需重复注册。</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature"><span class="feature-dot"></span>账号密码登录，适合日常稳定使用</div>
+        <div class="feature"><span class="feature-dot"></span>验证码登录，适合快速回访与新用户</div>
+        <div class="feature"><span class="feature-dot"></span>Google / Twitter 授权，一键进入</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>登录 xiaoma.cyou</h2>
+      <p class="sub">继续访问你的专属页面与功能</p>
+
+      <div class="social-grid">
+        <button class="btn" id="oauthGoogleBtn">使用 Google 继续</button>
+        <button class="btn" id="oauthTwitterBtn">使用 Twitter 继续</button>
+      </div>
+
+      <div class="divider">或使用账号</div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="password">密码登录</button>
+        <button class="tab" data-tab="otp">验证码登录</button>
+      </div>
+
+      <div id="panel-password" class="form-panel active">
+        <div class="field">
+          <label for="email">邮箱</label>
+          <input type="email" id="email" placeholder="name@example.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">密码</label>
+          <input type="password" id="password" placeholder="请输入密码" autocomplete="current-password" />
+        </div>
+        <div class="inline-row">
+          <label class="toggle"><input type="checkbox" id="showPassword" />显示密码</label>
+          <button class="link-btn" id="forgotLink">忘记密码？</button>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="loginBtn">登录</button>
+          <button class="btn secondary" id="registerLink">创建账号</button>
+        </div>
+      </div>
+
+      <div id="panel-otp" class="form-panel">
+        <div class="field">
+          <label for="otpIdentity">邮箱或手机号</label>
+          <input type="text" id="otpIdentity" placeholder="name@example.com / 138xxxx" autocomplete="username" />
+        </div>
+        <div class="actions">
+          <button class="btn" id="sendOtpBtn">发送验证码</button>
+        </div>
+        <div class="field">
+          <label for="otpCode">验证码</label>
+          <input type="text" id="otpCode" placeholder="输入 6 位验证码" maxlength="6" inputmode="numeric" />
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="verifyOtpBtn">验证并登录</button>
+        </div>
+      </div>
+
+      <div id="status" class="status">请选择登录方式</div>
+    </section>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const sb = window.supabase.createClient(
-      "https://vtplvtwbkyydxmcxgctn.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU"
-    );
+    const supabaseUrl = "https://vtplvtwbkyydxmcxgctn.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU";
 
-    const msgEl = document.getElementById('msg');
-    
-    function showMsg(text, type) {
-      msgEl.textContent = text;
-      msgEl.className = type;
+    const statusEl = document.getElementById("status");
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
+    const otpIdentityEl = document.getElementById("otpIdentity");
+    const otpCodeEl = document.getElementById("otpCode");
+
+    const loginBtn = document.getElementById("loginBtn");
+    const sendOtpBtn = document.getElementById("sendOtpBtn");
+    const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+
+    const registerBtn = document.getElementById("registerLink");
+    const forgotBtn = document.getElementById("forgotLink");
+    const showPasswordEl = document.getElementById("showPassword");
+    const oauthGoogleBtn = document.getElementById("oauthGoogleBtn");
+    const oauthTwitterBtn = document.getElementById("oauthTwitterBtn");
+
+    function setStatus(text, kind = "") {
+      statusEl.textContent = text;
+      statusEl.className = "status";
+      if (kind) statusEl.classList.add(kind);
     }
 
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      
-      if (!email || !password) {
-        showMsg('请输入邮箱和密码', 'error');
-        return;
-      }
+    function setLoading(btn, loading, defaultText, loadingText) {
+      btn.disabled = loading;
+      btn.textContent = loading ? loadingText : defaultText;
+    }
 
-      showMsg('登录中...', '');
-      
-      const { data, error } = await sb.auth.signInWithPassword({
-        email: email,
-        password: password
+    function isEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    const sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    document.querySelectorAll(".tab").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
+        button.classList.add("active");
+
+        const activeTab = button.dataset.tab;
+        document.querySelectorAll(".form-panel").forEach((panel) => panel.classList.remove("active"));
+        document.getElementById("panel-" + activeTab).classList.add("active");
+
+        setStatus(activeTab === "password" ? "请输入邮箱和密码" : "请输入邮箱或手机号并获取验证码");
+      });
+    });
+
+    showPasswordEl.addEventListener("change", () => {
+      passwordEl.type = showPasswordEl.checked ? "text" : "password";
+    });
+
+    async function oauthLogin(provider, label) {
+      setStatus("正在跳转 " + label + " 授权...", "");
+      const result = await sb.auth.signInWithOAuth({
+        provider: provider,
+        options: { redirectTo: window.location.origin + "/" }
       });
 
-      if (error) {
-        showMsg('登录失败：' + error.message, 'error');
-        return;
+      if (result.error) {
+        setStatus(label + " 登录失败：" + result.error.message, "err");
       }
+    }
 
-      showMsg('登录成功！', 'success');
-      setTimeout(() => window.location.href = '/', 1000);
-    });
+    oauthGoogleBtn.addEventListener("click", () => oauthLogin("google", "Google"));
+    oauthTwitterBtn.addEventListener("click", () => oauthLogin("twitter", "Twitter"));
 
-    document.getElementById('registerLink').addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      
+    loginBtn.addEventListener("click", async () => {
+      const email = (emailEl.value || "").trim();
+      const password = passwordEl.value || "";
+
       if (!email || !password) {
-        showMsg('请输入邮箱和密码', 'error');
+        setStatus("请输入邮箱和密码", "err");
         return;
       }
 
-      const { error } = await sb.auth.signUp({ email, password });
-      
+      if (!isEmail(email)) {
+        setStatus("请输入正确的邮箱格式", "err");
+        return;
+      }
+
+      setLoading(loginBtn, true, "登录", "登录中...");
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      setLoading(loginBtn, false, "登录", "登录中...");
+
       if (error) {
-        showMsg('注册失败：' + error.message, 'error');
+        setStatus("登录失败：" + error.message, "err");
+        return;
+      }
+
+      setStatus("登录成功，正在进入首页", "ok");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 900);
+    });
+
+    registerBtn.addEventListener("click", async () => {
+      const email = (emailEl.value || "").trim();
+      const password = passwordEl.value || "";
+
+      if (!email || !password) {
+        setStatus("请先填写邮箱和密码", "err");
+        return;
+      }
+
+      if (!isEmail(email)) {
+        setStatus("请输入正确的邮箱格式", "err");
+        return;
+      }
+
+      setLoading(registerBtn, true, "创建账号", "创建中...");
+      const { error } = await sb.auth.signUp({ email, password });
+      setLoading(registerBtn, false, "创建账号", "创建中...");
+
+      if (error) {
+        setStatus("注册失败：" + error.message, "err");
       } else {
-        showMsg('注册成功！请查收邮箱验证', 'success');
+        setStatus("注册成功，请到邮箱查收验证链接", "ok");
       }
     });
 
-    document.getElementById('forgotLink').addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      
+    forgotBtn.addEventListener("click", async () => {
+      const email = (emailEl.value || "").trim();
+
       if (!email) {
-        showMsg('请输入邮箱', 'error');
+        setStatus("请输入邮箱后再找回密码", "err");
         return;
       }
 
-      const { error } = await sb.auth.resetPasswordForEmail(email);
-      
-      if (error) {
-        showMsg('发送失败：' + error.message, 'error');
-      } else {
-        showMsg('重置链接已发送到邮箱', 'success');
+      if (!isEmail(email)) {
+        setStatus("请输入正确的邮箱格式", "err");
+        return;
       }
+
+      setLoading(forgotBtn, true, "忘记密码？", "发送中...");
+      const { error } = await sb.auth.resetPasswordForEmail(email);
+      setLoading(forgotBtn, false, "忘记密码？", "发送中...");
+
+      if (error) {
+        setStatus("发送失败：" + error.message, "err");
+      } else {
+        setStatus("重置链接已发送到邮箱", "ok");
+      }
+    });
+
+    sendOtpBtn.addEventListener("click", async () => {
+      const identity = (otpIdentityEl.value || "").trim();
+
+      if (!identity) {
+        setStatus("请输入邮箱或手机号", "err");
+        return;
+      }
+
+      setLoading(sendOtpBtn, true, "发送验证码", "发送中...");
+      const result = isEmail(identity)
+        ? await sb.auth.signInWithOtp({ email: identity, options: { shouldCreateUser: true } })
+        : await sb.auth.signInWithOtp({ phone: identity, options: { shouldCreateUser: true } });
+      setLoading(sendOtpBtn, false, "发送验证码", "发送中...");
+
+      if (result.error) {
+        setStatus("发送失败：" + result.error.message, "err");
+        return;
+      }
+
+      setStatus("验证码已发送，请查收", "ok");
+      otpCodeEl.focus();
+    });
+
+    verifyOtpBtn.addEventListener("click", async () => {
+      const identity = (otpIdentityEl.value || "").trim();
+      const token = (otpCodeEl.value || "").trim();
+
+      if (!identity || !token) {
+        setStatus("请填写完整验证码信息", "err");
+        return;
+      }
+
+      setLoading(verifyOtpBtn, true, "验证并登录", "验证中...");
+      const result = isEmail(identity)
+        ? await sb.auth.verifyOtp({ email: identity, token, type: "email" })
+        : await sb.auth.verifyOtp({ phone: identity, token, type: "sms" });
+      setLoading(verifyOtpBtn, false, "验证并登录", "验证中...");
+
+      if (result.error) {
+        setStatus("验证失败：" + result.error.message, "err");
+        return;
+      }
+
+      setStatus("登录成功，正在进入首页", "ok");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 900);
+    });
+
+    otpCodeEl.addEventListener("input", (event) => {
+      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 6);
+    });
+
+    emailEl.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") passwordEl.focus();
+    });
+
+    passwordEl.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") loginBtn.click();
+    });
+
+    otpCodeEl.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") verifyOtpBtn.click();
     });
   </script>
 </body>
