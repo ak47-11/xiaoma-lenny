@@ -19,10 +19,13 @@
   const showPasswordEl = document.getElementById("showPassword");
 
   const sendOtpBtn = document.getElementById("sendOtpBtn");
+  const resendOtpBtn = document.getElementById("resendOtpBtn");
   const verifyOtpBtn = document.getElementById("verifyOtpBtn");
 
 
   const ADMIN_EMAILS = ["3102850054@qq.com"];
+  const OTP_COOLDOWN_SECONDS = 60;
+  const otpTimestampKey = "xiaoma_otp_last_sent_at";
   const rememberCache = localStorage.getItem("xiaoma_remember_auth");
   if (rememberMeEl && rememberCache !== null) {
     rememberMeEl.checked = rememberCache === "1";
@@ -50,6 +53,35 @@
     return next;
   }
 
+  function otpFriendlyError(error) {
+    const raw = String(error?.message || "");
+    const text = raw.toLowerCase();
+    if (text.includes("rate") || text.includes("too many")) {
+      return "请求太频繁，请 60 秒后重试；也请检查垃圾邮箱";
+    }
+    if (text.includes("invalid") || text.includes("email")) {
+      return "邮箱格式或配置异常，请确认邮箱地址与 Supabase 邮件配置";
+    }
+    return "发送失败：" + raw;
+  }
+
+  function getCooldownLeft() {
+    const last = Number(localStorage.getItem(otpTimestampKey) || "0");
+    if (!last) return 0;
+    const seconds = Math.ceil((last + OTP_COOLDOWN_SECONDS * 1000 - Date.now()) / 1000);
+    return Math.max(seconds, 0);
+  }
+
+  function renderOtpButtonState() {
+    if (!resendOtpBtn) return;
+    const left = getCooldownLeft();
+    const disabled = left > 0;
+    sendOtpBtn.disabled = disabled;
+    resendOtpBtn.disabled = disabled;
+    sendOtpBtn.textContent = disabled ? "稍后重发(" + left + "s)" : "发送验证码";
+    resendOtpBtn.textContent = disabled ? "重新发送(" + left + "s)" : "重新发送";
+  }
+
   function createClient(storage) {
     return window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
@@ -67,6 +99,7 @@
 
   const sbLocal = createClient(window.localStorage);
   const sbSession = createClient(window.sessionStorage);
+  setInterval(renderOtpButtonState, 1000);
 
   async function getAuthContext() {
     const localSession = (await sbLocal.auth.getSession()).data.session;
@@ -208,16 +241,31 @@
     const identity = (otpIdentityEl.value || "").trim();
     if (!identity) return setStatus("请输入邮箱", "err");
     if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
+    if (getCooldownLeft() > 0) return setStatus("验证码发送过于频繁，请稍候再试", "err");
 
     const client = getActiveClient();
     setLoading(sendOtpBtn, true, "发送验证码", "发送中...");
-    const result = await client.auth.signInWithOtp({ email: identity, options: { shouldCreateUser: true } });
+    const result = await client.auth.signInWithOtp({
+      email: identity,
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: window.location.origin + "/auth.html?next=" + encodeURIComponent(getNextPath())
+      }
+    });
     setLoading(sendOtpBtn, false, "发送验证码", "发送中...");
-    if (result.error) return setStatus("发送失败：" + result.error.message, "err");
+    if (result.error) return setStatus(otpFriendlyError(result.error), "err");
 
-    setStatus("验证码已发送，请查收", "ok");
+    localStorage.setItem(otpTimestampKey, String(Date.now()));
+    renderOtpButtonState();
+    setStatus("验证码已发送，请查收邮箱（含垃圾邮箱），60 秒后可重发", "ok");
     otpCodeEl.focus();
   });
+
+  if (resendOtpBtn) {
+    resendOtpBtn.addEventListener("click", function () {
+      sendOtpBtn.click();
+    });
+  }
 
   verifyOtpBtn.addEventListener("click", async function () {
     const identity = (otpIdentityEl.value || "").trim();
@@ -250,5 +298,6 @@
     if (event.key === "Enter") verifyOtpBtn.click();
   });
 
+  renderOtpButtonState();
   renderSessionBar();
 })();
