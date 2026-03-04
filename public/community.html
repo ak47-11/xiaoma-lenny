@@ -14,7 +14,10 @@
         <h1>三角洲讨论社区 + 充电社区</h1>
         <p>可爱统一画风，支持发帖、点赞、评论、收藏与图文视频动态。</p>
       </div>
-      <a class="back" href="/">返回首页</a>
+      <div class="hero-actions">
+        <a class="back" href="/auth.html">登录账号</a>
+        <a class="back" href="/">返回首页</a>
+      </div>
     </header>
 
     <section class="switcher">
@@ -37,6 +40,12 @@
       </article>
 
       <aside class="side card">
+        <h3>我的信息</h3>
+        <div id="viewerCard" class="viewer">未登录，当前为游客模式</div>
+        <hr />
+        <h3>通知中心</h3>
+        <div id="noticeList" class="notice-list"></div>
+        <hr />
         <h3>热门话题</h3>
         <div id="topics" class="topics"></div>
         <hr />
@@ -59,12 +68,14 @@
         </div>
         <span class="chip post-topic"></span>
       </div>
+      <div class="author-line"></div>
       <p class="post-content"></p>
       <div class="media"></div>
       <div class="actions">
         <button class="act like-btn">❤ <span>0</span></button>
         <button class="act comment-toggle">💬 评论</button>
         <button class="act collect-btn">⭐ 收藏</button>
+        <button class="act follow-btn">+ 关注作者</button>
       </div>
       <div class="comment-box hidden">
         <div class="comment-list"></div>
@@ -76,6 +87,7 @@
     </div>
   </template>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/community.js"></script>
 </body>
 </html>

@@ -36,6 +36,13 @@ body {
   gap: 12px;
 }
 
+.hero-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .pill {
   display: inline-block;
   padding: 6px 10px;
@@ -110,6 +117,34 @@ p { margin: 0; color: var(--muted); }
   font: inherit;
 }
 
+.hint {
+  margin-top: 8px;
+  color: #7e87a5;
+  font-size: 12px;
+}
+
+.uploader {
+  border: 1px dashed #cfd8ee;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fbfcff;
+}
+
+.preview {
+  margin-top: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e7e9f2;
+  background: #fff;
+}
+
+.preview img,
+.preview video {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+}
+
 .composer textarea { min-height: 110px; resize: vertical; }
 .composer .row { display: grid; gap: 8px; margin-top: 10px; }
 
@@ -150,6 +185,7 @@ p { margin: 0; color: var(--muted); }
 .post-title { font-size: 17px; }
 .meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
 .chip { background: #f2f4ff; color: #5563a1; padding: 4px 9px; border-radius: 999px; font-size: 12px; }
+.author-line { margin-top: 7px; color: #7a86a6; font-size: 12px; }
 .post-content { margin: 10px 0 0; line-height: 1.65; }
 
 .media { margin-top: 10px; }
@@ -213,6 +249,31 @@ p { margin: 0; color: var(--muted); }
 
 .topics { display: flex; gap: 8px; flex-wrap: wrap; }
 .topics span { padding: 6px 10px; border-radius: 999px; background: #f5f3ff; font-size: 12px; color: #5d4f87; }
+
+.viewer {
+  border: 1px solid #e3e8f6;
+  border-radius: 12px;
+  padding: 10px;
+  color: #596584;
+  background: #fafbff;
+  font-size: 13px;
+}
+
+.viewer b { color: #23314f; }
+
+.notice-list {
+  display: grid;
+  gap: 7px;
+}
+
+.notice {
+  border: 1px solid #e5e9f5;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 12px;
+  color: #687494;
+}
 
 .side ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); line-height: 1.8; }
 
