@@ -125,6 +125,8 @@
       <article class="card"><div class="label">帖子总数</div><div id="postCount" class="metric">-</div></article>
       <article class="card"><div class="label">评论总数</div><div id="commentCount" class="metric">-</div></article>
       <article class="card"><div class="label">用户总数</div><div id="userCount" class="metric">-</div></article>
+      <article class="card"><div class="label">待审核条目</div><div id="queueCount" class="metric">-</div></article>
+      <article class="card"><div class="label">操作日志数</div><div id="logCount" class="metric">-</div></article>
     </section>
 
     <section class="panels">
@@ -154,6 +156,38 @@
               <tr><th>内容</th><th>作者</th><th>帖子ID</th><th>时间</th><th>操作</th></tr>
             </thead>
             <tbody id="commentTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="panels">
+      <article class="card">
+        <div class="head-row">
+          <h2>敏感词审核队列</h2>
+          <span class="small">驳回或放行命中内容</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>内容摘要</th><th>原因</th><th>提交者</th><th>时间</th><th>操作</th></tr>
+            </thead>
+            <tbody id="queueTable"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="head-row">
+          <h2>管理员操作日志</h2>
+          <span class="small">记录删帖/删评/改角色/审核操作</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>操作者</th><th>动作</th><th>对象</th><th>详情</th><th>时间</th></tr>
+            </thead>
+            <tbody id="logTable"></tbody>
           </table>
         </div>
       </article>

@@ -92,6 +92,20 @@
     return { ok: true, text };
   }
 
+  async function queueFlaggedContent(sourceType, sourceId, contentPreview, reason) {
+    if (!state.cloudReady || !state.viewer) return;
+
+    await supabase.from("moderation_queue").insert({
+      source_type: sourceType,
+      source_id: sourceId || "",
+      content_preview: (contentPreview || "").slice(0, 220),
+      reason: reason || "敏感词命中",
+      submitter_id: state.viewer.id,
+      submitter_name: state.viewerName,
+      status: "pending"
+    });
+  }
+
   function seedPosts() {
     return [
       {
@@ -517,11 +531,21 @@
       const checkedTitle = safeText(rawTitle);
       const checkedContent = safeText(rawContent);
       if (!checkedTitle.ok || !checkedContent.ok) {
+        await queueFlaggedContent(
+          "draft_post",
+          "",
+          (rawTitle || "") + " " + (rawContent || ""),
+          (checkedTitle.ok ? checkedContent : checkedTitle).msg
+        );
         showToast((checkedTitle.ok ? checkedContent : checkedTitle).msg);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "发布到" + (isDelta ? "三角洲讨论社区" : "充电社区");
         return;
       }
       if (!checkedContent.text) {
         showToast("请输入内容后再发布");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "发布到" + (isDelta ? "三角洲讨论社区" : "充电社区");
         return;
       }
 
@@ -693,6 +717,7 @@
         sendBtn.textContent = "发送中";
         const checked = safeText(input.value);
         if (!checked.ok || !checked.text) {
+          await queueFlaggedContent("draft_comment", post.id, input.value, checked.ok ? "评论不能为空" : checked.msg);
           sendBtn.disabled = false;
           sendBtn.textContent = "发送";
           showToast(checked.ok ? "评论不能为空" : checked.msg);
