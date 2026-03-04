@@ -243,6 +243,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
       color: #5e6c7d;
       font-size: 12px;
     }
@@ -264,6 +266,41 @@
       font-size: 12px;
       cursor: pointer;
       padding: 0;
+      margin-left: auto;
+    }
+
+    .session-bar {
+      margin-top: 2px;
+      border: 1px solid #dce4ef;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 10px;
+      display: none;
+      gap: 8px;
+    }
+
+    .session-text {
+      font-size: 12px;
+      color: #5d6c80;
+    }
+
+    .session-actions {
+      margin-top: 7px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .mini-btn {
+      border: 1px solid #ced9e9;
+      background: #fff;
+      color: #243247;
+      border-radius: 999px;
+      min-height: 30px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     .actions {
@@ -344,6 +381,7 @@
     <section class="panel">
       <h2>登录 xiaoma.cyou</h2>
       <p class="sub">继续访问你的专属页面与功能</p>
+      <div id="sessionBar" class="session-bar"></div>
 
       <div class="social-grid">
         <button class="btn" id="oauthGoogleBtn">使用 Google 继续</button>
@@ -368,6 +406,7 @@
         </div>
         <div class="inline-row">
           <label class="toggle"><input type="checkbox" id="showPassword" />显示密码</label>
+          <label class="toggle"><input type="checkbox" id="rememberMe" checked />记住我</label>
           <button class="link-btn" id="forgotLink">忘记密码？</button>
         </div>
         <div class="actions">
@@ -398,221 +437,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const supabaseUrl = "https:\/\/vtplvtwbkyydxmcxgctn.supabase.co";
-    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU";
-
-    const statusEl = document.getElementById("status");
-    const emailEl = document.getElementById("email");
-    const passwordEl = document.getElementById("password");
-    const otpIdentityEl = document.getElementById("otpIdentity");
-    const otpCodeEl = document.getElementById("otpCode");
-
-    const loginBtn = document.getElementById("loginBtn");
-    const sendOtpBtn = document.getElementById("sendOtpBtn");
-    const verifyOtpBtn = document.getElementById("verifyOtpBtn");
-
-    const registerBtn = document.getElementById("registerLink");
-    const forgotBtn = document.getElementById("forgotLink");
-    const showPasswordEl = document.getElementById("showPassword");
-    const oauthGoogleBtn = document.getElementById("oauthGoogleBtn");
-    const oauthTwitterBtn = document.getElementById("oauthTwitterBtn");
-
-    function setStatus(text, kind = "") {
-      statusEl.textContent = text;
-      statusEl.className = "status";
-      if (kind) statusEl.classList.add(kind);
-    }
-
-    function setLoading(btn, loading, defaultText, loadingText) {
-      btn.disabled = loading;
-      btn.textContent = loading ? loadingText : defaultText;
-    }
-
-    function isEmail(value) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    }
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      setStatus("请先在 hugo.toml 配置 supabaseUrl 与 supabaseAnonKey", "err");
-    }
-
-    const sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-
-    document.querySelectorAll(".tab").forEach((button) => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
-        button.classList.add("active");
-
-        const activeTab = button.dataset.tab;
-        document.querySelectorAll(".form-panel").forEach((panel) => panel.classList.remove("active"));
-        document.getElementById("panel-" + activeTab).classList.add("active");
-
-        setStatus(activeTab === "password" ? "请输入邮箱和密码" : "请输入邮箱或手机号并获取验证码");
-      });
-    });
-
-    showPasswordEl.addEventListener("change", () => {
-      passwordEl.type = showPasswordEl.checked ? "text" : "password";
-    });
-
-    async function oauthLogin(provider, label) {
-      setStatus("正在跳转 " + label + " 授权...", "");
-      const result = await sb.auth.signInWithOAuth({
-        provider: provider,
-        options: { redirectTo: window.location.origin + "/" }
-      });
-
-      if (result.error) {
-        setStatus(label + " 登录失败：" + result.error.message, "err");
-      }
-    }
-
-    oauthGoogleBtn.addEventListener("click", () => oauthLogin("google", "Google"));
-    oauthTwitterBtn.addEventListener("click", () => oauthLogin("twitter", "Twitter"));
-
-    loginBtn.addEventListener("click", async () => {
-      const email = (emailEl.value || "").trim();
-      const password = passwordEl.value || "";
-
-      if (!email || !password) {
-        setStatus("请输入邮箱和密码", "err");
-        return;
-      }
-
-      if (!isEmail(email)) {
-        setStatus("请输入正确的邮箱格式", "err");
-        return;
-      }
-
-      setLoading(loginBtn, true, "登录", "登录中...");
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      setLoading(loginBtn, false, "登录", "登录中...");
-
-      if (error) {
-        setStatus("登录失败：" + error.message, "err");
-        return;
-      }
-
-      setStatus("登录成功，正在进入首页", "ok");
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 900);
-    });
-
-    registerBtn.addEventListener("click", async () => {
-      const email = (emailEl.value || "").trim();
-      const password = passwordEl.value || "";
-
-      if (!email || !password) {
-        setStatus("请先填写邮箱和密码", "err");
-        return;
-      }
-
-      if (!isEmail(email)) {
-        setStatus("请输入正确的邮箱格式", "err");
-        return;
-      }
-
-      setLoading(registerBtn, true, "创建账号", "创建中...");
-      const { error } = await sb.auth.signUp({ email, password });
-      setLoading(registerBtn, false, "创建账号", "创建中...");
-
-      if (error) {
-        setStatus("注册失败：" + error.message, "err");
-      } else {
-        setStatus("注册成功，请到邮箱查收验证链接", "ok");
-      }
-    });
-
-    forgotBtn.addEventListener("click", async () => {
-      const email = (emailEl.value || "").trim();
-
-      if (!email) {
-        setStatus("请输入邮箱后再找回密码", "err");
-        return;
-      }
-
-      if (!isEmail(email)) {
-        setStatus("请输入正确的邮箱格式", "err");
-        return;
-      }
-
-      setLoading(forgotBtn, true, "忘记密码？", "发送中...");
-      const { error } = await sb.auth.resetPasswordForEmail(email);
-      setLoading(forgotBtn, false, "忘记密码？", "发送中...");
-
-      if (error) {
-        setStatus("发送失败：" + error.message, "err");
-      } else {
-        setStatus("重置链接已发送到邮箱", "ok");
-      }
-    });
-
-    sendOtpBtn.addEventListener("click", async () => {
-      const identity = (otpIdentityEl.value || "").trim();
-
-      if (!identity) {
-        setStatus("请输入邮箱或手机号", "err");
-        return;
-      }
-
-      setLoading(sendOtpBtn, true, "发送验证码", "发送中...");
-      const result = isEmail(identity)
-        ? await sb.auth.signInWithOtp({ email: identity, options: { shouldCreateUser: true } })
-        : await sb.auth.signInWithOtp({ phone: identity, options: { shouldCreateUser: true } });
-      setLoading(sendOtpBtn, false, "发送验证码", "发送中...");
-
-      if (result.error) {
-        setStatus("发送失败：" + result.error.message, "err");
-        return;
-      }
-
-      setStatus("验证码已发送，请查收", "ok");
-      otpCodeEl.focus();
-    });
-
-    verifyOtpBtn.addEventListener("click", async () => {
-      const identity = (otpIdentityEl.value || "").trim();
-      const token = (otpCodeEl.value || "").trim();
-
-      if (!identity || !token) {
-        setStatus("请填写完整验证码信息", "err");
-        return;
-      }
-
-      setLoading(verifyOtpBtn, true, "验证并登录", "验证中...");
-      const result = isEmail(identity)
-        ? await sb.auth.verifyOtp({ email: identity, token, type: "email" })
-        : await sb.auth.verifyOtp({ phone: identity, token, type: "sms" });
-      setLoading(verifyOtpBtn, false, "验证并登录", "验证中...");
-
-      if (result.error) {
-        setStatus("验证失败：" + result.error.message, "err");
-        return;
-      }
-
-      setStatus("登录成功，正在进入首页", "ok");
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 900);
-    });
-
-    otpCodeEl.addEventListener("input", (event) => {
-      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 6);
-    });
-
-    emailEl.addEventListener("keypress", (event) => {
-      if (event.key === "Enter") passwordEl.focus();
-    });
-
-    passwordEl.addEventListener("keypress", (event) => {
-      if (event.key === "Enter") loginBtn.click();
-    });
-
-    otpCodeEl.addEventListener("keypress", (event) => {
-      if (event.key === "Enter") verifyOtpBtn.click();
-    });
-  </script>
+  <script src="/js/auth-plus.js" data-supabase-url="https://vtplvtwbkyydxmcxgctn.supabase.co" data-supabase-anon-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU"></script>
 </body>
 </html>
