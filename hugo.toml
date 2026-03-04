@@ -3,6 +3,9 @@ languageCode = "zh-cn"
 title = "小马 Lenny 的博客"
 theme = "PaperMod"
 
+[outputs]
+home = ["HTML", "RSS", "JSON"]
+
 [pagination]
 pagerSize = 10
 
