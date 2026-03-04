@@ -281,6 +281,52 @@ body.tab-charge .tab.active {
   background: #fbfcff;
 }
 
+.file-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.file-picker input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.pick-btn {
+  border: 1px solid #cfd8ee;
+  background: linear-gradient(100deg, #f2f7ff, #fff3ee);
+  color: #44557f;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.pick-btn:hover {
+  transform: translateY(-1px);
+  border-color: #b9c8e8;
+  box-shadow: 0 8px 14px rgba(112, 129, 170, 0.14);
+}
+
+.file-name {
+  font-size: 12px;
+  color: #68759a;
+  background: #fff;
+  border: 1px solid #e1e7f4;
+  border-radius: 999px;
+  padding: 6px 10px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .preview {
   margin-top: 8px;
   border-radius: 10px;

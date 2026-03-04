@@ -468,7 +468,7 @@
       "<div class='row'><select id='postTopic'>" + topics.map((item) => "<option value='" + item + "'>" + item + "</option>").join("") + "</select></div>",
       "<div class='row'><textarea id='postContent' maxlength='1200' placeholder='" + placeholder + "'></textarea></div>",
       "<div class='counter' id='contentCounter'>0 / 1200</div>",
-      "<div class='row uploader'><input id='mediaFile' type='file' accept='image/*,video/*' /><input id='mediaUrl' maxlength='600' placeholder='或手动填写图片/视频 URL（https://...）' /><div id='mediaPreview' class='preview'></div></div>",
+      "<div class='row uploader'><div class='file-picker'><input id='mediaFile' type='file' accept='image/*,video/*' /><button type='button' id='mediaPickBtn' class='pick-btn'>📎 选择图片/视频</button><span id='mediaFileName' class='file-name'>未选择文件</span></div><input id='mediaUrl' maxlength='600' placeholder='或手动填写图片/视频 URL（https://...）' /><div id='mediaPreview' class='preview'></div></div>",
       "<button type='submit'>发布到" + (isDelta ? "三角洲讨论社区" : "充电社区") + "</button>",
       "<div class='hint'>云端模式支持上传文件到 Supabase Storage（bucket: community-media）</div>",
       "</form>"
@@ -481,10 +481,18 @@
     });
 
     const mediaFile = document.getElementById("mediaFile");
+    const mediaPickBtn = document.getElementById("mediaPickBtn");
+    const mediaFileName = document.getElementById("mediaFileName");
     const mediaPreview = document.getElementById("mediaPreview");
+
+    mediaPickBtn.addEventListener("click", () => {
+      mediaFile.click();
+    });
+
     mediaFile.addEventListener("change", () => {
       mediaPreview.innerHTML = "";
       const file = mediaFile.files?.[0];
+      mediaFileName.textContent = file ? file.name : "未选择文件";
       if (!file) return;
       const objectUrl = URL.createObjectURL(file);
 
