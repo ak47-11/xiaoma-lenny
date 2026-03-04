@@ -91,23 +91,6 @@
     resendOtpBtn.textContent = disabled ? "重新发送(" + left + "s)" : "重新发送";
   }
 
-  function decodeAuthHashError() {
-    const hash = window.location.hash || "";
-    if (!hash.includes("error=")) return;
-
-    const params = new URLSearchParams(hash.replace(/^#/, ""));
-    const code = params.get("error_code") || "";
-    const desc = decodeURIComponent((params.get("error_description") || "").replace(/\+/g, " "));
-
-    if (code === "otp_expired") {
-      setStatus("邮件登录链接已失效或已被使用，请重新发送最新邮件后只点击一次 Log In", "err");
-    } else {
-      setStatus("登录链接异常：" + (desc || code || "未知错误"), "err");
-    }
-
-    history.replaceState({}, document.title, window.location.pathname + window.location.search);
-  }
-
   function createClient(storage) {
     return window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
@@ -126,21 +109,6 @@
   const sbLocal = createClient(window.localStorage);
   const sbSession = createClient(window.sessionStorage);
   setInterval(renderOtpButtonState, 1000);
-
-  function bindAuthStateWatch(client) {
-    client.auth.onAuthStateChange(function (event, session) {
-      if (!session?.user) return;
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        setStatus("已通过邮件链接完成登录，正在跳转", "ok");
-        setTimeout(function () {
-          window.location.href = getNextPath();
-        }, 700);
-      }
-    });
-  }
-
-  bindAuthStateWatch(sbLocal);
-  bindAuthStateWatch(sbSession);
 
   async function getAuthContext() {
     const localSession = (await sbLocal.auth.getSession()).data.session;
@@ -292,8 +260,7 @@
     const result = await client.auth.signInWithOtp({
       email: identity,
       options: {
-        shouldCreateUser: true,
-        emailRedirectTo: window.location.origin + "/auth.html?next=" + encodeURIComponent(getNextPath())
+        shouldCreateUser: true
       }
     });
     setLoading(sendOtpBtn, false, "发送验证码", "发送中...");
@@ -310,7 +277,7 @@
     localStorage.setItem(otpTimestampKey, String(Date.now()));
     localStorage.setItem(otpIdentityKey, identity.toLowerCase());
     renderOtpButtonState();
-    setStatus("邮件已发送。若收到 Magic Link，请直接点击邮件里的 Log In；若有验证码/Token 也可在此输入验证。", "ok");
+    setStatus("验证码已发送，请查收邮箱并输入验证码", "ok");
     otpCodeEl.focus();
   });
 
@@ -326,17 +293,7 @@
     if (!identity) return setStatus("请先输入邮箱", "err");
     if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
 
-    if (!token) {
-      const context = await getAuthContext();
-      if (context.session?.user) {
-        setStatus("已识别到 Magic Link 登录状态，正在跳转", "ok");
-        setTimeout(function () {
-          window.location.href = getNextPath();
-        }, 600);
-        return;
-      }
-      return setStatus("如果邮件里没有验证码，请直接点击邮件中的 Log In 按钮完成登录", "err");
-    }
+    if (!token) return setStatus("请输入邮箱验证码", "err");
 
     const client = getActiveClient();
     setLoading(verifyOtpBtn, true, "验证并登录", "验证中...");
@@ -364,6 +321,5 @@
   });
 
   renderOtpButtonState();
-  decodeAuthHashError();
   renderSessionBar();
 })();
