@@ -46,8 +46,8 @@ url = "/"
 weight = 1
 
 [[menu.main]]
-name = "文章"
-url = "/posts/"
+name = "免责声明"
+url = "/disclaimer/"
 weight = 2
 
 [[menu.main]]
@@ -55,7 +55,4 @@ name = "标签"
 url = "/tags/"
 weight = 3
 
-[[menu.main]]
-name = "关于"
-url = "/about/"
-weight = 4
+
