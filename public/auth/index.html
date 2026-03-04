@@ -5,64 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>注册与登录 | xiaoma.cyou</title>
   <style>
-    :root{--bg:#030712;--card-bg:rgba(17,24,39,0.7);--border:rgba(56,189,248,0.15);--text:#f0f9ff;--muted:#94a3b8;--brand:#22d3ee;--brand2:#a78bfa;--brand3:#f472b6;--success:#34d399;--error:#f87171}
+    :root{--bg:#030712;--card-bg:rgba(17,24,39,0.7);--border:rgba(56,189,248,0.15);--text:#f0f9ff;--muted:#94a3b8;--brand:#22d3ee;--brand2:#a78bfa;--success:#34d399;--error:#f87171}
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Inter','PingFang SC','Microsoft YaHei',system-ui;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
     
     .bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
-    .bg::before{content:'';position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:radial-gradient(circle at 20% 80%,rgba(34,211,238,0.12) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(167,139,250,0.12) 0%,transparent 50%);animation:bgMove 20s ease-in-out infinite}
-    @keyframes bgMove{0%,100%{transform:translate(0,0)}50%{transform:translate(-5%,-5%)}}
+    .bg::before{content:'';position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:radial-gradient(circle at 20% 80%,rgba(34,211,238,0.12) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(167,139,250,0.12) 0%,transparent 50%)}
     
-    .orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.5;animation:float 8s ease-in-out infinite}
-    .orb1{width:400px;height:400px;background:var(--brand);top:-100px;left:-100px;animation-delay:0s}
-    .orb2{width:300px;height:300px;background:var(--brand2);bottom:-50px;right:-50px;animation-delay:-3s}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+    .orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.5}
+    .orb1{width:400px;height:400px;background:var(--brand);top:-100px;left:-100px}
+    .orb2{width:300px;height:300px;background:var(--brand2);bottom:-50px;right:-50px}
     
     .wrap{width:min(440px,94%);margin:60px auto;padding:20px;position:relative;z-index:1}
-    .card{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:24px;padding:40px;position:relative;overflow:hidden}
+    .card{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:24px;padding:40px}
     .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--brand),var(--brand2),transparent)}
-    
-    .glow{position:absolute;width:200px;height:200px;background:var(--brand);filter:blur(100px);opacity:0.15;border-radius:50%;top:-100px;right:-50px;pointer-events:none}
     
     h1{font-size:28px;text-align:center;margin-bottom:8px}
     .grad{background:linear-gradient(135deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
     .muted{color:var(--muted);font-size:14px;text-align:center;margin-bottom:28px}
     
     .tabs{display:flex;gap:8px;margin-bottom:24px;background:rgba(0,0,0,0.3);padding:6px;border-radius:12px}
-    .tab{flex:1;padding:10px;border:none;background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.3s}
-    .tab.active{color:var(--text);background:linear-gradient(135deg,rgba(34,211,238,0.2),rgba(167,139,250,0.2));box-shadow:0 2px 10px rgba(34,211,238,0.2)}
+    .tab{flex:1;padding:10px;border:none;background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+    .tab.active{color:var(--text);background:linear-gradient(135deg,rgba(34,211,238,0.2),rgba(167,139,250,0.2))}
     
-    .panel{display:none;animation:fadeIn 0.3s ease}
+    .panel{display:none}
     .panel.active{display:block}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     
-    .field{margin-bottom:18px;position:relative}
+    .field{margin-bottom:18px}
     .field label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
-    .field input{width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:var(--text);padding:14px 16px;border-radius:12px;outline:none;font-size:15px;transition:all 0.3s}
+    .field input{width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:var(--text);padding:14px 16px;border-radius:12px;outline:none;font-size:15px}
     .field input::placeholder{color:rgba(148,163,184,0.5)}
-    .field input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(34,211,238,0.1)}
+    .field input:focus{border-color:var(--brand)}
     
-    .btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.3s;margin-bottom:12px}
-    .btn.primary{background:linear-gradient(135deg,var(--brand),#06b6d4);color:#000;box-shadow:0 4px 20px rgba(34,211,238,0.3)}
-    .btn.primary:hover{box-shadow:0 6px 30px rgba(34,211,238,0.4);transform:translateY(-1px)}
-    .btn.primary:active{transform:scale(0.98)}
+    .btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px}
+    .btn.primary{background:linear-gradient(135deg,var(--brand),#06b6d4);color:#000}
     .btn:disabled{opacity:0.5;cursor:not-allowed}
-    
-    .btn .spinner{width:18px;height:18px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
-    @keyframes spin{to{transform:rotate(360deg)}}
     
     .status{margin-top:16px;padding:12px 16px;border-radius:10px;font-size:13px;background:rgba(0,0,0,0.3);border:1px solid var(--border);text-align:center}
     .status.ok{border-color:rgba(52,211,153,0.4);color:var(--success)}
     .status.err{border-color:rgba(248,113,113,0.4);color:var(--error)}
     
-    .divider{display:flex;align-items:center;gap:16px;margin:20px 0;color:var(--muted);font-size:12px}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-    
     .link{color:var(--brand);text-decoration:none;font-size:13px}
-    .link:hover{text-decoration:underline}
     .links{display:flex;justify-content:space-between;margin-top:8px}
-    
-    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
   </style>
 </head>
 <body>
@@ -72,7 +56,7 @@
   </div>
 
   <div class="wrap">
-    <div class="card glow">
+    <div class="card">
       <h1><span class="grad">欢迎登录</span></h1>
       <p class="muted">登录后可查看专属内容与功能</p>
 
@@ -84,36 +68,30 @@
       <div id="panel-password" class="panel active">
         <div class="field">
           <label>邮箱</label>
-          <input id="email" type="email" placeholder="your@email.com" />
+          <input type="email" id="email" placeholder="your@email.com" />
         </div>
         <div class="field">
           <label>密码</label>
-          <input id="password" type="password" placeholder="请输入密码" />
+          <input type="password" id="password" placeholder="请输入密码" />
         </div>
-        <button class="btn primary" id="loginBtn">
-          <span class="btn-text">登录</span>
-        </button>
+        <button class="btn primary" id="loginBtn">登录</button>
         <div class="links">
-          <a href="#" class="link" id="forgotLink">忘记密码？</a>
-          <a href="#" class="link" id="registerLink">注册账号</a>
+          <a href="#" id="forgotLink">忘记密码？</a>
+          <a href="#" id="registerLink">注册账号</a>
         </div>
       </div>
 
       <div id="panel-otp" class="panel">
         <div class="field">
-          <label>邮箱 或 手机号</label>
-          <input id="otpIdentity" type="text" placeholder="name@email.com 或 +86138..." />
+          <label>邮箱</label>
+          <input type="text" id="otpIdentity" placeholder="your@email.com" />
         </div>
-        <button class="btn primary" id="sendOtpBtn">
-          <span class="btn-text">发送验证码</span>
-        </button>
+        <button class="btn primary" id="sendOtpBtn">发送验证码</button>
         <div class="field" style="margin-top:12px">
           <label>验证码</label>
-          <input id="otpCode" type="text" placeholder="输入6位验证码" maxlength="6" />
+          <input type="text" id="otpCode" placeholder="输入6位验证码" maxlength="6" />
         </div>
-        <button class="btn primary" id="verifyOtpBtn">
-          <span class="btn-text">验证登录</span>
-        </button>
+        <button class="btn primary" id="verifyOtpBtn">验证登录</button>
       </div>
 
       <div id="status" class="status">请选择登录方式</div>
@@ -121,9 +99,158 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script
-    src="/js/auth.js"
-    data-supabase-url="https://vtplvtwbkyydxmcxgctn.supabase.co"
-    data-supabase-anon-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU"></script>
+  <script>
+    const sb = window.supabase.createClient(
+      "https:\/\/vtplvtwbkyydxmcxgctn.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU"
+    );
+
+    const statusEl = document.getElementById("status");
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
+    const otpIdentityEl = document.getElementById("otpIdentity");
+    const otpCodeEl = document.getElementById("otpCode");
+    const loginBtn = document.getElementById("loginBtn");
+    const sendOtpBtn = document.getElementById("sendOtpBtn");
+    const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+    
+    function setStatus(text, kind) {
+      statusEl.textContent = text;
+      statusEl.className = "status" + (kind ? " " + kind : "");
+    }
+
+    document.querySelectorAll(".tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(n => n.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+        document.getElementById("panel-" + tab).classList.add("active");
+        setStatus(tab === "password" ? "请输入账号密码登录" : "请输入邮箱获取验证码");
+      });
+    });
+
+    loginBtn.addEventListener("click", async () => {
+      const email = emailEl.value.trim();
+      const password = passwordEl.value;
+      
+      if (!email || !password) {
+        setStatus("请输入邮箱和密码", "err");
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "登录中...";
+      
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      loginBtn.disabled = false;
+      loginBtn.textContent = "登录";
+
+      if (error) {
+        setStatus("登录失败：" + error.message, "err");
+        return;
+      }
+
+      setStatus("登录成功！欢迎回来", "ok");
+      setTimeout(() => window.location.href = "/", 1500);
+    });
+
+    sendOtpBtn.addEventListener("click", async () => {
+      const email = otpIdentityEl.value.trim();
+      if (!email) {
+        setStatus("请输入邮箱", "err");
+        return;
+      }
+
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.textContent = "发送中...";
+      
+      const { data, error } = await sb.auth.signInWithOtp({
+        email: email,
+        options: { shouldCreateUser: true }
+      });
+
+      sendOtpBtn.disabled = false;
+      sendOtpBtn.textContent = "发送验证码";
+
+      if (error) {
+        setStatus("发送失败：" + error.message, "err");
+        return;
+      }
+      setStatus("验证码已发送到邮箱", "ok");
+    });
+
+    verifyOtpBtn.addEventListener("click", async () => {
+      const email = otpIdentityEl.value.trim();
+      const token = otpCodeEl.value.trim();
+
+      if (!email || !token) {
+        setStatus("请输入完整信息", "err");
+        return;
+      }
+
+      verifyOtpBtn.disabled = true;
+      verifyOtpBtn.textContent = "验证中...";
+      
+      const result = await sb.auth.verifyOtp({ email: email, token: token, type: "email" });
+
+      verifyOtpBtn.disabled = false;
+      verifyOtpBtn.textContent = "验证登录";
+
+      if (result.error) {
+        setStatus("验证失败：" + result.error.message, "err");
+        return;
+      }
+      setStatus("登录成功！", "ok");
+      setTimeout(() => window.location.href = "/", 1500);
+    });
+
+    document.getElementById("registerLink").addEventListener("click", async (e) => {
+      e.preventDefault();
+      const email = emailEl.value.trim();
+      const password = passwordEl.value;
+      
+      if (!email || !password) {
+        setStatus("请填写邮箱和密码", "err");
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "注册中...";
+      
+      const { data, error } = await sb.auth.signUp({ email, password });
+      
+      loginBtn.disabled = false;
+      loginBtn.textContent = "登录";
+
+      if (error) {
+        setStatus("注册失败：" + error.message, "err");
+      } else {
+        setStatus("注册成功！请查收邮箱验证链接", "ok");
+      }
+    });
+
+    document.getElementById("forgotLink").addEventListener("click", async (e) => {
+      e.preventDefault();
+      const email = emailEl.value.trim();
+      
+      if (!email) {
+        setStatus("请输入邮箱", "err");
+        return;
+      }
+
+      const { error } = await sb.auth.resetPasswordForEmail(email);
+      
+      if (error) {
+        setStatus("发送失败：" + error.message, "err");
+      } else {
+        setStatus("重置链接已发送到邮箱", "ok");
+      }
+    });
+  </script>
 </body>
 </html>
