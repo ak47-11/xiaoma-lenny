@@ -67,6 +67,23 @@
     setTimeout(() => toast.remove(), 1800);
   }
 
+  function bumpButton(button) {
+    button.classList.remove("bump");
+    button.offsetHeight;
+    button.classList.add("bump");
+  }
+
+  function floatHeart(button) {
+    const rect = button.getBoundingClientRect();
+    const node = document.createElement("div");
+    node.className = "heart-float";
+    node.textContent = "❤";
+    node.style.left = rect.left + rect.width / 2 - 6 + "px";
+    node.style.top = rect.top - 6 + "px";
+    document.body.appendChild(node);
+    setTimeout(() => node.remove(), 700);
+  }
+
   function safeText(input) {
     const text = (input || "").trim();
     const lowered = text.toLowerCase();
@@ -450,11 +467,18 @@
       "<div class='row'><input id='postTitle' maxlength='60' placeholder='标题（选填）' /></div>",
       "<div class='row'><select id='postTopic'>" + topics.map((item) => "<option value='" + item + "'>" + item + "</option>").join("") + "</select></div>",
       "<div class='row'><textarea id='postContent' maxlength='1200' placeholder='" + placeholder + "'></textarea></div>",
+      "<div class='counter' id='contentCounter'>0 / 1200</div>",
       "<div class='row uploader'><input id='mediaFile' type='file' accept='image/*,video/*' /><input id='mediaUrl' maxlength='600' placeholder='或手动填写图片/视频 URL（https://...）' /><div id='mediaPreview' class='preview'></div></div>",
       "<button type='submit'>发布到" + (isDelta ? "三角洲讨论社区" : "充电社区") + "</button>",
       "<div class='hint'>云端模式支持上传文件到 Supabase Storage（bucket: community-media）</div>",
       "</form>"
     ].join("");
+
+    const postContent = document.getElementById("postContent");
+    const counter = document.getElementById("contentCounter");
+    postContent.addEventListener("input", () => {
+      counter.textContent = postContent.value.length + " / 1200";
+    });
 
     const mediaFile = document.getElementById("mediaFile");
     const mediaPreview = document.getElementById("mediaPreview");
@@ -473,6 +497,9 @@
 
     document.getElementById("postForm").addEventListener("submit", async (event) => {
       event.preventDefault();
+      const submitBtn = event.target.querySelector("button[type='submit']");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "发布中...";
       const rawTitle = document.getElementById("postTitle").value || (isDelta ? "未命名帖子" : "新动态");
       const rawContent = document.getElementById("postContent").value;
       const topic = document.getElementById("postTopic").value;
@@ -512,6 +539,8 @@
         media_url: mediaUrl
       });
 
+      submitBtn.disabled = false;
+      submitBtn.textContent = "发布到" + (isDelta ? "三角洲讨论社区" : "充电社区");
       showToast("发布成功");
       await refreshAll();
     });
@@ -591,6 +620,9 @@
       const likeBtn = node.querySelector(".like-btn");
       likeBtn.classList.toggle("on", state.likedSet.has(likeKey));
       likeBtn.addEventListener("click", async () => {
+        const willLike = !state.likedSet.has(likeKey);
+        bumpButton(likeBtn);
+        if (willLike) floatHeart(likeBtn);
         await toggleLike(post);
         await refreshAll();
       });
@@ -598,6 +630,7 @@
       const collectBtn = node.querySelector(".collect-btn");
       collectBtn.classList.toggle("on", state.collectSet.has(collectKey));
       collectBtn.addEventListener("click", async () => {
+        bumpButton(collectBtn);
         await toggleCollect(post);
         await refreshAll();
       });
@@ -608,6 +641,7 @@
       followBtn.classList.toggle("on", state.followingSet.has(post.author_id));
       followBtn.textContent = state.followingSet.has(post.author_id) ? "已关注" : "+ 关注作者";
       followBtn.addEventListener("click", async () => {
+        bumpButton(followBtn);
         await toggleFollow(post.author_id, post.author_name);
         await refreshAll();
       });
@@ -625,16 +659,37 @@
         commentBox.classList.toggle("hidden");
       });
 
+      const quickReplies = ["支持一下", "很有帮助", "学到了", "这个太实用啦"];
+      const quickWrap = document.createElement("div");
+      quickWrap.className = "quick-replies";
+      quickWrap.innerHTML = quickReplies.map((item) => "<button type='button' class='quick-tag'>" + item + "</button>").join("");
+      commentBox.appendChild(quickWrap);
+
+      const commentInput = node.querySelector(".comment-form input");
+      quickWrap.querySelectorAll(".quick-tag").forEach((tag) => {
+        tag.addEventListener("click", () => {
+          commentInput.value = tag.textContent;
+          commentInput.focus();
+        });
+      });
+
       node.querySelector(".comment-form").addEventListener("submit", async (event) => {
         event.preventDefault();
         const input = event.target.querySelector("input");
+        const sendBtn = event.target.querySelector("button");
+        sendBtn.disabled = true;
+        sendBtn.textContent = "发送中";
         const checked = safeText(input.value);
         if (!checked.ok || !checked.text) {
+          sendBtn.disabled = false;
+          sendBtn.textContent = "发送";
           showToast(checked.ok ? "评论不能为空" : checked.msg);
           return;
         }
 
         await addComment(post, checked.text);
+        sendBtn.disabled = false;
+        sendBtn.textContent = "发送";
         await refreshAll();
       });
 
