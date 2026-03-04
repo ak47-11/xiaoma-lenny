@@ -1,19 +1,109 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{{ .Title }} | xiaoma.cyou</title>
+<meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}xiaoma.cyou{{ end }}">
 <style>
-body{max-width:900px;margin:50px auto;padding:0 16px;font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui;background:#0b1020;color:#eaf0ff;line-height:1.85}
-a{color:#7ee3ff} .card{border:1px solid #2b3558;border-radius:14px;padding:24px;background:#111933}
+:root{
+--bg:#070b16;
+--bg2:#0f1730;
+--text:#eaf0ff;
+--muted:#9db0d4;
+--line:rgba(255,255,255,.14);
+--card:rgba(255,255,255,.06);
+--brand:#62e6ff;
+--brand2:#7f8dff;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+color:var(--text);
+background:
+radial-gradient(1200px 500px at 10% -20%, rgba(98,230,255,.16), transparent 60%),
+radial-gradient(900px 500px at 95% -15%, rgba(127,141,255,.16), transparent 60%),
+linear-gradient(155deg,var(--bg),var(--bg2));
+min-height:100vh;
+}
+.wrap{width:min(980px,92%);margin:0 auto;padding:24px 0 56px}
+.nav{
+display:flex;justify-content:space-between;align-items:center;
+padding:10px 0 20px;border-bottom:1px solid var(--line)
+}
+.nav a{color:var(--muted);text-decoration:none;margin-left:20px}
+.nav a:hover{color:#fff}
+.logo{font-weight:700;letter-spacing:.3px}
+.card{
+margin-top:26px;
+border:1px solid var(--line);
+border-radius:18px;
+background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+box-shadow:0 20px 60px rgba(0,0,0,.35);
+padding:26px 24px;
+}
+h1{
+margin:0 0 10px;
+font-size:clamp(28px,4.2vw,42px);
+line-height:1.15;
+background:linear-gradient(90deg,var(--brand),var(--brand2));
+-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.meta{color:var(--muted);font-size:14px;margin-bottom:20px}
+.content{line-height:1.9;font-size:17px}
+.content h2,.content h3{margin-top:30px;color:#f2f6ff}
+.content a{color:var(--brand)}
+.content code{
+background:rgba(255,255,255,.08);
+border:1px solid var(--line);
+border-radius:8px;
+padding:2px 6px;
+font-size:.92em;
+}
+.content pre{
+overflow:auto;
+background:#0a1022;
+border:1px solid var(--line);
+border-radius:12px;
+padding:14px;
+}
+.footer{
+margin-top:20px;
+display:flex;justify-content:space-between;align-items:center;
+color:var(--muted);font-size:14px
+}
+.btn{
+display:inline-block;padding:10px 14px;border-radius:10px;
+border:1px solid var(--line);text-decoration:none;color:#dbe6ff;background:var(--card)
+}
+.btn:hover{border-color:rgba(255,255,255,.3)}
 </style>
 </head>
 <body>
-<div class="card">
+<div class="wrap">
+<div class="nav">
+<div class="logo">xiaoma.cyou</div>
+<div>
+<a href="/">首页</a>
+<a href="/about/">关于</a>
+<a href="/disclaimer/">免责声明</a>
+</div>
+</div>
+
+<article class="card">
 <h1>{{ .Title }}</h1>
+<div class="meta">
+{{ with .Date }}更新于 {{ .Format "2006-01-02" }}{{ end }}
+</div>
+<div class="content">
 {{ .Content }}
-<p><a href="/">← 返回首页</a></p>
+</div>
+<div class="footer">
+<span>© 2026 xiaoma.cyou</span>
+<a class="btn" href="/">返回首页</a>
+</div>
+</article>
 </div>
 </body>
 </html>
