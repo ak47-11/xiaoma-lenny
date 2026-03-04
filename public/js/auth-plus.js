@@ -82,6 +82,23 @@
     resendOtpBtn.textContent = disabled ? "重新发送(" + left + "s)" : "重新发送";
   }
 
+  function decodeAuthHashError() {
+    const hash = window.location.hash || "";
+    if (!hash.includes("error=")) return;
+
+    const params = new URLSearchParams(hash.replace(/^#/, ""));
+    const code = params.get("error_code") || "";
+    const desc = decodeURIComponent((params.get("error_description") || "").replace(/\+/g, " "));
+
+    if (code === "otp_expired") {
+      setStatus("邮件登录链接已失效或已被使用，请重新发送最新邮件后只点击一次 Log In", "err");
+    } else {
+      setStatus("登录链接异常：" + (desc || code || "未知错误"), "err");
+    }
+
+    history.replaceState({}, document.title, window.location.pathname + window.location.search);
+  }
+
   function createClient(storage) {
     return window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
@@ -326,5 +343,6 @@
   });
 
   renderOtpButtonState();
+  decodeAuthHashError();
   renderSessionBar();
 })();
