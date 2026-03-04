@@ -21,8 +21,6 @@
   const sendOtpBtn = document.getElementById("sendOtpBtn");
   const verifyOtpBtn = document.getElementById("verifyOtpBtn");
 
-  const oauthGoogleBtn = document.getElementById("oauthGoogleBtn");
-  const oauthTwitterBtn = document.getElementById("oauthTwitterBtn");
 
   const ADMIN_EMAILS = ["3102850054@qq.com"];
   const rememberCache = localStorage.getItem("xiaoma_remember_auth");
@@ -146,16 +144,6 @@
     return remember ? sbLocal : sbSession;
   }
 
-  async function oauthLogin(provider, label) {
-    const client = getActiveClient();
-    setStatus("正在跳转 " + label + " 授权...", "");
-    const result = await client.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: window.location.origin + getNextPath() }
-    });
-    if (result.error) setStatus(label + " 登录失败：" + result.error.message, "err");
-  }
-
   document.querySelectorAll(".tab").forEach((button) => {
     button.addEventListener("click", function () {
       document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
@@ -163,19 +151,12 @@
       const activeTab = button.dataset.tab;
       document.querySelectorAll(".form-panel").forEach((panel) => panel.classList.remove("active"));
       document.getElementById("panel-" + activeTab).classList.add("active");
-      setStatus(activeTab === "password" ? "请输入邮箱和密码" : "请输入邮箱或手机号并获取验证码");
+      setStatus(activeTab === "password" ? "请输入邮箱和密码" : "请输入邮箱并获取验证码");
     });
   });
 
   showPasswordEl.addEventListener("change", function () {
     passwordEl.type = showPasswordEl.checked ? "text" : "password";
-  });
-
-  oauthGoogleBtn.addEventListener("click", function () {
-    oauthLogin("google", "Google");
-  });
-  oauthTwitterBtn.addEventListener("click", function () {
-    oauthLogin("twitter", "Twitter");
   });
 
   loginBtn.addEventListener("click", async function () {
@@ -225,13 +206,12 @@
 
   sendOtpBtn.addEventListener("click", async function () {
     const identity = (otpIdentityEl.value || "").trim();
-    if (!identity) return setStatus("请输入邮箱或手机号", "err");
+    if (!identity) return setStatus("请输入邮箱", "err");
+    if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
 
     const client = getActiveClient();
     setLoading(sendOtpBtn, true, "发送验证码", "发送中...");
-    const result = isEmail(identity)
-      ? await client.auth.signInWithOtp({ email: identity, options: { shouldCreateUser: true } })
-      : await client.auth.signInWithOtp({ phone: identity, options: { shouldCreateUser: true } });
+    const result = await client.auth.signInWithOtp({ email: identity, options: { shouldCreateUser: true } });
     setLoading(sendOtpBtn, false, "发送验证码", "发送中...");
     if (result.error) return setStatus("发送失败：" + result.error.message, "err");
 
@@ -243,12 +223,11 @@
     const identity = (otpIdentityEl.value || "").trim();
     const token = (otpCodeEl.value || "").trim();
     if (!identity || !token) return setStatus("请填写完整验证码信息", "err");
+    if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
 
     const client = getActiveClient();
     setLoading(verifyOtpBtn, true, "验证并登录", "验证中...");
-    const result = isEmail(identity)
-      ? await client.auth.verifyOtp({ email: identity, token, type: "email" })
-      : await client.auth.verifyOtp({ phone: identity, token, type: "sms" });
+    const result = await client.auth.verifyOtp({ email: identity, token, type: "email" });
     setLoading(verifyOtpBtn, false, "验证并登录", "验证中...");
     if (result.error) return setStatus("验证失败：" + result.error.message, "err");
 

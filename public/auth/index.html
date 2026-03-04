@@ -136,11 +136,6 @@
       margin-bottom: 10px;
     }
 
-    .social-grid {
-      display: grid;
-      gap: 10px;
-    }
-
     .btn {
       width: 100%;
       border: 1px solid var(--line);
@@ -369,12 +364,12 @@
       <div>
         <div class="brand-tag">Xiaoma ID</div>
         <h1><strong>快速登录</strong>，像推特一样直接，<span>像特斯拉一样克制</span></h1>
-        <p>支持邮箱密码、邮箱/手机号验证码登录，以及社交账号授权。你可以继续使用已有账号，无需重复注册。</p>
+        <p>支持邮箱密码登录与邮箱验证码登录。登录后可继续访问社区、发布内容和管理功能。</p>
       </div>
       <div class="feature-list">
         <div class="feature"><span class="feature-dot"></span>账号密码登录，适合日常稳定使用</div>
-        <div class="feature"><span class="feature-dot"></span>验证码登录，适合快速回访与新用户</div>
-        <div class="feature"><span class="feature-dot"></span>Google / Twitter 授权，一键进入</div>
+        <div class="feature"><span class="feature-dot"></span>邮箱验证码登录，适合快速回访与新用户</div>
+        <div class="feature"><span class="feature-dot"></span>记住登录状态，提升日常使用效率</div>
       </div>
     </section>
 
@@ -383,12 +378,7 @@
       <p class="sub">继续访问你的专属页面与功能</p>
       <div id="sessionBar" class="session-bar"></div>
 
-      <div class="social-grid">
-        <button class="btn" id="oauthGoogleBtn">使用 Google 继续</button>
-        <button class="btn" id="oauthTwitterBtn">使用 Twitter 继续</button>
-      </div>
-
-      <div class="divider">或使用账号</div>
+      <div class="divider">使用账号登录</div>
 
       <div class="tabs">
         <button class="tab active" data-tab="password">密码登录</button>
@@ -417,8 +407,8 @@
 
       <div id="panel-otp" class="form-panel">
         <div class="field">
-          <label for="otpIdentity">邮箱或手机号</label>
-          <input type="text" id="otpIdentity" placeholder="name@example.com / 138xxxx" autocomplete="username" />
+          <label for="otpIdentity">邮箱</label>
+          <input type="text" id="otpIdentity" placeholder="name@example.com" autocomplete="username" />
         </div>
         <div class="actions">
           <button class="btn" id="sendOtpBtn">发送验证码</button>
