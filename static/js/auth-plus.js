@@ -26,6 +26,7 @@
   const ADMIN_EMAILS = ["3102850054@qq.com"];
   const OTP_COOLDOWN_SECONDS = 60;
   const otpTimestampKey = "xiaoma_otp_last_sent_at";
+  const otpIdentityKey = "xiaoma_otp_last_identity";
   const rememberCache = localStorage.getItem("xiaoma_remember_auth");
   if (rememberMeEl && rememberCache !== null) {
     rememberMeEl.checked = rememberCache === "1";
@@ -65,7 +66,15 @@
     return "发送失败：" + raw;
   }
 
-  function getCooldownLeft() {
+  function getCurrentOtpIdentity() {
+    return String((otpIdentityEl?.value || "").trim().toLowerCase());
+  }
+
+  function getCooldownLeft(identity) {
+    const current = String(identity || "").toLowerCase();
+    const cachedIdentity = String(localStorage.getItem(otpIdentityKey) || "").toLowerCase();
+    if (!current || !cachedIdentity || current !== cachedIdentity) return 0;
+
     const last = Number(localStorage.getItem(otpTimestampKey) || "0");
     if (!last) return 0;
     const seconds = Math.ceil((last + OTP_COOLDOWN_SECONDS * 1000 - Date.now()) / 1000);
@@ -74,7 +83,7 @@
 
   function renderOtpButtonState() {
     if (!resendOtpBtn) return;
-    const left = getCooldownLeft();
+    const left = getCooldownLeft(getCurrentOtpIdentity());
     const disabled = left > 0;
     sendOtpBtn.disabled = disabled;
     resendOtpBtn.disabled = disabled;
@@ -224,6 +233,8 @@
     passwordEl.type = showPasswordEl.checked ? "text" : "password";
   });
 
+  otpIdentityEl.addEventListener("input", renderOtpButtonState);
+
   loginBtn.addEventListener("click", async function () {
     const email = (emailEl.value || "").trim();
     const password = passwordEl.value || "";
@@ -273,7 +284,8 @@
     const identity = (otpIdentityEl.value || "").trim();
     if (!identity) return setStatus("请输入邮箱", "err");
     if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
-    if (getCooldownLeft() > 0) return setStatus("验证码发送过于频繁，请稍候再试", "err");
+    const left = getCooldownLeft(identity);
+    if (left > 0) return setStatus("该邮箱发送过于频繁，请 " + left + " 秒后重试", "err");
 
     const client = getActiveClient();
     setLoading(sendOtpBtn, true, "发送验证码", "发送中...");
@@ -285,9 +297,18 @@
       }
     });
     setLoading(sendOtpBtn, false, "发送验证码", "发送中...");
-    if (result.error) return setStatus(otpFriendlyError(result.error), "err");
+    if (result.error) {
+      const msg = otpFriendlyError(result.error);
+      if (msg.includes("请求太频繁")) {
+        localStorage.setItem(otpTimestampKey, String(Date.now()));
+        localStorage.setItem(otpIdentityKey, identity.toLowerCase());
+        renderOtpButtonState();
+      }
+      return setStatus(msg, "err");
+    }
 
     localStorage.setItem(otpTimestampKey, String(Date.now()));
+    localStorage.setItem(otpIdentityKey, identity.toLowerCase());
     renderOtpButtonState();
     setStatus("邮件已发送。若收到 Magic Link，请直接点击邮件里的 Log In；若有验证码/Token 也可在此输入验证。", "ok");
     otpCodeEl.focus();
