@@ -1,16 +1,23 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>{{ .Title }}</title>
+<title>{{ .Title }} | xiaoma.cyou</title>
+<style>
+body{max-width:980px;margin:50px auto;padding:0 16px;font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui;background:#0b1020;color:#eaf0ff}
+.item{border:1px solid #2b3558;border-radius:12px;padding:16px 18px;margin:12px 0;background:#111933}
+a{color:#7ee3ff;text-decoration:none}
+</style>
 </head>
-<body style="max-width:760px;margin:60px auto;padding:0 16px;font-family:system-ui;line-height:1.8;">
+<body>
 <h1>{{ .Title }}</h1>
-<ul>
 {{ range .Pages }}
-<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+<div class="item">
+<h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+<small>{{ .Date.Format "2006-01-02" }}</small>
+</div>
 {{ end }}
-</ul>
+<p><a href="/">← 返回首页</a></p>
 </body>
 </html>
