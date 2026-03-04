@@ -8,94 +8,110 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="description" content="小马 Lenny：让我们一起学很多很多东西，做自己想做的事情。">
+<meta name="description" content="小马 Lenny：社交分享与图文内容社区，记录成长和灵感。">
 <style>
 :root{
---bg:#060913;
---bg2:#0c1224;
---text:#e8edf8;
---muted:#9fb0d0;
---brand:#5ee1ff;
---brand2:#7b8cff;
---card:rgba(255,255,255,.06);
---line:rgba(255,255,255,.12);
+--bg:#fffaf6;
+--text:#2a3147;
+--muted:#6d7899;
+--line:#e6e8f5;
+--card:#ffffff;
+--delta:#89c4ff;
+--charge:#ffc7b4;
+--mint:#7ae4ce;
+--lav:#d8c7ff;
 }
 *{box-sizing:border-box}
 body{
 margin:0;
-font-family:Inter, "PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+font-family:"Nunito","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
 color:var(--text);
 background:
-radial-gradient(1200px 500px at 20% -10%, rgba(94,225,255,.18), transparent 60%),
-radial-gradient(1000px 500px at 90% -20%, rgba(123,140,255,.18), transparent 60%),
-linear-gradient(160deg,var(--bg),var(--bg2));
+radial-gradient(1100px 500px at 10% -20%, rgba(137,196,255,.40), transparent 62%),
+radial-gradient(1100px 500px at 100% -10%, rgba(255,199,180,.38), transparent 62%),
+radial-gradient(1000px 450px at 50% 110%, rgba(216,199,255,.20), transparent 68%),
+var(--bg);
 min-height:100vh;
 }
-.container{width:min(1120px,92%);margin:0 auto}
+.container{width:min(1140px,92%);margin:0 auto}
 .nav{
 display:flex;align-items:center;justify-content:space-between;
-padding:22px 0;position:sticky;top:0;
-backdrop-filter: blur(10px);
+padding:18px 0;position:sticky;top:0;z-index:8;
+backdrop-filter: blur(8px);
 }
-.logo{font-weight:700;letter-spacing:.3px}
-.menu a{color:var(--muted);text-decoration:none;margin-left:24px}
-.menu a:hover{color:#fff}
+.logo{font-weight:900;letter-spacing:.3px}
+.menu a{color:var(--muted);text-decoration:none;margin-left:20px;font-weight:700}
+.menu a:hover{color:#43547f}
 .login-btn{
-  color:#05111d !important;
-  background:linear-gradient(90deg,var(--brand),#8fe7ff);
+  color:#2c3c5f !important;
+  background:linear-gradient(100deg,var(--delta),#c6dcff);
   padding:8px 16px;
-  border-radius:8px;
-  font-weight:600;
+  border-radius:999px;
+  border:1px solid #d7e2f8;
+  font-weight:800;
   margin-left:20px;
 }
-.login-btn:hover{opacity:0.9}
-.hero{padding:64px 0 32px;display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
+.hero{
+padding:34px 0 22px;display:grid;grid-template-columns:1.2fr .8fr;gap:16px;align-items:stretch;
+}
 .tag{
 display:inline-block;padding:8px 12px;border:1px solid var(--line);
-border-radius:999px;color:#c9d8f6;background:rgba(255,255,255,.03);font-size:13px
+border-radius:999px;color:#5e75a8;background:#f3f7ff;font-size:12px;font-weight:700
 }
-h1{font-size:clamp(34px,6vw,62px);line-height:1.06;margin:16px 0}
+h1{font-size:clamp(34px,6vw,58px);line-height:1.08;margin:16px 0}
 .grad{
-background:linear-gradient(90deg,var(--brand),var(--brand2));
+background:linear-gradient(100deg,#69b2ff,#7ee8d4,#ffbfa9);
 -webkit-background-clip:text;background-clip:text;color:transparent
 }
 .sub{color:var(--muted);font-size:18px;line-height:1.8;max-width:640px}
 .cta{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
 .btn{
-padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:600;
+padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:800;
 border:1px solid var(--line);display:inline-block
 }
-.btn.primary{
-color:#05111d;background:linear-gradient(90deg,var(--brand),#8fe7ff);
-border:none;
-}
-.btn.ghost{color:#d8e4ff;background:rgba(255,255,255,.04)}
+.btn.primary{color:#213152;background:linear-gradient(100deg,var(--mint),var(--delta));border:none}
+.btn.ghost{color:#5a6a95;background:#fff}
 .panel{
-border:1px solid var(--line);border-radius:18px;padding:20px;
-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
-box-shadow:0 20px 60px rgba(0,0,0,.35);
+border:1px solid var(--line);border-radius:22px;padding:20px;
+background:linear-gradient(140deg,#fff, #f8fbff);
+box-shadow:0 12px 28px rgba(113,125,164,.14);
 }
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.cell{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.cell{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
 .cell b{font-size:22px;display:block}
-.sec{padding:44px 0}
+.sec{padding:36px 0}
 .sec h2{font-size:30px;margin:0 0 10px}
 .muted{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .card{
-border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--card)
+border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--card);
+box-shadow:0 10px 22px rgba(118,128,164,.10)
 }
 .card h3{margin:0 0 8px;font-size:20px}
-.price{font-size:28px;font-weight:800;margin:6px 0 10px}
-.card ul{margin:0;padding-left:18px;color:#c8d6f2;line-height:1.8}
+.card ul{margin:0;padding-left:18px;color:#62719a;line-height:1.8}
+
+.showcase{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;}
+.photo-card{border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px;box-shadow:0 10px 22px rgba(118,128,164,.10)}
+.photo-mock{height:180px;border-radius:14px;background:linear-gradient(130deg, rgba(137,196,255,.38), rgba(255,199,180,.38), rgba(216,199,255,.35));display:flex;align-items:center;justify-content:center;font-size:42px}
+.photo-meta{margin-top:10px;color:#5d6990;font-size:14px;line-height:1.7}
+
+.community-band{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.band-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+.band-card.delta{background:linear-gradient(120deg,rgba(137,196,255,.28),#fff)}
+.band-card.charge{background:linear-gradient(120deg,rgba(255,199,180,.28),#fff)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:#4d5a82;background:#f3f5ff;padding:4px 8px;border-radius:999px;border:1px solid #dfe4f5}
+.band-card p{margin:8px 0 0;color:#607099;line-height:1.7}
+
 .final{
-margin:40px 0 60px;border:1px solid var(--line);border-radius:20px;padding:28px;
-background:linear-gradient(90deg,rgba(94,225,255,.12),rgba(123,140,255,.12));
+margin:30px 0 54px;border:1px solid var(--line);border-radius:22px;padding:24px;
+background:linear-gradient(100deg,rgba(122,228,206,.26),rgba(137,196,255,.22),rgba(255,199,180,.24));
 display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap
 }
 footer{padding:24px 0 40px;color:var(--muted);border-top:1px solid var(--line)}
 @media (max-width:900px){
 .hero{grid-template-columns:1fr}
+.showcase{grid-template-columns:1fr}
+.community-band{grid-template-columns:1fr}
 .grid{grid-template-columns:1fr}
 .stats{grid-template-columns:1fr 1fr}
 }
@@ -116,69 +132,79 @@ footer{padding:24px 0 40px;color:var(--muted);border-top:1px solid var(--line)}
 
 <section class="hero">
 <div>
-<span class="tag">AI Automation · Growth · Build in Public</span>
-<h1>把想法变成<br><span class="grad">可运行的系统</span></h1>
+<span class="tag">Social Sharing · Community · Build in Public</span>
+<h1>分享你的故事，<br><span class="grad">连接更多同频的人</span></h1>
 <p class="sub">
-我是小马 Lenny，专注 AI 自动化、效率系统与增长实验。
-帮个人与小团队 7 天内跑通第一条可落地流程。
+这里是小马 Lenny 的社交分享站点：聊游戏、发图文、记录日常与成长，
+把有价值的内容持续沉淀。
 </p>
 <div class="cta">
-<a class="btn primary" href="mailto:3102850054@qq.com">预约咨询</a>
-<a class="btn ghost" href="/posts/">查看实战文章</a>
+<a class="btn primary" href="/community.html">进入社区</a>
+<a class="btn ghost" href="/auth.html">注册/登录</a>
+</div>
+
+<div class="community-band">
+<div class="band-card delta">
+<span class="badge">🦊 三角洲讨论社区</span>
+<p>以攻略、配装、组队和战报为核心，打造高质量游戏讨论氛围。</p>
+</div>
+<div class="band-card charge">
+<span class="badge">🐼 充电社区</span>
+<p>用图文和短视频记录生活、学习和灵感，打造轻松的分享空间。</p>
+</div>
 </div>
 </div>
 
 <div class="panel">
-<h3 style="margin:0 0 6px">本周目标</h3>
-<p class="muted" style="margin:0">每周发布 1 篇 AI 实战 + 1 个可复用模板。</p>
+<h3 style="margin:0 0 6px">社区活跃看板</h3>
+<p class="muted" style="margin:0">每天更新内容，让更多人看到真实分享。</p>
 <div class="stats">
-<div class="cell"><b>7天</b><span class="muted">交付首条流程</span></div>
-<div class="cell"><b>1→N</b><span class="muted">从手工到自动化</span></div>
-<div class="cell"><b>ROI</b><span class="muted">以结果为导向</span></div>
+<div class="cell"><b>24h</b><span class="muted">持续热帖更新</span></div>
+<div class="cell"><b>图文+视频</b><span class="muted">双内容形态</span></div>
+<div class="cell"><b>互动优先</b><span class="muted">点赞评论收藏</span></div>
 </div>
 </div>
 </section>
 
 <section class="sec">
-<h2>服务方案</h2>
-<p class="muted">从试水到深度落地，按预算和阶段选择。</p>
-<div class="grid">
+<h2>图文介绍</h2>
+<p class="muted">首页主打社交分享，你可以快速了解两个社区的内容方向。</p>
+<div class="showcase">
 <div class="card">
-<h3>AI 体检</h3>
-<div class="price">¥99</div>
+<h3>三角洲社区内容结构</h3>
 <ul>
-<li>30 分钟诊断</li>
-<li>优先级清单</li>
-<li>落地建议路径</li>
+<li>战术攻略：地图、路线、打法拆解</li>
+<li>配装建议：版本适配与实战反馈</li>
+<li>组队招募：快速找到同频队友</li>
 </ul>
 </div>
 <div class="card">
-<h3>启动版</h3>
-<div class="price">¥999 起</div>
+<h3>充电社区内容结构</h3>
 <ul>
-<li>1 条自动化流程</li>
-<li>提示词模板包</li>
-<li>基础交付培训</li>
+<li>图文日常：生活、学习、成长片段</li>
+<li>视频动态：短视频记录与分享</li>
+<li>主题话题：灵感征集与活动互动</li>
 </ul>
 </div>
-<div class="card">
-<h3>增长陪跑</h3>
-<div class="price">¥2999 / 月</div>
-<ul>
-<li>每周迭代优化</li>
-<li>流程与内容双升级</li>
-<li>持续数据复盘</li>
-</ul>
+
+<div class="photo-card">
+<div class="photo-mock">📷</div>
+<div class="photo-meta">图文风格展示区：支持内容封面、描述文案和互动按钮，未来可接入真实用户内容瀑布流。</div>
+</div>
+
+<div class="photo-card">
+<div class="photo-mock">🎬</div>
+<div class="photo-meta">视频风格展示区：支持短视频发布与话题标签，打造“可刷、可评、可收藏”的社交体验。</div>
 </div>
 </div>
 </section>
 
 <section class="sec">
 <h2>快速入口</h2>
-<p class="muted">点击进入对应页面</p>
+<p class="muted">点击进入对应社区，开始发帖或浏览互动内容</p>
 <div class="grid">
 <a class="card" href="/community.html?tab=delta" style="text-decoration:none;color:inherit;">
-<h3>1）三角洲行动</h3>
+<h3>1）三角洲讨论社区</h3>
 <p class="muted">进入三角洲讨论社区</p>
 </a>
 
@@ -188,12 +214,13 @@ footer{padding:24px 0 40px;color:var(--muted);border-top:1px solid var(--line)}
 </a>
 </div>
 </section>
+
 <section class="final">
 <div>
-<h3 style="margin:0 0 8px">先跑通第一条流程，再谈规模化</h3>
-<div class="muted">如果你也想把重复工作交给 AI，现在就开始。</div>
+<h3 style="margin:0 0 8px">分享内容，沉淀关系，打造你的社区影响力</h3>
+<div class="muted">从第一条图文或第一条视频开始，把真实内容长期积累。</div>
 </div>
-<a class="btn primary" href="mailto:3102850054@qq.com">联系我</a>
+<a class="btn primary" href="/community.html">现在去发布</a>
 </section>
 
 <footer>
