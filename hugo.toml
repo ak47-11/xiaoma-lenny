@@ -1,0 +1,52 @@
+baseURL = "https://xiaoma.cyou/"
+languageCode = "zh-cn"
+title = "小马 Lenny 的博客"
+theme = "PaperMod"
+
+[pagination]
+pagerSize = 10
+
+[params]
+description = "分享 AI 自动化、效率工具、副业实战"
+author = "小马Lenny"
+defaultTheme = "auto"
+ShowReadingTime = true
+ShowShareButtons = true
+ShowCodeCopyButtons = true
+ShowPostNavLinks = true
+ShowBreadCrumbs = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+mainSections = ["posts"]
+
+[params.homeInfoParams]
+Title = "你好，我是小马 👋"
+Content = "这里记录 AI 自动化、赚钱路径和实战复盘。目标：每周一篇，持续输出。"
+
+[[params.socialIcons]]
+name = "github"
+url = "https://github.com/你的用户名"
+
+[[params.socialIcons]]
+name = "email"
+url = "mailto:hi@xiaoma.cyou"
+
+[[menu.main]]
+name = "首页"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "文章"
+url = "/posts/"
+weight = 2
+
+[[menu.main]]
+name = "标签"
+url = "/tags/"
+weight = 3
+
+[[menu.main]]
+name = "关于"
+url = "/about/"
+weight = 4
