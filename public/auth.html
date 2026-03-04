@@ -415,8 +415,8 @@
           <button class="btn secondary" id="resendOtpBtn" type="button">重新发送</button>
         </div>
         <div class="field">
-          <label for="otpCode">验证码</label>
-          <input type="text" id="otpCode" placeholder="输入 6 位验证码" maxlength="6" inputmode="numeric" />
+          <label for="otpCode">验证码 / Token</label>
+          <input type="text" id="otpCode" placeholder="输入邮箱中的验证码或 Token（可选）" maxlength="64" autocomplete="one-time-code" />
         </div>
         <div class="actions">
           <button class="btn primary" id="verifyOtpBtn">验证并登录</button>

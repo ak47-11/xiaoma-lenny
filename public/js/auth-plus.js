@@ -101,6 +101,21 @@
   const sbSession = createClient(window.sessionStorage);
   setInterval(renderOtpButtonState, 1000);
 
+  function bindAuthStateWatch(client) {
+    client.auth.onAuthStateChange(function (event, session) {
+      if (!session?.user) return;
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        setStatus("已通过邮件链接完成登录，正在跳转", "ok");
+        setTimeout(function () {
+          window.location.href = getNextPath();
+        }, 700);
+      }
+    });
+  }
+
+  bindAuthStateWatch(sbLocal);
+  bindAuthStateWatch(sbSession);
+
   async function getAuthContext() {
     const localSession = (await sbLocal.auth.getSession()).data.session;
     if (localSession) return { client: sbLocal, session: localSession, mode: "local" };
@@ -257,7 +272,7 @@
 
     localStorage.setItem(otpTimestampKey, String(Date.now()));
     renderOtpButtonState();
-    setStatus("验证码已发送，请查收邮箱（含垃圾邮箱），60 秒后可重发", "ok");
+    setStatus("邮件已发送。若收到 Magic Link，请直接点击邮件里的 Log In；若有验证码/Token 也可在此输入验证。", "ok");
     otpCodeEl.focus();
   });
 
@@ -270,8 +285,20 @@
   verifyOtpBtn.addEventListener("click", async function () {
     const identity = (otpIdentityEl.value || "").trim();
     const token = (otpCodeEl.value || "").trim();
-    if (!identity || !token) return setStatus("请填写完整验证码信息", "err");
+    if (!identity) return setStatus("请先输入邮箱", "err");
     if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
+
+    if (!token) {
+      const context = await getAuthContext();
+      if (context.session?.user) {
+        setStatus("已识别到 Magic Link 登录状态，正在跳转", "ok");
+        setTimeout(function () {
+          window.location.href = getNextPath();
+        }, 600);
+        return;
+      }
+      return setStatus("如果邮件里没有验证码，请直接点击邮件中的 Log In 按钮完成登录", "err");
+    }
 
     const client = getActiveClient();
     setLoading(verifyOtpBtn, true, "验证并登录", "验证中...");
@@ -286,7 +313,7 @@
   });
 
   otpCodeEl.addEventListener("input", function (event) {
-    event.target.value = event.target.value.replace(/\D/g, "").slice(0, 6);
+    event.target.value = event.target.value.trim().slice(0, 64);
   });
   emailEl.addEventListener("keypress", function (event) {
     if (event.key === "Enter") passwordEl.focus();
