@@ -698,10 +698,12 @@
   }
 
   function renderTabs() {
+    document.body.classList.remove("tab-delta", "tab-charge");
+    document.body.classList.add(state.tab === "delta" ? "tab-delta" : "tab-charge");
     document.querySelectorAll(".tab").forEach((button) => {
       button.classList.toggle("active", button.dataset.tab === state.tab);
     });
-    feedTitle.textContent = state.tab === "delta" ? "三角洲热帖" : "充电动态";
+    feedTitle.textContent = state.tab === "delta" ? "🎯 三角洲热帖" : "✨ 充电动态";
   }
 
   async function refreshAll() {
