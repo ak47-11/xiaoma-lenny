@@ -582,6 +582,10 @@
     mediaBox.appendChild(image);
   }
 
+  function mascotForCommunity(community) {
+    return community === "delta" ? "🦊" : "🐼";
+  }
+
   function sortedPosts() {
     const list = state.posts.filter((post) => post.community === state.tab);
     const sorted = [...list];
@@ -609,7 +613,7 @@
       node.querySelector(".post-title").textContent = post.title;
       node.querySelector(".post-topic").textContent = post.topic;
       node.querySelector(".post-content").textContent = post.content;
-      node.querySelector(".author-line").textContent = "作者：" + (post.author_name || "匿名用户");
+      node.querySelector(".author-line").innerHTML = mascotForCommunity(post.community) + " 作者：" + (post.author_name || "匿名用户") + "<span class='sticker'>萌新友好</span>";
       node.querySelector(".meta").textContent = new Date(post.created_at).toLocaleString("zh-CN", { hour12: false }) + " · 评论 " + (post.comments?.length || 0);
       node.querySelector(".like-btn span").textContent = post.likes || 0;
       drawMedia(post, node.querySelector(".media"));
@@ -651,7 +655,7 @@
       const comments = post.comments || [];
       commentList.innerHTML = comments.length
         ? comments
-            .map((comment) => "<div class='comment'><b>" + (comment.author_name || "用户") + "：</b>" + comment.text + "<br /><small>" + comment.time + "</small></div>")
+            .map((comment) => "<div class='comment'><b>" + mascotForCommunity(post.community) + " " + (comment.author_name || "用户") + "：</b>" + comment.text + "<br /><small>" + comment.time + "</small></div>")
             .join("")
         : "<p>还没有评论，抢个沙发～</p>";
 
