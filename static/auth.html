@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>登录 | xiaoma.cyou</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      width: 360px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    h1 { text-align: center; margin-bottom: 30px; }
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+    input::placeholder { color: rgba(255,255,255,0.5); }
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(90deg, #00d4ff, #7c3aed);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    button:hover { opacity: 0.9; }
+    .links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    a { color: #00d4ff; text-decoration: none; }
+    #msg {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+      display: none;
+    }
+    #msg.error { display: block; background: rgba(255,0,0,0.2); }
+    #msg.success { display: block; background: rgba(0,255,0,0.2); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>账号登录</h1>
+    <input type="email" id="email" placeholder="邮箱地址" />
+    <input type="password" id="password" placeholder="密码" />
+    <button id="loginBtn">登录</button>
+    <div class="links">
+      <a href="#" id="forgotLink">忘记密码？</a>
+      <a href="#" id="registerLink">注册账号</a>
+    </div>
+    <div id="msg"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const sb = window.supabase.createClient(
+      "https://vtplvtwbkyydxmcxgctn.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU"
+    );
+
+    const msgEl = document.getElementById('msg');
+    
+    function showMsg(text, type) {
+      msgEl.textContent = text;
+      msgEl.className = type;
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      
+      if (!email || !password) {
+        showMsg('请输入邮箱和密码', 'error');
+        return;
+      }
+
+      showMsg('登录中...', '');
+      
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        showMsg('登录失败：' + error.message, 'error');
+        return;
+      }
+
+      showMsg('登录成功！', 'success');
+      setTimeout(() => window.location.href = '/', 1000);
+    });
+
+    document.getElementById('registerLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      
+      if (!email || !password) {
+        showMsg('请输入邮箱和密码', 'error');
+        return;
+      }
+
+      const { error } = await sb.auth.signUp({ email, password });
+      
+      if (error) {
+        showMsg('注册失败：' + error.message, 'error');
+      } else {
+        showMsg('注册成功！请查收邮箱验证', 'success');
+      }
+    });
+
+    document.getElementById('forgotLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      
+      if (!email) {
+        showMsg('请输入邮箱', 'error');
+        return;
+      }
+
+      const { error } = await sb.auth.resetPasswordForEmail(email);
+      
+      if (error) {
+        showMsg('发送失败：' + error.message, 'error');
+      } else {
+        showMsg('重置链接已发送到邮箱', 'success');
+      }
+    });
+  </script>
+</body>
+</html>

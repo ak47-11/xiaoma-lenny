@@ -56,5 +56,5 @@ weight = 3
 
 [[menu.main]]
 name = "注册/登录"
-url = "/auth/"
+url = "/auth.html"
 weight = 4
