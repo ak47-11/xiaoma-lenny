@@ -3,11 +3,172 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>小马 Lenny 的博客</title>
+<title>小马 Lenny | AI 自动化与增长</title>
+<meta name="description" content="小马 Lenny：AI 自动化、效率工具与增长实践。帮你把想法变成可运行的系统。">
+<style>
+:root{
+--bg:#060913;
+--bg2:#0c1224;
+--text:#e8edf8;
+--muted:#9fb0d0;
+--brand:#5ee1ff;
+--brand2:#7b8cff;
+--card:rgba(255,255,255,.06);
+--line:rgba(255,255,255,.12);
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Inter, "PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+color:var(--text);
+background:
+radial-gradient(1200px 500px at 20% -10%, rgba(94,225,255,.18), transparent 60%),
+radial-gradient(1000px 500px at 90% -20%, rgba(123,140,255,.18), transparent 60%),
+linear-gradient(160deg,var(--bg),var(--bg2));
+min-height:100vh;
+}
+.container{width:min(1120px,92%);margin:0 auto}
+.nav{
+display:flex;align-items:center;justify-content:space-between;
+padding:22px 0;position:sticky;top:0;
+backdrop-filter: blur(10px);
+}
+.logo{font-weight:700;letter-spacing:.3px}
+.menu a{color:var(--muted);text-decoration:none;margin-left:24px}
+.menu a:hover{color:#fff}
+.hero{padding:64px 0 32px;display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
+.tag{
+display:inline-block;padding:8px 12px;border:1px solid var(--line);
+border-radius:999px;color:#c9d8f6;background:rgba(255,255,255,.03);font-size:13px
+}
+h1{font-size:clamp(34px,6vw,62px);line-height:1.06;margin:16px 0}
+.grad{
+background:linear-gradient(90deg,var(--brand),var(--brand2));
+-webkit-background-clip:text;background-clip:text;color:transparent
+}
+.sub{color:var(--muted);font-size:18px;line-height:1.8;max-width:640px}
+.cta{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.btn{
+padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:600;
+border:1px solid var(--line);display:inline-block
+}
+.btn.primary{
+color:#05111d;background:linear-gradient(90deg,var(--brand),#8fe7ff);
+border:none;
+}
+.btn.ghost{color:#d8e4ff;background:rgba(255,255,255,.04)}
+.panel{
+border:1px solid var(--line);border-radius:18px;padding:20px;
+background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.cell{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.cell b{font-size:22px;display:block}
+.sec{padding:44px 0}
+.sec h2{font-size:30px;margin:0 0 10px}
+.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{
+border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--card)
+}
+.card h3{margin:0 0 8px;font-size:20px}
+.price{font-size:28px;font-weight:800;margin:6px 0 10px}
+.card ul{margin:0;padding-left:18px;color:#c8d6f2;line-height:1.8}
+.final{
+margin:40px 0 60px;border:1px solid var(--line);border-radius:20px;padding:28px;
+background:linear-gradient(90deg,rgba(94,225,255,.12),rgba(123,140,255,.12));
+display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap
+}
+footer{padding:24px 0 40px;color:var(--muted);border-top:1px solid var(--line)}
+@media (max-width:900px){
+.hero{grid-template-columns:1fr}
+.grid{grid-template-columns:1fr}
+.stats{grid-template-columns:1fr 1fr}
+}
+</style>
 </head>
-<body style="max-width:760px;margin:60px auto;padding:0 16px;font-family:system-ui;line-height:1.8;">
-<h1>你好，我是小马 👋</h1>
-<p>欢迎来到 xiaoma.cyou，这里分享 AI 自动化、效率工具和变现实战。</p>
-<p><a href="/posts/">查看文章</a></p>
+<body>
+<div class="container">
+<nav class="nav">
+<div class="logo">xiaoma.cyou</div>
+<div class="menu">
+<a href="/">首页</a>
+<a href="/posts/">文章</a>
+<a href="/about/">关于</a>
+</div>
+</nav>
+
+<section class="hero">
+<div>
+<span class="tag">AI Automation · Growth · Build in Public</span>
+<h1>把想法变成<br><span class="grad">可运行的系统</span></h1>
+<p class="sub">
+我是小马 Lenny，专注 AI 自动化、效率系统与增长实验。
+帮个人与小团队 7 天内跑通第一条可落地流程。
+</p>
+<div class="cta">
+<a class="btn primary" href="mailto:3102850054@qq.com">预约咨询</a>
+<a class="btn ghost" href="/posts/">查看实战文章</a>
+</div>
+</div>
+
+<div class="panel">
+<h3 style="margin:0 0 6px">本周目标</h3>
+<p class="muted" style="margin:0">每周发布 1 篇 AI 实战 + 1 个可复用模板。</p>
+<div class="stats">
+<div class="cell"><b>7天</b><span class="muted">交付首条流程</span></div>
+<div class="cell"><b>1→N</b><span class="muted">从手工到自动化</span></div>
+<div class="cell"><b>ROI</b><span class="muted">以结果为导向</span></div>
+</div>
+</div>
+</section>
+
+<section class="sec">
+<h2>服务方案</h2>
+<p class="muted">从试水到深度落地，按预算和阶段选择。</p>
+<div class="grid">
+<div class="card">
+<h3>AI 体检</h3>
+<div class="price">¥99</div>
+<ul>
+<li>30 分钟诊断</li>
+<li>优先级清单</li>
+<li>落地建议路径</li>
+</ul>
+</div>
+<div class="card">
+<h3>启动版</h3>
+<div class="price">¥999 起</div>
+<ul>
+<li>1 条自动化流程</li>
+<li>提示词模板包</li>
+<li>基础交付培训</li>
+</ul>
+</div>
+<div class="card">
+<h3>增长陪跑</h3>
+<div class="price">¥2999 / 月</div>
+<ul>
+<li>每周迭代优化</li>
+<li>流程与内容双升级</li>
+<li>持续数据复盘</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="final">
+<div>
+<h3 style="margin:0 0 8px">先跑通第一条流程，再谈规模化</h3>
+<div class="muted">如果你也想把重复工作交给 AI，现在就开始。</div>
+</div>
+<a class="btn primary" href="mailto:3102850054@qq.com">联系我</a>
+</section>
+
+<footer>
+© 2026 xiaoma.cyou · Built with Hugo & Vercel
+</footer>
+</div>
 </body>
 </html>
