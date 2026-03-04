@@ -12,9 +12,6 @@ term = ["HTML", "RSS"]
 [pagination]
 pagerSize = 10
 
-[outputs]
-home = ["HTML", "RSS", "JSON"]
-
 [params]
 description = "分享 AI 自动化、效率工具、副业实战"
 author = "小马Lenny"
@@ -27,6 +24,8 @@ ShowBreadCrumbs = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 mainSections = ["posts"]
+supabaseUrl = "https://vtplvtwbkyydxmcxgctn.supabase.co"
+supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU"
 
 [params.homeInfoParams]
 Title = "你好，我是小马 👋"
@@ -55,4 +54,7 @@ name = "标签"
 url = "/tags/"
 weight = 3
 
-
+[[menu.main]]
+name = "注册/登录"
+url = "/auth/"
+weight = 4
