@@ -4,56 +4,25 @@
   const supabaseAnonKey = script?.dataset?.supabaseAnonKey || "";
 
   const statusEl = document.getElementById("status");
-  const identityEl = document.getElementById("identity");
+  const emailEl = document.getElementById("email");
+  const passwordEl = document.getElementById("password");
+  const otpIdentityEl = document.getElementById("otpIdentity");
   const otpCodeEl = document.getElementById("otpCode");
-  const mfaCodeEl = document.getElementById("mfaCode");
 
+  const loginBtn = document.getElementById("loginBtn");
   const sendOtpBtn = document.getElementById("sendOtpBtn");
   const verifyOtpBtn = document.getElementById("verifyOtpBtn");
-  const signOutBtn = document.getElementById("signOutBtn");
-  const enrollMfaBtn = document.getElementById("enrollMfaBtn");
-  const challengeMfaBtn = document.getElementById("challengeMfaBtn");
-  const verifyMfaBtn = document.getElementById("verifyMfaBtn");
-
-  const qrWrap = document.getElementById("qrWrap");
-  const qrImg = document.getElementById("qrImg");
-
-  let factorId = null;
-  let challengeId = null;
 
   function setStatus(text, kind = "") {
-    const iconEl = statusEl.querySelector(".icon");
-    const textEl = statusEl.querySelector(".text");
-    if (textEl) textEl.textContent = text;
+    statusEl.textContent = text;
     statusEl.className = "status";
-    if (kind === "ok") {
-      statusEl.classList.add("ok");
-      if (iconEl) iconEl.textContent = "✓";
-    } else if (kind === "err") {
-      statusEl.classList.add("err");
-      if (iconEl) iconEl.textContent = "✕";
-    } else {
-      if (iconEl) iconEl.textContent = "ℹ️";
-    }
+    if (kind) statusEl.classList.add(kind);
   }
 
-  function setLoading(btn, loading, text) {
-    const btnText = btn.querySelector(".btn-text");
-    if (loading) {
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>';
-    } else {
-      btn.disabled = false;
-      btn.innerHTML = `<span class="btn-text">${text}</span>`;
-    }
-  }
-
-  function isEmail(value) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  }
-
-  function isPhone(value) {
-    return /^\+\d{8,15}$/.test(value);
+  function setLoading(btn, loading) {
+    const text = btn.id === "loginBtn" ? "登录" : btn.id === "sendOtpBtn" ? "发送验证码" : "验证登录";
+    btn.disabled = loading;
+    btn.innerHTML = loading ? '<span class="spinner"></span>' : text;
   }
 
   function shake(el) {
@@ -71,25 +40,58 @@
 
   document.querySelectorAll(".tab").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach((n) => n.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(n => n.classList.remove("active"));
       btn.classList.add("active");
       const tab = btn.dataset.tab;
       document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
       document.getElementById(`panel-${tab}`).classList.add("active");
+      setStatus(tab === "password" ? "请输入账号密码登录" : "请输入邮箱或手机号获取验证码");
     });
   });
 
-  sendOtpBtn.addEventListener("click", async () => {
-    const value = (identityEl.value || "").trim();
-    if (!isEmail(value) && !isPhone(value)) {
-      setStatus("请输入合法邮箱或手机号（格式：+8613800000000）", "err");
-      shake(identityEl);
+  loginBtn.addEventListener("click", async () => {
+    const email = (emailEl.value || "").trim();
+    const password = passwordEl.value;
+
+    if (!email || !password) {
+      setStatus("请输入邮箱和密码", "err");
+      if (!email) shake(emailEl);
+      else shake(passwordEl);
       return;
     }
 
-    setLoading(sendOtpBtn, true, "发送中...");
+    setLoading(loginBtn, true);
+    const { data, error } = await sb.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    setLoading(loginBtn, false);
+
+    if (error) {
+      setStatus("登录失败：" + error.message, "err");
+      return;
+    }
+
+    setStatus("登录成功！欢迎回来", "ok");
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1500);
+  });
+
+  sendOtpBtn.addEventListener("click", async () => {
+    const value = (otpIdentityEl.value || "").trim();
+    if (!value) {
+      setStatus("请输入邮箱或手机号", "err");
+      shake(otpIdentityEl);
+      return;
+    }
+
+    setLoading(sendOtpBtn, true);
+    const isEmail = value.includes("@");
     let result;
-    if (isEmail(value)) {
+
+    if (isEmail) {
       result = await sb.auth.signInWithOtp({
         email: value,
         options: { shouldCreateUser: true }
@@ -101,143 +103,98 @@
       });
     }
 
-    setLoading(sendOtpBtn, false, "发送验证码");
+    setLoading(sendOtpBtn, false);
+
     if (result.error) {
       setStatus("发送失败：" + result.error.message, "err");
-      shake(sendOtpBtn);
       return;
     }
-    setStatus("验证码已发送，请查收（有效期30分钟）", "ok");
+    setStatus("验证码已发送，请查收", "ok");
     otpCodeEl.focus();
   });
 
   verifyOtpBtn.addEventListener("click", async () => {
-    const value = (identityEl.value || "").trim();
+    const value = (otpIdentityEl.value || "").trim();
     const token = (otpCodeEl.value || "").trim();
-    if (!token) {
-      setStatus("请输入验证码", "err");
-      shake(otpCodeEl);
+
+    if (!value || !token) {
+      setStatus("请输入完整信息", "err");
       return;
     }
 
-    setLoading(verifyOtpBtn, true, "验证中...");
-    let result;
-    if (isEmail(value)) {
-      result = await sb.auth.verifyOtp({ email: value, token, type: "email" });
-    } else if (isPhone(value)) {
-      result = await sb.auth.verifyOtp({ phone: value, token, type: "sms" });
-    } else {
-      setLoading(verifyOtpBtn, false, "验证并登录");
-      setStatus("身份格式不正确", "err");
-      return;
-    }
+    setLoading(verifyOtpBtn, true);
+    const isEmail = value.includes("@");
+    const result = isEmail 
+      ? await sb.auth.verifyOtp({ email: value, token, type: "email" })
+      : await sb.auth.verifyOtp({ phone: value, token, type: "sms" });
 
-    setLoading(verifyOtpBtn, false, "验证并登录");
+    setLoading(verifyOtpBtn, false);
+
     if (result.error) {
       setStatus("验证失败：" + result.error.message, "err");
-      shake(otpCodeEl);
       return;
     }
-    setStatus("登录成功！建议进入「二步验证」绑定 TOTP 增强安全", "ok");
-    identityEl.value = "";
-    otpCodeEl.value = "";
+    setStatus("登录成功！", "ok");
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1500);
   });
 
-  signOutBtn.addEventListener("click", async () => {
-    setLoading(signOutBtn, true, "退出中...");
-    const { error } = await sb.auth.signOut();
-    setLoading(signOutBtn, false, "退出登录");
-    if (error) {
-      setStatus("退出失败：" + error.message, "err");
-      return;
-    }
-    setStatus("已退出登录", "ok");
+  emailEl.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") passwordEl.focus();
   });
-
-  enrollMfaBtn.addEventListener("click", async () => {
-    setLoading(enrollMfaBtn, true, "生成中...");
-    const { data: sessionData } = await sb.auth.getSession();
-    if (!sessionData?.session) {
-      setLoading(enrollMfaBtn, false, "生成二维码");
-      setStatus("请先登录后再绑定二步验证", "err");
-      return;
-    }
-
-    const { data, error } = await sb.auth.mfa.enroll({
-      factorType: "totp",
-      friendlyName: "xiaoma-auth"
-    });
-
-    setLoading(enrollMfaBtn, false, "生成二维码");
-    if (error) {
-      setStatus("绑定失败：" + error.message, "err");
-      return;
-    }
-
-    factorId = data.id;
-    if (data?.totp?.qr_code) {
-      qrImg.src = data.totp.qr_code;
-      qrWrap.style.display = "block";
-    }
-    setStatus("二维码已生成，请扫码后点击「发送挑战」", "ok");
-  });
-
-  challengeMfaBtn.addEventListener("click", async () => {
-    if (!factorId) {
-      setStatus("请先生成二维码并完成扫码绑定", "err");
-      return;
-    }
-    setLoading(challengeMfaBtn, true, "发送中...");
-    const { data, error } = await sb.auth.mfa.challenge({ factorId });
-    setLoading(challengeMfaBtn, false, "发送挑战");
-    if (error) {
-      setStatus("挑战失败：" + error.message, "err");
-      return;
-    }
-    challengeId = data.id;
-    setStatus("挑战已创建，请输入 TOTP 验证码", "ok");
-    mfaCodeEl.focus();
-  });
-
-  verifyMfaBtn.addEventListener("click", async () => {
-    const code = (mfaCodeEl.value || "").trim();
-    if (!factorId || !challengeId) {
-      setStatus("请先生成并发送挑战", "err");
-      return;
-    }
-    if (!/^\d{6}$/.test(code)) {
-      setStatus("请输入6位数字验证码", "err");
-      shake(mfaCodeEl);
-      return;
-    }
-
-    setLoading(verifyMfaBtn, true, "验证中...");
-    const { error } = await sb.auth.mfa.verify({ factorId, challengeId, code });
-    setLoading(verifyMfaBtn, false, "验证二步验证码");
-    if (error) {
-      setStatus("二步验证失败：" + error.message, "err");
-      shake(mfaCodeEl);
-      return;
-    }
-    setStatus("二步验证已启用！账户安全等级提升", "ok");
-    mfaCodeEl.value = "";
-  });
-
-  identityEl.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendOtpBtn.click();
+  passwordEl.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") loginBtn.click();
   });
   otpCodeEl.addEventListener("keypress", (e) => {
     if (e.key === "Enter") verifyOtpBtn.click();
-  });
-  mfaCodeEl.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") verifyMfaBtn.click();
   });
 
   otpCodeEl.addEventListener("input", (e) => {
     e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6);
   });
-  mfaCodeEl.addEventListener("input", (e) => {
-    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6);
+
+  document.getElementById("registerLink").addEventListener("click", (e) => {
+    e.preventDefault();
+    const email = emailEl.value.trim();
+    const password = passwordEl.value;
+    if (email && password) {
+      signup(email, password);
+    } else {
+      setStatus("请先填写邮箱和密码进行注册", "err");
+    }
+  });
+
+  async function signup(email, password) {
+    setLoading(loginBtn, true);
+    const { data, error } = await sb.auth.signUp({
+      email: email,
+      password: password
+    });
+    setLoading(loginBtn, false);
+
+    if (error) {
+      setStatus("注册失败：" + error.message, "err");
+      return;
+    }
+    setStatus("注册成功！请查收邮箱验证链接", "ok");
+  }
+
+  document.getElementById("forgotLink").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const email = emailEl.value.trim();
+    if (!email) {
+      setStatus("请先输入邮箱", "err");
+      shake(emailEl);
+      return;
+    }
+    
+    const { error } = await sb.auth.resetPasswordForEmail(email);
+    if (error) {
+      setStatus("重置失败：" + error.message, "err");
+    } else {
+      setStatus("重置链接已发送到邮箱", "ok");
+    }
   });
 })();
 
@@ -245,8 +202,8 @@ const style = document.createElement("style");
 style.textContent = `
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-8px); }
-    40%, 80% { transform: translateX(8px); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
   }
 `;
 document.head.appendChild(style);
