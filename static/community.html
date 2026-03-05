@@ -9,28 +9,27 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <style>
     :root {
-      --bg: #f5f8fc;
-      --surface: #fff;
-      --line: #dbe5f3;
-      --text: #18273f;
-      --muted: #60738f;
+      --bg: #000;
+      --surface: #16181c;
+      --line: #2f3336;
+      --text: #e7e9ea;
+      --muted: #71767b;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Sora", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(980px 520px at 8% -10%, rgba(29, 155, 240, 0.16), transparent 63%),
-        radial-gradient(980px 520px at 92% -10%, rgba(251, 114, 153, 0.14), transparent 63%),
-        radial-gradient(1100px 540px at 50% 118%, rgba(45, 164, 78, 0.12), transparent 68%),
+        radial-gradient(1100px 540px at 100% -10%, rgba(29, 155, 240, 0.16), transparent 64%),
+        radial-gradient(960px 520px at 0% 120%, rgba(29, 155, 240, 0.08), transparent 68%),
         var(--bg);
       min-height: 100vh;
     }
     .shell { width: min(1160px, 94%); margin: 18px auto 40px; }
     .top {
       border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(0, 0, 0, 0.88);
       backdrop-filter: blur(8px);
       border-radius: 16px;
       padding: 13px 14px;
@@ -46,9 +45,9 @@
     .nav { display: flex; flex-wrap: wrap; gap: 8px; }
     .nav a {
       text-decoration: none;
-      color: #2f466e;
-      border: 1px solid #cfdbee;
-      background: #fff;
+      color: #e7e9ea;
+      border: 1px solid #2f3336;
+      background: #111214;
       border-radius: 999px;
       min-height: 34px;
       padding: 0 12px;
@@ -65,17 +64,17 @@
       margin-top: 14px;
       border: 1px solid var(--line);
       border-radius: 22px;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.9));
+      background: linear-gradient(145deg, #16181c, #131417);
       padding: 24px;
-      box-shadow: 0 16px 36px rgba(84, 107, 142, 0.14);
+      box-shadow: 0 0 0 rgba(0, 0, 0, 0);
     }
     .badge {
       display: inline-flex;
       align-items: center;
-      border: 1px solid #d8e3f2;
+      border: 1px solid #2f3336;
       border-radius: 999px;
-      background: #fff;
-      color: #4f6281;
+      background: #111214;
+      color: #9ea4aa;
       font-size: 12px;
       font-weight: 700;
       padding: 6px 11px;
@@ -87,7 +86,7 @@
       letter-spacing: -0.02em;
     }
     h1 span {
-      background: linear-gradient(100deg, #1d9bf0, #fb7299, #2da44e);
+      background: linear-gradient(100deg, #1d9bf0, #67b8f6, #1d9bf0);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -111,8 +110,8 @@
       padding: 14px;
       text-decoration: none;
       color: inherit;
-      background: #fff;
-      box-shadow: 0 10px 22px rgba(93, 115, 147, 0.1);
+      background: #111214;
+      box-shadow: 0 0 0 rgba(0, 0, 0, 0);
       display: grid;
       gap: 8px;
     }
@@ -121,26 +120,26 @@
     .card .logo { font-size: 26px; font-weight: 800; }
     .chip {
       font-size: 11px;
-      border: 1px solid #d7e2f2;
+      border: 1px solid #2f3336;
       border-radius: 999px;
-      background: #f7faff;
-      color: #536686;
+      background: #0f1012;
+      color: #9ea4aa;
       padding: 4px 9px;
       font-weight: 700;
     }
     .card h3 { margin: 0; font-size: 21px; }
     .card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
-    .card ul { margin: 0; padding-left: 18px; color: #526789; font-size: 13px; line-height: 1.8; }
-    .card.m { border-color: rgba(29, 155, 240, 0.3); background: linear-gradient(155deg, rgba(29, 155, 240, 0.1), #fff 40%); }
-    .card.mi { border-color: rgba(251, 114, 153, 0.3); background: linear-gradient(155deg, rgba(251, 114, 153, 0.1), #fff 40%); }
-    .card.lenny { border-color: rgba(45, 164, 78, 0.3); background: linear-gradient(155deg, rgba(45, 164, 78, 0.1), #fff 40%); }
+    .card ul { margin: 0; padding-left: 18px; color: #9ea4aa; font-size: 13px; line-height: 1.8; }
+    .card.m { border-color: rgba(29, 155, 240, 0.6); background: linear-gradient(160deg, rgba(29, 155, 240, 0.14), #111214 42%); }
+    .card.mi { border-color: rgba(249, 24, 128, 0.6); background: linear-gradient(160deg, rgba(249, 24, 128, 0.13), #111214 42%); }
+    .card.lenny { border-color: rgba(0, 186, 124, 0.6); background: linear-gradient(160deg, rgba(0, 186, 124, 0.13), #111214 42%); }
     .tip {
       margin-top: 14px;
       border: 1px solid var(--line);
       border-radius: 14px;
-      background: #fff;
+      background: #111214;
       padding: 12px;
-      color: #60728e;
+      color: #8b949e;
       font-size: 13px;
     }
     @media (max-width: 980px) {
