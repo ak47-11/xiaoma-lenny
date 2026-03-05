@@ -34,7 +34,6 @@
   const verifyOtpBtn = document.getElementById("verifyOtpBtn");
 
 
-  const ADMIN_EMAILS = ["3102850054@qq.com"];
   const SUPPORT_EMAIL = "3102850054@qq.com";
   const OTP_COOLDOWN_SECONDS = 60;
   const otpTimestampKey = "xiaoma_otp_last_sent_at";
@@ -189,7 +188,6 @@
 
   async function checkAdmin(client, user) {
     if (!user) return false;
-    if (ADMIN_EMAILS.includes((user.email || "").toLowerCase())) return true;
 
     try {
       const result = await client
@@ -303,13 +301,27 @@
     }
 
     const client = getActiveClient();
-    const profile = await client
+    let profile = await client
       .from("profiles")
-      .select("contact")
-      .eq("display_name", value)
+      .select("*")
+      .eq("username", value)
       .maybeSingle();
 
-    const contact = profile.data?.contact || "";
+    if (profile.error && String(profile.error.message || "").includes("username")) {
+      profile = await client
+        .from("profiles")
+        .select("*")
+        .eq("display_name", value)
+        .maybeSingle();
+    } else if (!profile.error && !profile.data) {
+      profile = await client
+        .from("profiles")
+        .select("*")
+        .eq("display_name", value)
+        .maybeSingle();
+    }
+
+    const contact = String(profile.data?.contact || "").trim();
     if (!profile.error && isEmail(contact)) {
       return { email: contact.toLowerCase(), error: "" };
     }

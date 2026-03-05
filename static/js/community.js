@@ -11,6 +11,8 @@
   const DELTA_TOPICS = ["攻略", "配装", "战报", "求助", "招募"];
   const CHARGE_TOPICS = ["日常", "学习", "视频", "图片", "灵感"];
   const bannedWords = ["spam", "博彩", "色情", "辱骂", "侮辱"];
+  const REQUIRE_AUTH_FOR_WRITE = true;
+  const ALLOW_LOCAL_FALLBACK = false;
 
   const state = {
     tab: new URLSearchParams(window.location.search).get("tab") || "delta",
@@ -65,6 +67,29 @@
     toast.textContent = text;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 1800);
+  }
+
+  function currentPathWithQuery() {
+    return window.location.pathname + window.location.search;
+  }
+
+  function redirectToLogin(actionText) {
+    showToast("请先登录后" + actionText);
+    setTimeout(() => {
+      window.location.href = "/auth.html?next=" + encodeURIComponent(currentPathWithQuery());
+    }, 500);
+  }
+
+  function ensureWriteAccess(actionText) {
+    if (REQUIRE_AUTH_FOR_WRITE && !state.viewer) {
+      redirectToLogin(actionText);
+      return false;
+    }
+    if (!state.cloudReady) {
+      showToast("社区服务暂不可用，请稍后再试");
+      return false;
+    }
+    return true;
   }
 
   function bumpButton(button) {
@@ -171,12 +196,12 @@
     state.viewerName = user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || "游客";
 
     if (!user) {
-      viewerCard.innerHTML = "未登录，当前为游客模式（可浏览、点赞、评论本地数据）";
+      viewerCard.innerHTML = "未登录，当前可浏览内容；发帖、评论、点赞需先登录";
       return;
     }
 
     if (!state.cloudReady) {
-      viewerCard.innerHTML = "<b>" + state.viewerName + "</b><br />已登录（当前仍在本地模式，等待数据库表创建）";
+      viewerCard.innerHTML = "<b>" + state.viewerName + "</b><br />已登录（社区服务初始化中）";
       return;
     }
 
@@ -220,7 +245,7 @@
       }
     }
 
-    state.notices = readJson(STORAGE_NOTICES, []);
+    state.notices = [];
   }
 
   function pushLocalNotice(text) {
@@ -251,6 +276,11 @@
   }
 
   async function loadFollowState() {
+    if (!state.viewer) {
+      state.followingSet = new Set();
+      return;
+    }
+
     if (state.cloudReady && state.viewer) {
       const cloudRes = await supabase
         .from("follows")
@@ -262,7 +292,7 @@
       }
     }
 
-    state.followingSet = new Set(readJson(STORAGE_FOLLOWS, []));
+    state.followingSet = new Set();
   }
 
   function saveLocalFollowState() {
@@ -310,7 +340,7 @@
       }
     }
 
-    state.posts = getLocalPosts();
+    state.posts = ALLOW_LOCAL_FALLBACK ? getLocalPosts() : [];
   }
 
   async function uploadMedia(file, community) {
@@ -338,78 +368,56 @@
   }
 
   async function createPost(payload) {
-    if (state.cloudReady && state.viewer) {
-      const cloudPayload = {
-        community: payload.community,
-        title: payload.title,
-        content: payload.content,
-        topic: payload.topic,
-        likes: 0,
-        author_id: state.viewer.id,
-        author_name: state.viewerName,
-        media_type: payload.media_type,
-        media_url: payload.media_url
-      };
+    if (!ensureWriteAccess("发布内容")) return false;
 
-      const cloudRes = await supabase.from("community_posts").insert(cloudPayload);
-      if (!cloudRes.error) {
-        return true;
-      }
-      showToast("云端发布失败，已自动切本地发布");
-    }
-
-    const posts = getLocalPosts();
-    posts.unshift({
-      id: randomId(),
-      ...payload,
+    const cloudPayload = {
+      community: payload.community,
+      title: payload.title,
+      content: payload.content,
+      topic: payload.topic,
       likes: 0,
-      author_id: state.viewer?.id || "guest",
+      author_id: state.viewer.id,
       author_name: state.viewerName,
-      comments: [],
-      created_at: new Date().toISOString()
-    });
-    setLocalPosts(posts);
+      media_type: payload.media_type,
+      media_url: payload.media_url
+    };
+
+    const cloudRes = await supabase.from("community_posts").insert(cloudPayload);
+    if (cloudRes.error) {
+      showToast("发布失败：" + cloudRes.error.message);
+      return false;
+    }
     return true;
   }
 
   async function toggleLike(post) {
+    if (!ensureWriteAccess("点赞")) return;
+
     const key = "like:" + post.id;
     const liked = state.likedSet.has(key);
     const diff = liked ? -1 : 1;
 
-    if (state.cloudReady) {
-      const cloudRes = await supabase
-        .from("community_posts")
-        .update({ likes: Math.max((post.likes || 0) + diff, 0) })
-        .eq("id", post.id);
-      if (!cloudRes.error) {
-        if (liked) state.likedSet.delete(key);
-        else state.likedSet.add(key);
-        saveLocalActionState();
-
-        if (!liked && post.author_id && post.author_id !== state.viewer?.id) {
-          await pushNotice(state.viewerName + " 点赞了你的帖子《" + post.title + "》", post.author_id);
-        }
-        return;
-      }
+    const cloudRes = await supabase
+      .from("community_posts")
+      .update({ likes: Math.max((post.likes || 0) + diff, 0) })
+      .eq("id", post.id);
+    if (cloudRes.error) {
+      showToast("点赞失败：" + cloudRes.error.message);
+      return;
     }
-
-    const posts = getLocalPosts();
-    const target = posts.find((item) => item.id === post.id);
-    if (!target) return;
-    target.likes = Math.max((target.likes || 0) + diff, 0);
-    setLocalPosts(posts);
 
     if (liked) state.likedSet.delete(key);
     else state.likedSet.add(key);
     saveLocalActionState();
 
-    if (!liked && post.author_id !== "guest") {
-      pushLocalNotice(state.viewerName + " 点赞了《" + post.title + "》");
+    if (!liked && post.author_id && post.author_id !== state.viewer?.id) {
+      await pushNotice(state.viewerName + " 点赞了你的帖子《" + post.title + "》", post.author_id);
     }
   }
 
   async function toggleCollect(post) {
+    if (!ensureWriteAccess("收藏")) return;
+
     const key = "collect:" + post.id;
     if (state.collectSet.has(key)) state.collectSet.delete(key);
     else state.collectSet.add(key);
@@ -417,60 +425,72 @@
   }
 
   async function addComment(post, text) {
-    if (state.cloudReady && state.viewer) {
-      const cloudRes = await supabase.from("community_comments").insert({
-        post_id: post.id,
-        text,
-        author_id: state.viewer.id,
-        author_name: state.viewerName
-      });
+    if (!ensureWriteAccess("评论")) return false;
 
-      if (!cloudRes.error) {
-        if (post.author_id && post.author_id !== state.viewer.id) {
-          await pushNotice(state.viewerName + " 评论了你的帖子《" + post.title + "》", post.author_id);
-        }
-        return true;
-      }
+    const cloudRes = await supabase.from("community_comments").insert({
+      post_id: post.id,
+      text,
+      author_id: state.viewer.id,
+      author_name: state.viewerName
+    });
+
+    if (cloudRes.error) {
+      showToast("评论失败：" + cloudRes.error.message);
+      return false;
     }
 
-    const posts = getLocalPosts();
-    const target = posts.find((item) => item.id === post.id);
-    if (!target) return false;
-    target.comments = target.comments || [];
-    target.comments.unshift({ id: randomId(), text, author_name: state.viewerName, time: nowStr() });
-    setLocalPosts(posts);
-    pushLocalNotice(state.viewerName + " 评论了《" + post.title + "》");
+    if (post.author_id && post.author_id !== state.viewer.id) {
+      await pushNotice(state.viewerName + " 评论了你的帖子《" + post.title + "》", post.author_id);
+    }
     return true;
   }
 
   async function toggleFollow(authorId, authorName) {
+    if (!ensureWriteAccess("关注作者")) return;
     if (!authorId || authorId === state.viewer?.id) return;
 
     if (state.followingSet.has(authorId)) {
-      if (state.cloudReady && state.viewer) {
-        await supabase.from("follows").delete().eq("follower_id", state.viewer.id).eq("followee_id", authorId);
-      }
+      await supabase.from("follows").delete().eq("follower_id", state.viewer.id).eq("followee_id", authorId);
       state.followingSet.delete(authorId);
       saveLocalFollowState();
       return;
     }
 
-    if (state.cloudReady && state.viewer) {
-      const cloudRes = await supabase.from("follows").insert({ follower_id: state.viewer.id, followee_id: authorId });
-      if (!cloudRes.error) {
-        state.followingSet.add(authorId);
-        saveLocalFollowState();
-        await pushNotice(state.viewerName + " 关注了你", authorId);
-        return;
-      }
+    const cloudRes = await supabase.from("follows").insert({ follower_id: state.viewer.id, followee_id: authorId });
+    if (cloudRes.error) {
+      showToast("关注失败：" + cloudRes.error.message);
+      return;
     }
 
     state.followingSet.add(authorId);
     saveLocalFollowState();
-    pushLocalNotice(state.viewerName + " 关注了 " + (authorName || "作者"));
+    await pushNotice(state.viewerName + " 关注了你", authorId);
   }
 
   function buildComposer() {
+    if (REQUIRE_AUTH_FOR_WRITE && !state.viewer) {
+      composerArea.innerHTML = [
+        "<h3>发布内容</h3>",
+        "<p class='hint'>登录后可发布、评论、点赞与收藏内容。</p>",
+        "<button id='goLoginBtn' type='button'>立即登录</button>"
+      ].join("");
+      const loginBtn = document.getElementById("goLoginBtn");
+      if (loginBtn) {
+        loginBtn.addEventListener("click", () => {
+          window.location.href = "/auth.html?next=" + encodeURIComponent(currentPathWithQuery());
+        });
+      }
+      return;
+    }
+
+    if (!state.cloudReady) {
+      composerArea.innerHTML = [
+        "<h3>发布内容</h3>",
+        "<p class='hint'>社区服务初始化中，请稍后刷新重试。</p>"
+      ].join("");
+      return;
+    }
+
     const isDelta = state.tab === "delta";
     const topics = isDelta ? DELTA_TOPICS : CHARGE_TOPICS;
     const placeholder = isDelta ? "分享你的攻略、配装、组队或版本理解" : "分享你的图文、视频、学习记录与灵感";
@@ -562,7 +582,7 @@
         mediaType = /\.(mp4|mov|webm|m4v)(\?|$)/i.test(manualUrl) ? "video" : "image";
       }
 
-      await createPost({
+      const created = await createPost({
         community: state.tab,
         title: checkedTitle.text,
         content: checkedContent.text,
@@ -573,8 +593,10 @@
 
       submitBtn.disabled = false;
       submitBtn.textContent = "发布到" + (isDelta ? "三角洲讨论社区" : "充电社区");
-      showToast("发布成功");
-      await refreshAll();
+      if (created) {
+        showToast("发布成功");
+        await refreshAll();
+      }
     });
   }
 
@@ -636,7 +658,7 @@
     const list = sortedPosts();
     feedList.innerHTML = "";
     if (!list.length) {
-      feedList.innerHTML = "<p>还没有内容，快发布第一条吧。</p>";
+      feedList.innerHTML = state.cloudReady ? "<p>还没有内容，快发布第一条吧。</p>" : "<p>社区服务初始化中，请稍后刷新。</p>";
       return;
     }
 
@@ -724,10 +746,10 @@
           return;
         }
 
-        await addComment(post, checked.text);
+        const ok = await addComment(post, checked.text);
         sendBtn.disabled = false;
         sendBtn.textContent = "发送";
-        await refreshAll();
+        if (ok) await refreshAll();
       });
 
       feedList.appendChild(node);
@@ -776,7 +798,7 @@
     await refreshAll();
 
     if (!state.cloudReady) {
-      showToast("当前为本地模式；创建 Supabase 社区表后会自动切云端");
+      showToast("社区服务暂不可用，请先完成 Supabase 数据表迁移");
     }
   }
 

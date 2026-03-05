@@ -2,7 +2,6 @@
   const script = document.currentScript;
   const supabaseUrl = script?.dataset?.supabaseUrl || "";
   const supabaseAnonKey = script?.dataset?.supabaseAnonKey || "";
-  const ADMIN_EMAILS = ["3102850054@qq.com"];
 
   const statusEl = document.getElementById("status");
   const viewerTextEl = document.getElementById("viewerText");
@@ -71,16 +70,16 @@
     }
 
     currentUser = session.user;
-    viewerTextEl.textContent = "已登录：" + (currentUser.email || currentUser.id);
-
-    const emailAdmin = ADMIN_EMAILS.includes((currentUser.email || "").toLowerCase());
-    if (emailAdmin) {
-      await sb.from("profiles").upsert({ id: currentUser.id, display_name: currentUser.email || "admin", role: "admin" }, { onConflict: "id" });
-      return true;
+    const roleRes = await sb.from("profiles").select("role").eq("id", currentUser.id).maybeSingle();
+    if (roleRes.error) {
+      setStatus("权限校验失败：" + roleRes.error.message + "，请先执行最新 SQL 迁移", "err");
+      refreshBtn.disabled = true;
+      return false;
     }
 
-    const roleRes = await sb.from("profiles").select("role").eq("id", currentUser.id).maybeSingle();
-    if (!roleRes.error && roleRes.data?.role === "admin") return true;
+    const role = roleRes.data?.role || "user";
+    viewerTextEl.textContent = "已登录：" + (currentUser.email || currentUser.id) + "（" + role + "）";
+    if (role === "admin") return true;
 
     setStatus("你没有管理权限，请联系管理员分配 admin 角色", "err");
     refreshBtn.disabled = true;
