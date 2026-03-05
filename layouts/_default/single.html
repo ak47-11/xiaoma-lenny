@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>关于我 | xiaoma.cyou</title>
+<title>{{ .Title }} | xiaoma.cyou</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -69,15 +69,7 @@ box-shadow:0 12px 30px rgba(108,121,156,.12)
   </header>
 
   <article class="paper">
-    <div class="content"><p>你好，我是小马。
-我专注做三件事：</p>
-<ol>
-<li>AI 自动化落地</li>
-<li>效率工具实战</li>
-<li>个人品牌与变现</li>
-</ol>
-<p>如果你想合作，可以邮件联系：3102850054@qq.com</p>
-</div>
+    <div class="content">{{ .Content }}</div>
   </article>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

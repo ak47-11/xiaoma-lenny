@@ -1,6 +1,6 @@
 baseURL = "https://xiaoma.cyou/"
 languageCode = "zh-cn"
-title = "小马 Lenny 的博客"
+title = "xiaoma.cyou"
 theme = "PaperMod"
 
 [outputs]
@@ -20,7 +20,7 @@ ShowReadingTime = true
 ShowShareButtons = true
 ShowCodeCopyButtons = true
 ShowPostNavLinks = true
-ShowBreadCrumbs = true
+ShowBreadCrumbs = false
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 mainSections = ["posts"]
@@ -39,27 +39,3 @@ url = "https://github.com/ak47-11"
 name = "email"
 url = "mailto:3102850054@qq.com"
 
-[[menu.main]]
-name = "首页"
-url = "/"
-weight = 1
-
-[[menu.main]]
-name = "免责声明"
-url = "/disclaimer/"
-weight = 2
-
-[[menu.main]]
-name = "社区"
-url = "/community.html"
-weight = 3
-
-[[menu.main]]
-name = "标签"
-url = "/tags/"
-weight = 4
-
-[[menu.main]]
-name = "注册/登录"
-url = "/auth.html"
-weight = 5
