@@ -76,6 +76,33 @@
     return "发送失败：" + raw;
   }
 
+  function authFriendlyError(action, error) {
+    const raw = String(error?.message || "");
+    const text = raw.toLowerCase();
+
+    if (text.includes("invalid login credentials")) {
+      return "邮箱或密码错误；如果你是验证码注册，请先点击“忘记密码”设置密码";
+    }
+    if (text.includes("email not confirmed")) {
+      return "邮箱尚未验证，请先完成邮箱验证后再登录";
+    }
+    if (text.includes("too many") || text.includes("rate")) {
+      return "请求过于频繁，请稍后再试";
+    }
+    if (text.includes("user") && text.includes("not") && text.includes("found")) {
+      return "该邮箱未注册，请先创建账号";
+    }
+    if (text.includes("password should be at least")) {
+      return "密码强度不足，请设置至少 6 位密码";
+    }
+
+    if (action === "login") return "登录失败：" + raw;
+    if (action === "register") return "注册失败：" + raw;
+    if (action === "reset") return "重置密码失败：" + raw;
+    if (action === "verify") return "验证码校验失败：" + raw;
+    return raw;
+  }
+
   function getCurrentOtpIdentity() {
     return String((otpIdentityEl?.value || "").trim().toLowerCase());
   }
@@ -289,7 +316,7 @@
     setLoading(loginBtn, true, "登录", "登录中...");
     const { error } = await client.auth.signInWithPassword({ email, password });
     setLoading(loginBtn, false, "登录", "登录中...");
-    if (error) return setStatus("登录失败：" + error.message, "err");
+    if (error) return setStatus(authFriendlyError("login", error), "err");
 
     setStatus("登录成功，正在跳转", "ok");
     setTimeout(function () {
@@ -327,7 +354,7 @@
     setLoading(forgotBtn, true, "忘记密码？", "发送中...");
     const { error } = await client.auth.resetPasswordForEmail(email);
     setLoading(forgotBtn, false, "忘记密码？", "发送中...");
-    if (error) return setStatus("发送失败：" + error.message, "err");
+    if (error) return setStatus(authFriendlyError("reset", error), "err");
     setStatus("重置链接已发送到邮箱", "ok");
   });
 
@@ -356,7 +383,7 @@
     setLoading(verifyOtpBtn, true, "验证并登录", "验证中...");
     const result = await client.auth.verifyOtp({ email: identity, token, type: "email" });
     setLoading(verifyOtpBtn, false, "验证并登录", "验证中...");
-    if (result.error) return setStatus("验证失败：" + result.error.message, "err");
+    if (result.error) return setStatus(authFriendlyError("verify", result.error), "err");
 
     if (otpPurpose === "register") {
       if (identity.toLowerCase() !== pendingRegisterEmail || !pendingRegisterPassword) {
@@ -365,7 +392,7 @@
 
       const updateResult = await client.auth.updateUser({ password: pendingRegisterPassword });
       if (updateResult.error) {
-        return setStatus("验证码通过，但设置密码失败：" + updateResult.error.message, "err");
+        return setStatus("验证码通过，但设置密码失败：" + authFriendlyError("register", updateResult.error), "err");
       }
 
       pendingRegisterEmail = "";
