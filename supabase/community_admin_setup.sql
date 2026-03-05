@@ -139,12 +139,25 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  jwt_role text := coalesce(current_setting('request.jwt.claim.role', true), '');
+  is_privileged boolean := (
+    jwt_role = 'service_role'
+    or current_user in ('postgres', 'supabase_admin', 'supabase_auth_admin', 'service_role')
+  );
 begin
   if new.username is not null then
     new.username := lower(trim(new.username));
     if new.username !~ '^[a-z0-9_]{3,24}$' then
       raise exception 'username must match ^[a-z0-9_]{3,24}$';
     end if;
+  end if;
+
+  if is_privileged then
+    if new.role is null then
+      new.role := 'user';
+    end if;
+    return new;
   end if;
 
   if tg_op = 'INSERT' then
