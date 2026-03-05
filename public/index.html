@@ -4,230 +4,259 @@
 	<meta name="generator" content="Hugo 0.157.0">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>小马 Lenny | 小马可不是笨笨嘟</title>
+<title>xiaoma.cyou | M · Mi · Lenny</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="description" content="小马 Lenny：社交分享与图文内容社区，记录成长和灵感。">
+<meta name="description" content="M、Mi、Lenny 三个社区的一站式入口：社交发布、视频内容、技术社区。">
 <style>
-:root{
---bg:#fffaf6;
---text:#2a3147;
---muted:#6d7899;
---line:#e6e8f5;
---card:#ffffff;
---delta:#89c4ff;
---charge:#ffc7b4;
---mint:#7ae4ce;
---lav:#d8c7ff;
-}
-*{box-sizing:border-box}
-body{
-margin:0;
-font-family:"Nunito","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
-color:var(--text);
-background:
-radial-gradient(1100px 500px at 10% -20%, rgba(137,196,255,.40), transparent 62%),
-radial-gradient(1100px 500px at 100% -10%, rgba(255,199,180,.38), transparent 62%),
-radial-gradient(1000px 450px at 50% 110%, rgba(216,199,255,.20), transparent 68%),
-var(--bg);
-min-height:100vh;
-}
-.container{width:min(1140px,92%);margin:0 auto}
-.nav{
-display:flex;align-items:center;justify-content:space-between;
-padding:18px 0;position:sticky;top:0;z-index:8;
-backdrop-filter: blur(8px);
-}
-.logo{font-weight:900;letter-spacing:.3px}
-.menu a{color:var(--muted);text-decoration:none;margin-left:14px;font-weight:700}
-.menu a:hover{color:#43547f}
-.login-btn{
-  color:#2c3c5f !important;
-  background:linear-gradient(100deg,var(--delta),#c6dcff);
-  padding:8px 16px;
-  border-radius:999px;
-  border:1px solid #d7e2f8;
-  font-weight:800;
-  margin-left:20px;
-}
-.hero{
-padding:34px 0 22px;display:grid;grid-template-columns:1.2fr .8fr;gap:16px;align-items:stretch;
-}
-.tag{
-display:inline-block;padding:8px 12px;border:1px solid var(--line);
-border-radius:999px;color:#5e75a8;background:#f3f7ff;font-size:12px;font-weight:700
-}
-h1{font-size:clamp(34px,6vw,58px);line-height:1.08;margin:16px 0}
-.grad{
-background:linear-gradient(100deg,#69b2ff,#7ee8d4,#ffbfa9);
--webkit-background-clip:text;background-clip:text;color:transparent
-}
-.sub{color:var(--muted);font-size:18px;line-height:1.8;max-width:640px}
-.cta{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
-.btn{
-padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:800;
-border:1px solid var(--line);display:inline-block
-}
-.btn.primary{color:#213152;background:linear-gradient(100deg,var(--mint),var(--delta));border:none}
-.btn.ghost{color:#5a6a95;background:#fff}
-.panel{
-border:1px solid var(--line);border-radius:22px;padding:20px;
-background:linear-gradient(140deg,#fff, #f8fbff);
-box-shadow:0 12px 28px rgba(113,125,164,.14);
-}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.cell{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
-.cell b{font-size:22px;display:block}
-.sec{padding:36px 0}
-.sec h2{font-size:30px;margin:0 0 10px}
-.muted{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.card{
-border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--card);
-box-shadow:0 10px 22px rgba(118,128,164,.10)
-}
-.card h3{margin:0 0 8px;font-size:20px}
-.card ul{margin:0;padding-left:18px;color:#62719a;line-height:1.8}
+  :root {
+    --bg: #f7fafc;
+    --text: #18243a;
+    --muted: #5f728f;
+    --line: #dce6f3;
+    --surface: #ffffff;
+    --m: #1d9bf0;
+    --mi: #fb7299;
+    --lenny: #2da44e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Sora", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(980px 520px at 10% -10%, rgba(29, 155, 240, 0.18), transparent 63%),
+      radial-gradient(980px 520px at 90% -10%, rgba(251, 114, 153, 0.16), transparent 63%),
+      radial-gradient(1100px 540px at 50% 120%, rgba(45, 164, 78, 0.14), transparent 68%),
+      var(--bg);
+    min-height: 100vh;
+  }
+  .container { width: min(1160px, 93%); margin: 18px auto 42px; }
+  .top {
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    position: sticky;
+    top: 12px;
+    z-index: 20;
+  }
+  .brand {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nav a {
+    text-decoration: none;
+    color: #30486f;
+    border: 1px solid #d2dff2;
+    background: #fff;
+    border-radius: 999px;
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+  }
+  .nav .entry {
+    border: none;
+    color: #fff;
+  }
+  .nav .m { background: linear-gradient(100deg, #2ea7f4, #1d9bf0); }
+  .nav .mi { background: linear-gradient(100deg, #ff8db1, #fb7299); }
+  .nav .lenny { background: linear-gradient(100deg, #42bf63, #2da44e); }
 
-.showcase{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;}
-.photo-card{border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px;box-shadow:0 10px 22px rgba(118,128,164,.10)}
-.photo-mock{height:180px;border-radius:14px;background:linear-gradient(130deg, rgba(137,196,255,.38), rgba(255,199,180,.38), rgba(216,199,255,.35));display:flex;align-items:center;justify-content:center;font-size:42px}
-.photo-meta{margin-top:10px;color:#5d6990;font-size:14px;line-height:1.7}
+  .hero {
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(247,250,255,0.88));
+    padding: 28px;
+    box-shadow: 0 18px 42px rgba(87, 112, 149, 0.14);
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    border: 1px solid #dbe5f2;
+    background: #fff;
+    color: #4c5f7f;
+    padding: 6px 11px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .hero h1 {
+    margin: 12px 0 10px;
+    font-size: clamp(34px, 5vw, 56px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span {
+    background: linear-gradient(100deg, #1d9bf0, #fb7299, #2da44e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.8;
+    max-width: 900px;
+  }
 
-.community-band{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.band-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
-.band-card.delta{background:linear-gradient(120deg,rgba(137,196,255,.28),#fff)}
-.band-card.charge{background:linear-gradient(120deg,rgba(255,199,180,.28),#fff)}
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:#4d5a82;background:#f3f5ff;padding:4px 8px;border-radius:999px;border:1px solid #dfe4f5}
-.band-card p{margin:8px 0 0;color:#607099;line-height:1.7}
+  .portal-grid {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .portal {
+    border-radius: 20px;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 16px;
+    box-shadow: 0 14px 28px rgba(97, 118, 151, 0.1);
+    transition: transform .18s ease, box-shadow .18s ease;
+    display: grid;
+    gap: 10px;
+  }
+  .portal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 34px rgba(97, 118, 151, 0.14);
+  }
+  .portal .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .portal .logo {
+    font-size: 26px;
+    font-weight: 800;
+  }
+  .portal .type {
+    font-size: 11px;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-weight: 700;
+    border: 1px solid #d6e0ef;
+    color: #4f607f;
+    background: #f7faff;
+  }
+  .portal h3 {
+    margin: 0;
+    font-size: 22px;
+  }
+  .portal p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .portal ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #516687;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .portal.m { border-color: rgba(29,155,240,.28); background: linear-gradient(155deg, rgba(29,155,240,.1), #fff 38%); }
+  .portal.mi { border-color: rgba(251,114,153,.28); background: linear-gradient(155deg, rgba(251,114,153,.1), #fff 38%); }
+  .portal.lenny { border-color: rgba(45,164,78,.28); background: linear-gradient(155deg, rgba(45,164,78,.1), #fff 38%); }
 
-.final{
-margin:30px 0 54px;border:1px solid var(--line);border-radius:22px;padding:24px;
-background:linear-gradient(100deg,rgba(122,228,206,.26),rgba(137,196,255,.22),rgba(255,199,180,.24));
-display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap
-}
-footer{padding:24px 0 40px;color:var(--muted);border-top:1px solid var(--line)}
-@media (max-width:900px){
-.hero{grid-template-columns:1fr}
-.showcase{grid-template-columns:1fr}
-.community-band{grid-template-columns:1fr}
-.grid{grid-template-columns:1fr}
-.stats{grid-template-columns:1fr 1fr}
-}
+  .foot {
+    margin-top: 16px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #fff;
+    padding: 14px;
+    color: #61738f;
+    font-size: 13px;
+  }
+
+  @media (max-width: 980px) {
+    .portal-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
-<div class="container">
-<nav class="nav">
-<div class="logo">xiaoma.cyou</div>
-<div class="menu">
-<a href="/community.html">发现内容</a>
-<a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
-<a href="/admin.html" id="adminNav" style="display:none">控制台</a>
-<a href="/auth.html" class="login-btn" id="loginNav">账号入口</a>
-<a href="#" class="login-btn" id="logoutNav" style="display:none;background:#fff;color:#2a3147 !important;">退出账号</a>
-</div>
-</nav>
+<main class="container">
+  <header class="top">
+    <div class="brand">xiaoma.cyou</div>
+    <nav class="nav">
+      <a class="entry m" href="/m.html">M</a>
+      <a class="entry mi" href="/mi.html">Mi</a>
+      <a class="entry lenny" href="/lenny.html">Lenny</a>
+      <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+      <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
+      <a href="/auth.html" id="loginNav">账号入口</a>
+      <a href="#" id="logoutNav" style="display:none">退出账号</a>
+    </nav>
+  </header>
 
-<section class="hero">
-<div>
-<span class="tag">Social Sharing · Community · Build in Public</span>
-<h1>分享你的故事，<br><span class="grad">连接更多同频的人</span></h1>
-<p class="sub">
-这里是小马 Lenny 的社交分享站点：聊游戏、发图文、记录日常与成长，
-把有价值的内容持续沉淀。
-</p>
-<div class="cta">
-<a class="btn primary" href="/community.html">进入社区</a>
-<a class="btn ghost" href="/auth.html">账号入口</a>
-</div>
+  <section class="hero">
+    <span class="eyebrow">Integrated Community Hub</span>
+    <h1>一个网站，<span>三种创作宇宙</span></h1>
+    <p>欢迎来到 xiaoma.cyou。这里把实时社交、视频社区、技术创作统一在一个账号体系里：你可以在 M 发动态，在 Mi 发视频，在 Lenny 写教程与分析文章。</p>
 
-<div class="community-band">
-<div class="band-card delta">
-<span class="badge">🦊 三角洲讨论社区</span>
-<p>以攻略、配装、组队和战报为核心，打造高质量游戏讨论氛围。</p>
-</div>
-<div class="band-card charge">
-<span class="badge">🐼 充电社区</span>
-<p>用图文和短视频记录生活、学习和灵感，打造轻松的分享空间。</p>
-</div>
-</div>
-</div>
+    <div class="portal-grid">
+      <a class="portal m" href="/m.html">
+        <div class="head"><div class="logo">M</div><span class="type">Micro Social</span></div>
+        <h3>像推特一样快速发布</h3>
+        <p>短内容优先，时间流刷新，适合即时观点、动态更新与社区互动。</p>
+        <ul>
+          <li>发布动态、图片链接、热门话题</li>
+          <li>点赞、评论、转发、关注作者</li>
+          <li>适合“边学边分享”的即时输出</li>
+        </ul>
+      </a>
 
-<div class="panel">
-<h3 style="margin:0 0 6px">社区活跃看板</h3>
-<p class="muted" style="margin:0">每天更新内容，让更多人看到真实分享。</p>
-<div class="stats">
-<div class="cell"><b>24h</b><span class="muted">持续热帖更新</span></div>
-<div class="cell"><b>图文+视频</b><span class="muted">双内容形态</span></div>
-<div class="cell"><b>互动优先</b><span class="muted">点赞评论收藏</span></div>
-</div>
-</div>
-</section>
+      <a class="portal mi" href="/mi.html">
+        <div class="head"><div class="logo">Mi</div><span class="type">Video Community</span></div>
+        <h3>像 B 站一样看与发视频</h3>
+        <p>视频卡片流 + 分类发现，支持封面、简介与链接发布，形成内容频道。</p>
+        <ul>
+          <li>上传视频信息、分类和封面</li>
+          <li>播放、点赞、收藏、快速浏览</li>
+          <li>适合教程视频和创作展示</li>
+        </ul>
+      </a>
 
-<section class="sec">
-<h2>图文介绍</h2>
-<p class="muted">首页主打社交分享，你可以快速了解两个社区的内容方向。</p>
-<div class="showcase">
-<div class="card">
-<h3>三角洲社区内容结构</h3>
-<ul>
-<li>战术攻略：地图、路线、打法拆解</li>
-<li>配装建议：版本适配与实战反馈</li>
-<li>组队招募：快速找到同频队友</li>
-</ul>
-</div>
-<div class="card">
-<h3>充电社区内容结构</h3>
-<ul>
-<li>图文日常：生活、学习、成长片段</li>
-<li>视频动态：短视频记录与分享</li>
-<li>主题话题：灵感征集与活动互动</li>
-</ul>
-</div>
+      <a class="portal lenny" href="/lenny.html">
+        <div class="head"><div class="logo">Lenny</div><span class="type">Tech Community</span></div>
+        <h3>像 GitHub 社区一样沉淀技术</h3>
+        <p>面向教程、复盘、分析文章的技术阵地，鼓励高质量长期内容。</p>
+        <ul>
+          <li>发布教程、分析、实战笔记</li>
+          <li>标签分类、文章互动、收藏管理</li>
+          <li>适合建立个人技术影响力</li>
+        </ul>
+      </a>
+    </div>
+  </section>
 
-<div class="photo-card">
-<div class="photo-mock">📷</div>
-<div class="photo-meta">图文风格展示区：支持内容封面、描述文案和互动按钮，未来可接入真实用户内容瀑布流。</div>
-</div>
-
-<div class="photo-card">
-<div class="photo-mock">🎬</div>
-<div class="photo-meta">视频风格展示区：支持短视频发布与话题标签，打造“可刷、可评、可收藏”的社交体验。</div>
-</div>
-</div>
-</section>
-
-<section class="sec">
-<h2>快速入口</h2>
-<p class="muted">点击进入对应社区，开始发帖或浏览互动内容</p>
-<div class="grid">
-<a class="card" href="/community.html?tab=delta" style="text-decoration:none;color:inherit;">
-<h3>1）三角洲讨论社区</h3>
-<p class="muted">进入三角洲讨论社区</p>
-</a>
-
-<a class="card" href="/community.html?tab=charge" style="text-decoration:none;color:inherit;">
-<h3>2）充电社区</h3>
-<p class="muted">发布图文和视频动态</p>
-</a>
-</div>
-</section>
-
-<section class="final">
-<div>
-<h3 style="margin:0 0 8px">分享内容，沉淀关系，打造你的社区影响力</h3>
-<div class="muted">从第一条图文或第一条视频开始，把真实内容长期积累。</div>
-</div>
-<a class="btn primary" href="/community.html">现在去发布</a>
-</section>
-
-<footer>
-© 2026 xiaoma.cyou · Built with Hugo & Vercel
-</footer>
-</div>
+  <section class="foot">建议先完成账号登录，再进入对应模块发布内容，这样可获得完整互动与个人资料联动体验。</section>
+</main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/js/session-gate.js"></script>
+<script src="/js/app-core.js"></script>
+<script>
+  window.XiaomaCore?.applyNavState();
+</script>
 </body>
 </html>

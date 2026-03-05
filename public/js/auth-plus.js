@@ -77,6 +77,8 @@
     const url = new URL(window.location.href);
     const next = url.searchParams.get("next");
     if (!next || !next.startsWith("/")) return "/";
+    if (next === "/community" || next === "/community/") return "/community.html";
+    if (next.startsWith("/community.html")) return "/community.html";
     return next;
   }
 
@@ -219,7 +221,7 @@
       "<div class='session-actions'>" +
       "<button type='button' class='mini-btn' id='goNextBtn'>继续访问</button>" +
       "<button type='button' class='mini-btn' id='goProfileBtn'>个人中心</button>" +
-      "<button type='button' class='mini-btn' id='goCommunityBtn'>社区首页</button>" +
+      "<button type='button' class='mini-btn' id='goCommunityBtn'>社区入口</button>" +
       (isAdmin ? "<button type='button' class='mini-btn' id='goAdminBtn'>管理台</button>" : "") +
       "<button type='button' class='mini-btn' id='logoutBtn'>退出登录</button>" +
       "</div>";

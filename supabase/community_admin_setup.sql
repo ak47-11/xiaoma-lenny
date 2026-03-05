@@ -89,6 +89,211 @@ create table if not exists operation_logs (
   created_at timestamptz default now()
 );
 
+create table if not exists m_posts (
+  id uuid primary key default gen_random_uuid(),
+  content text not null check (char_length(content) <= 280),
+  media_url text,
+  author_id uuid not null references auth.users(id) on delete cascade,
+  author_name text,
+  created_at timestamptz default now()
+);
+
+create table if not exists m_comments (
+  id uuid primary key default gen_random_uuid(),
+  post_id uuid not null references m_posts(id) on delete cascade,
+  text text not null check (char_length(text) <= 300),
+  author_id uuid not null references auth.users(id) on delete cascade,
+  author_name text,
+  created_at timestamptz default now()
+);
+
+create table if not exists m_reactions (
+  id bigserial primary key,
+  post_id uuid not null references m_posts(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  reaction_type text not null check (reaction_type in ('like', 'repost')),
+  created_at timestamptz default now(),
+  unique(post_id, user_id, reaction_type)
+);
+
+create index if not exists m_posts_created_at_idx on m_posts (created_at desc);
+create index if not exists m_comments_post_created_idx on m_comments (post_id, created_at desc);
+create index if not exists m_reactions_post_type_idx on m_reactions (post_id, reaction_type);
+create unique index if not exists m_reactions_unique_idx on m_reactions (post_id, user_id, reaction_type);
+
+create table if not exists mi_videos (
+  id uuid primary key default gen_random_uuid(),
+  title text not null check (char_length(title) <= 120),
+  summary text,
+  video_url text not null,
+  cover_url text,
+  category text not null default '综合推荐',
+  duration_text text,
+  tags text[] not null default '{}',
+  play_count int not null default 0,
+  like_count int not null default 0,
+  favorite_count int not null default 0,
+  author_id uuid not null references auth.users(id) on delete cascade,
+  author_name text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists mi_video_actions (
+  id bigserial primary key,
+  video_id uuid not null references mi_videos(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  action_type text not null check (action_type in ('like', 'favorite')),
+  created_at timestamptz default now(),
+  unique(video_id, user_id, action_type)
+);
+
+create table if not exists mi_video_comments (
+  id uuid primary key default gen_random_uuid(),
+  video_id uuid not null references mi_videos(id) on delete cascade,
+  text text not null check (char_length(text) <= 500),
+  author_id uuid not null references auth.users(id) on delete cascade,
+  author_name text,
+  created_at timestamptz default now()
+);
+
+create table if not exists mi_video_views (
+  id bigserial primary key,
+  video_id uuid not null references mi_videos(id) on delete cascade,
+  viewer_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz default now(),
+  unique(video_id, viewer_id)
+);
+
+create index if not exists mi_videos_created_at_idx on mi_videos (created_at desc);
+create index if not exists mi_videos_category_idx on mi_videos (category);
+create index if not exists mi_video_comments_video_created_idx on mi_video_comments (video_id, created_at desc);
+create unique index if not exists mi_video_actions_unique_idx on mi_video_actions (video_id, user_id, action_type);
+create unique index if not exists mi_video_views_unique_idx on mi_video_views (video_id, viewer_id);
+
+create table if not exists lenny_articles (
+  id uuid primary key default gen_random_uuid(),
+  title text not null check (char_length(title) <= 160),
+  summary text,
+  content text not null,
+  article_type text not null check (article_type in ('blog', 'tutorial', 'analysis')),
+  tags text[] not null default '{}',
+  read_count int not null default 0,
+  like_count int not null default 0,
+  bookmark_count int not null default 0,
+  author_id uuid not null references auth.users(id) on delete cascade,
+  author_name text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists lenny_article_actions (
+  id bigserial primary key,
+  article_id uuid not null references lenny_articles(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  action_type text not null check (action_type in ('like', 'bookmark')),
+  created_at timestamptz default now(),
+  unique(article_id, user_id, action_type)
+);
+
+create table if not exists lenny_article_comments (
+  id uuid primary key default gen_random_uuid(),
+  article_id uuid not null references lenny_articles(id) on delete cascade,
+  text text not null check (char_length(text) <= 800),
+  author_id uuid not null references auth.users(id) on delete cascade,
+  author_name text,
+  created_at timestamptz default now()
+);
+
+create table if not exists lenny_article_reads (
+  id bigserial primary key,
+  article_id uuid not null references lenny_articles(id) on delete cascade,
+  reader_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz default now(),
+  unique(article_id, reader_id)
+);
+
+create index if not exists lenny_articles_created_at_idx on lenny_articles (created_at desc);
+create index if not exists lenny_articles_type_idx on lenny_articles (article_type);
+create index if not exists lenny_article_comments_article_created_idx on lenny_article_comments (article_id, created_at desc);
+create unique index if not exists lenny_article_actions_unique_idx on lenny_article_actions (article_id, user_id, action_type);
+create unique index if not exists lenny_article_reads_unique_idx on lenny_article_reads (article_id, reader_id);
+
+alter table m_posts add column if not exists content text;
+alter table m_posts add column if not exists media_url text;
+alter table m_posts add column if not exists author_id uuid;
+alter table m_posts add column if not exists author_name text;
+alter table m_posts add column if not exists created_at timestamptz default now();
+
+alter table m_comments add column if not exists post_id uuid;
+alter table m_comments add column if not exists text text;
+alter table m_comments add column if not exists author_id uuid;
+alter table m_comments add column if not exists author_name text;
+alter table m_comments add column if not exists created_at timestamptz default now();
+
+alter table m_reactions add column if not exists post_id uuid;
+alter table m_reactions add column if not exists user_id uuid;
+alter table m_reactions add column if not exists reaction_type text;
+alter table m_reactions add column if not exists created_at timestamptz default now();
+
+alter table mi_videos add column if not exists title text;
+alter table mi_videos add column if not exists summary text;
+alter table mi_videos add column if not exists video_url text;
+alter table mi_videos add column if not exists cover_url text;
+alter table mi_videos add column if not exists category text default '综合推荐';
+alter table mi_videos add column if not exists duration_text text;
+alter table mi_videos add column if not exists tags text[] not null default '{}';
+alter table mi_videos add column if not exists play_count int not null default 0;
+alter table mi_videos add column if not exists like_count int not null default 0;
+alter table mi_videos add column if not exists favorite_count int not null default 0;
+alter table mi_videos add column if not exists author_id uuid;
+alter table mi_videos add column if not exists author_name text;
+alter table mi_videos add column if not exists created_at timestamptz default now();
+alter table mi_videos add column if not exists updated_at timestamptz default now();
+
+alter table mi_video_actions add column if not exists video_id uuid;
+alter table mi_video_actions add column if not exists user_id uuid;
+alter table mi_video_actions add column if not exists action_type text;
+alter table mi_video_actions add column if not exists created_at timestamptz default now();
+
+alter table mi_video_comments add column if not exists video_id uuid;
+alter table mi_video_comments add column if not exists text text;
+alter table mi_video_comments add column if not exists author_id uuid;
+alter table mi_video_comments add column if not exists author_name text;
+alter table mi_video_comments add column if not exists created_at timestamptz default now();
+
+alter table mi_video_views add column if not exists video_id uuid;
+alter table mi_video_views add column if not exists viewer_id uuid;
+alter table mi_video_views add column if not exists created_at timestamptz default now();
+
+alter table lenny_articles add column if not exists title text;
+alter table lenny_articles add column if not exists summary text;
+alter table lenny_articles add column if not exists content text;
+alter table lenny_articles add column if not exists article_type text;
+alter table lenny_articles add column if not exists tags text[] not null default '{}';
+alter table lenny_articles add column if not exists read_count int not null default 0;
+alter table lenny_articles add column if not exists like_count int not null default 0;
+alter table lenny_articles add column if not exists bookmark_count int not null default 0;
+alter table lenny_articles add column if not exists author_id uuid;
+alter table lenny_articles add column if not exists author_name text;
+alter table lenny_articles add column if not exists created_at timestamptz default now();
+alter table lenny_articles add column if not exists updated_at timestamptz default now();
+
+alter table lenny_article_actions add column if not exists article_id uuid;
+alter table lenny_article_actions add column if not exists user_id uuid;
+alter table lenny_article_actions add column if not exists action_type text;
+alter table lenny_article_actions add column if not exists created_at timestamptz default now();
+
+alter table lenny_article_comments add column if not exists article_id uuid;
+alter table lenny_article_comments add column if not exists text text;
+alter table lenny_article_comments add column if not exists author_id uuid;
+alter table lenny_article_comments add column if not exists author_name text;
+alter table lenny_article_comments add column if not exists created_at timestamptz default now();
+
+alter table lenny_article_reads add column if not exists article_id uuid;
+alter table lenny_article_reads add column if not exists reader_id uuid;
+alter table lenny_article_reads add column if not exists created_at timestamptz default now();
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -102,6 +307,18 @@ $$;
 drop trigger if exists trg_profiles_set_updated_at on profiles;
 create trigger trg_profiles_set_updated_at
 before update on profiles
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists trg_mi_videos_set_updated_at on mi_videos;
+create trigger trg_mi_videos_set_updated_at
+before update on mi_videos
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists trg_lenny_articles_set_updated_at on lenny_articles;
+create trigger trg_lenny_articles_set_updated_at
+before update on lenny_articles
 for each row
 execute function public.set_updated_at();
 
@@ -193,6 +410,17 @@ alter table follows enable row level security;
 alter table notifications enable row level security;
 alter table moderation_queue enable row level security;
 alter table operation_logs enable row level security;
+alter table m_posts enable row level security;
+alter table m_comments enable row level security;
+alter table m_reactions enable row level security;
+alter table mi_videos enable row level security;
+alter table mi_video_actions enable row level security;
+alter table mi_video_comments enable row level security;
+alter table mi_video_views enable row level security;
+alter table lenny_articles enable row level security;
+alter table lenny_article_actions enable row level security;
+alter table lenny_article_comments enable row level security;
+alter table lenny_article_reads enable row level security;
 
 -- 清理旧策略名
 drop policy if exists "profiles_read_all" on profiles;
@@ -213,6 +441,42 @@ drop policy if exists "queue_read_admin_or_mod" on moderation_queue;
 drop policy if exists "queue_update_admin_or_mod" on moderation_queue;
 drop policy if exists "logs_insert_admin_or_mod" on operation_logs;
 drop policy if exists "logs_read_admin_or_mod" on operation_logs;
+drop policy if exists "m_posts_select_public" on m_posts;
+drop policy if exists "m_posts_insert_self" on m_posts;
+drop policy if exists "m_posts_update_owner_or_admin" on m_posts;
+drop policy if exists "m_posts_delete_owner_or_admin" on m_posts;
+drop policy if exists "m_comments_select_public" on m_comments;
+drop policy if exists "m_comments_insert_self" on m_comments;
+drop policy if exists "m_comments_delete_owner_or_admin" on m_comments;
+drop policy if exists "m_reactions_select_public" on m_reactions;
+drop policy if exists "m_reactions_insert_self" on m_reactions;
+drop policy if exists "m_reactions_delete_self_or_admin" on m_reactions;
+drop policy if exists "mi_videos_select_public" on mi_videos;
+drop policy if exists "mi_videos_insert_self" on mi_videos;
+drop policy if exists "mi_videos_update_owner_or_admin" on mi_videos;
+drop policy if exists "mi_videos_delete_owner_or_admin" on mi_videos;
+drop policy if exists "mi_video_actions_select_public" on mi_video_actions;
+drop policy if exists "mi_video_actions_insert_self" on mi_video_actions;
+drop policy if exists "mi_video_actions_delete_self_or_admin" on mi_video_actions;
+drop policy if exists "mi_video_comments_select_public" on mi_video_comments;
+drop policy if exists "mi_video_comments_insert_self" on mi_video_comments;
+drop policy if exists "mi_video_comments_delete_owner_or_admin" on mi_video_comments;
+drop policy if exists "mi_video_views_select_public" on mi_video_views;
+drop policy if exists "mi_video_views_insert_self" on mi_video_views;
+drop policy if exists "mi_video_views_delete_self_or_admin" on mi_video_views;
+drop policy if exists "lenny_articles_select_public" on lenny_articles;
+drop policy if exists "lenny_articles_insert_self" on lenny_articles;
+drop policy if exists "lenny_articles_update_owner_or_admin" on lenny_articles;
+drop policy if exists "lenny_articles_delete_owner_or_admin" on lenny_articles;
+drop policy if exists "lenny_article_actions_select_public" on lenny_article_actions;
+drop policy if exists "lenny_article_actions_insert_self" on lenny_article_actions;
+drop policy if exists "lenny_article_actions_delete_self_or_admin" on lenny_article_actions;
+drop policy if exists "lenny_article_comments_select_public" on lenny_article_comments;
+drop policy if exists "lenny_article_comments_insert_self" on lenny_article_comments;
+drop policy if exists "lenny_article_comments_delete_owner_or_admin" on lenny_article_comments;
+drop policy if exists "lenny_article_reads_select_public" on lenny_article_reads;
+drop policy if exists "lenny_article_reads_insert_self" on lenny_article_reads;
+drop policy if exists "lenny_article_reads_delete_self_or_admin" on lenny_article_reads;
 
 -- Profiles
 create policy "profiles_select_public"
@@ -306,5 +570,155 @@ with check (
   public.is_admin_or_moderator(auth.uid())
   and auth.uid() = admin_id
 );
+
+-- M posts / comments / reactions
+create policy "m_posts_select_public"
+on m_posts for select
+using (true);
+
+create policy "m_posts_insert_self"
+on m_posts for insert
+with check (auth.uid() = author_id);
+
+create policy "m_posts_update_owner_or_admin"
+on m_posts for update
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()))
+with check (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "m_posts_delete_owner_or_admin"
+on m_posts for delete
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "m_comments_select_public"
+on m_comments for select
+using (true);
+
+create policy "m_comments_insert_self"
+on m_comments for insert
+with check (auth.uid() = author_id);
+
+create policy "m_comments_delete_owner_or_admin"
+on m_comments for delete
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "m_reactions_select_public"
+on m_reactions for select
+using (true);
+
+create policy "m_reactions_insert_self"
+on m_reactions for insert
+with check (auth.uid() = user_id);
+
+create policy "m_reactions_delete_self_or_admin"
+on m_reactions for delete
+using (auth.uid() = user_id or public.is_admin_or_moderator(auth.uid()));
+
+-- Mi videos / actions / comments
+create policy "mi_videos_select_public"
+on mi_videos for select
+using (true);
+
+create policy "mi_videos_insert_self"
+on mi_videos for insert
+with check (auth.uid() = author_id);
+
+create policy "mi_videos_update_owner_or_admin"
+on mi_videos for update
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()))
+with check (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "mi_videos_delete_owner_or_admin"
+on mi_videos for delete
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "mi_video_actions_select_public"
+on mi_video_actions for select
+using (true);
+
+create policy "mi_video_actions_insert_self"
+on mi_video_actions for insert
+with check (auth.uid() = user_id);
+
+create policy "mi_video_actions_delete_self_or_admin"
+on mi_video_actions for delete
+using (auth.uid() = user_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "mi_video_comments_select_public"
+on mi_video_comments for select
+using (true);
+
+create policy "mi_video_comments_insert_self"
+on mi_video_comments for insert
+with check (auth.uid() = author_id);
+
+create policy "mi_video_comments_delete_owner_or_admin"
+on mi_video_comments for delete
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "mi_video_views_select_public"
+on mi_video_views for select
+using (true);
+
+create policy "mi_video_views_insert_self"
+on mi_video_views for insert
+with check (auth.uid() = viewer_id);
+
+create policy "mi_video_views_delete_self_or_admin"
+on mi_video_views for delete
+using (auth.uid() = viewer_id or public.is_admin_or_moderator(auth.uid()));
+
+-- Lenny articles / actions / comments
+create policy "lenny_articles_select_public"
+on lenny_articles for select
+using (true);
+
+create policy "lenny_articles_insert_self"
+on lenny_articles for insert
+with check (auth.uid() = author_id);
+
+create policy "lenny_articles_update_owner_or_admin"
+on lenny_articles for update
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()))
+with check (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "lenny_articles_delete_owner_or_admin"
+on lenny_articles for delete
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "lenny_article_actions_select_public"
+on lenny_article_actions for select
+using (true);
+
+create policy "lenny_article_actions_insert_self"
+on lenny_article_actions for insert
+with check (auth.uid() = user_id);
+
+create policy "lenny_article_actions_delete_self_or_admin"
+on lenny_article_actions for delete
+using (auth.uid() = user_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "lenny_article_comments_select_public"
+on lenny_article_comments for select
+using (true);
+
+create policy "lenny_article_comments_insert_self"
+on lenny_article_comments for insert
+with check (auth.uid() = author_id);
+
+create policy "lenny_article_comments_delete_owner_or_admin"
+on lenny_article_comments for delete
+using (auth.uid() = author_id or public.is_admin_or_moderator(auth.uid()));
+
+create policy "lenny_article_reads_select_public"
+on lenny_article_reads for select
+using (true);
+
+create policy "lenny_article_reads_insert_self"
+on lenny_article_reads for insert
+with check (auth.uid() = reader_id);
+
+create policy "lenny_article_reads_delete_self_or_admin"
+on lenny_article_reads for delete
+using (auth.uid() = reader_id or public.is_admin_or_moderator(auth.uid()));
 
 -- Storage 说明：community-media bucket 建议设置“公开读 + 登录写”策略。

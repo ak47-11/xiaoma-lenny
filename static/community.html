@@ -3,120 +3,215 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>社区中心 | xiaoma.cyou</title>
-  <link rel="stylesheet" href="/css/community.css" />
+  <title>社区入口 | xiaoma.cyou</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <style>
+    :root {
+      --bg: #f5f8fc;
+      --surface: #fff;
+      --line: #dbe5f3;
+      --text: #18273f;
+      --muted: #60738f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Sora", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(980px 520px at 8% -10%, rgba(29, 155, 240, 0.16), transparent 63%),
+        radial-gradient(980px 520px at 92% -10%, rgba(251, 114, 153, 0.14), transparent 63%),
+        radial-gradient(1100px 540px at 50% 118%, rgba(45, 164, 78, 0.12), transparent 68%),
+        var(--bg);
+      min-height: 100vh;
+    }
+    .shell { width: min(1160px, 94%); margin: 18px auto 40px; }
+    .top {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 13px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+    }
+    .brand { font-size: 20px; font-weight: 800; }
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; }
+    .nav a {
+      text-decoration: none;
+      color: #2f466e;
+      border: 1px solid #cfdbee;
+      background: #fff;
+      border-radius: 999px;
+      min-height: 34px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+    .nav .entry { border: none; color: #fff; }
+    .nav .m { background: linear-gradient(100deg, #30a8f4, #1d9bf0); }
+    .nav .mi { background: linear-gradient(100deg, #ff8db1, #fb7299); }
+    .nav .lenny { background: linear-gradient(100deg, #43c064, #2da44e); }
+    .hero {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.9));
+      padding: 24px;
+      box-shadow: 0 16px 36px rgba(84, 107, 142, 0.14);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #d8e3f2;
+      border-radius: 999px;
+      background: #fff;
+      color: #4f6281;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 11px;
+    }
+    h1 {
+      margin: 10px 0 8px;
+      font-size: clamp(32px, 5vw, 54px);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+    h1 span {
+      background: linear-gradient(100deg, #1d9bf0, #fb7299, #2da44e);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+      max-width: 880px;
+    }
+    .grid {
+      margin-top: 15px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      box-shadow: 0 10px 22px rgba(93, 115, 147, 0.1);
+      display: grid;
+      gap: 8px;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card .head { display: flex; justify-content: space-between; align-items: center; }
+    .card .logo { font-size: 26px; font-weight: 800; }
+    .chip {
+      font-size: 11px;
+      border: 1px solid #d7e2f2;
+      border-radius: 999px;
+      background: #f7faff;
+      color: #536686;
+      padding: 4px 9px;
+      font-weight: 700;
+    }
+    .card h3 { margin: 0; font-size: 21px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
+    .card ul { margin: 0; padding-left: 18px; color: #526789; font-size: 13px; line-height: 1.8; }
+    .card.m { border-color: rgba(29, 155, 240, 0.3); background: linear-gradient(155deg, rgba(29, 155, 240, 0.1), #fff 40%); }
+    .card.mi { border-color: rgba(251, 114, 153, 0.3); background: linear-gradient(155deg, rgba(251, 114, 153, 0.1), #fff 40%); }
+    .card.lenny { border-color: rgba(45, 164, 78, 0.3); background: linear-gradient(155deg, rgba(45, 164, 78, 0.1), #fff 40%); }
+    .tip {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+      color: #60728e;
+      font-size: 13px;
+    }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <main class="app">
-    <header class="hero">
-      <div class="hero-blobs" aria-hidden="true">
-        <span class="blob b1"></span>
-        <span class="blob b2"></span>
-        <span class="blob b3"></span>
-      </div>
-      <div>
-        <span class="pill">Community Beta</span>
-        <h1>三角洲讨论社区 + 充电社区</h1>
-        <p>可爱统一画风，支持发帖、点赞、评论、收藏与图文视频动态。</p>
-        <div class="mascot-row">
-          <div class="mascot-card delta">
-            <span class="emoji">🦊</span>
-            <div><b>战术狐 Delta</b><small>带你冲战术与组队</small></div>
-          </div>
-          <div class="mascot-card charge">
-            <span class="emoji">🐼</span>
-            <div><b>电量熊 Charge</b><small>陪你发图文与视频</small></div>
-          </div>
-        </div>
-        <div class="modes">
-          <div class="mode delta">
-            <b>三角洲讨论</b>
-            <span>偏战术讨论、配装、组队与攻略</span>
-          </div>
-          <div class="mode charge">
-            <b>充电社区</b>
-            <span>偏日常分享、图文短视频与灵感记录</span>
-          </div>
-        </div>
-      </div>
-      <div class="hero-actions">
-        <a class="back" href="/profile.html" id="profileNav" style="display:none">个人中心</a>
-        <a class="back" href="/admin.html" id="adminNav" style="display:none">管理台</a>
-        <a class="back" href="/auth.html" id="loginNav">登录账号</a>
-        <a class="back" href="#" id="logoutNav" style="display:none">退出</a>
-        <a class="back" href="/">返回首页</a>
-      </div>
+  <main class="shell">
+    <header class="top">
+      <div class="brand">社区入口</div>
+      <nav class="nav">
+        <a class="entry m" href="/m.html">M</a>
+        <a class="entry mi" href="/mi.html">Mi</a>
+        <a class="entry lenny" href="/lenny.html">Lenny</a>
+        <a href="/">首页</a>
+        <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+        <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
+        <a href="/auth.html" id="loginNav">账号入口</a>
+        <a href="#" id="logoutNav" style="display:none">退出账号</a>
+      </nav>
     </header>
 
-    <section class="switcher">
-      <button class="tab active" data-tab="delta">三角洲讨论社区</button>
-      <button class="tab" data-tab="charge">充电社区</button>
+    <section class="hero">
+      <span class="badge">Community Gateway</span>
+      <h1>欢迎进入 <span>M · Mi · Lenny</span></h1>
+      <p>旧的“三角洲讨论社区 / 充电社区”已下线。现在统一为三个独立社区模块：实时社交、视频内容与技术创作。</p>
+
+      <div class="grid">
+        <a class="card m" href="/m.html">
+          <div class="head"><div class="logo">M</div><span class="chip">Micro Social</span></div>
+          <h3>实时社交发布</h3>
+          <p>类推特的信息流体验，适合快速表达观点与高频互动。</p>
+          <ul>
+            <li>发动态、发图、带话题</li>
+            <li>点赞、评论、转发</li>
+            <li>关注作者与即时反馈</li>
+          </ul>
+        </a>
+
+        <a class="card mi" href="/mi.html">
+          <div class="head"><div class="logo">Mi</div><span class="chip">Video Community</span></div>
+          <h3>视频社区</h3>
+          <p>类 B 站内容广场，支持视频链接、封面、分区和讨论。</p>
+          <ul>
+            <li>发布视频与简介</li>
+            <li>播放、点赞、收藏</li>
+            <li>按标签组织内容</li>
+          </ul>
+        </a>
+
+        <a class="card lenny" href="/lenny.html">
+          <div class="head"><div class="logo">Lenny</div><span class="chip">Tech Community</span></div>
+          <h3>技术社区</h3>
+          <p>类 GitHub 文化的技术沉淀区，面向教程、博客和分析文章。</p>
+          <ul>
+            <li>发布教程与技术复盘</li>
+            <li>文章阅读、收藏、评论</li>
+            <li>打造个人技术档案</li>
+          </ul>
+        </a>
+      </div>
     </section>
 
-    <section class="layout">
-      <article class="composer card" id="composerArea"></article>
-
-      <article class="feed card">
-        <div class="feed-top">
-          <h2 id="feedTitle">三角洲热帖</h2>
-          <select id="sortBy">
-            <option value="hot">按热度</option>
-            <option value="latest">按最新</option>
-          </select>
-        </div>
-        <div id="feedList" class="feed-list"></div>
-      </article>
-
-      <aside class="side card">
-        <h3>我的信息</h3>
-        <div id="viewerCard" class="viewer">未登录，当前为游客模式</div>
-        <hr />
-        <h3>通知中心</h3>
-        <div id="noticeList" class="notice-list"></div>
-        <hr />
-        <h3>热门话题</h3>
-        <div id="topics" class="topics"></div>
-        <hr />
-        <h3>社区提示</h3>
-        <ul>
-          <li>文明发言，拒绝人身攻击</li>
-          <li>攻略建议带标签便于检索</li>
-          <li>视频建议附 1 句摘要</li>
-        </ul>
-      </aside>
-    </section>
+    <section class="tip">建议登录后再进入模块，可保持完整的发布与互动权限。</section>
   </main>
 
-  <template id="postTemplate">
-    <div class="post">
-      <div class="post-head">
-        <div>
-          <b class="post-title"></b>
-          <div class="meta"></div>
-        </div>
-        <span class="chip post-topic"></span>
-      </div>
-      <div class="author-line"></div>
-      <p class="post-content"></p>
-      <div class="media"></div>
-      <div class="actions">
-        <button class="act like-btn">❤ <span>0</span></button>
-        <button class="act comment-toggle">💬 评论</button>
-        <button class="act collect-btn">⭐ 收藏</button>
-        <button class="act follow-btn">+ 关注作者</button>
-      </div>
-      <div class="comment-box hidden">
-        <div class="comment-list"></div>
-        <form class="comment-form">
-          <input type="text" maxlength="200" placeholder="写下你的评论" required />
-          <button type="submit">发送</button>
-        </form>
-      </div>
-    </div>
-  </template>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/js/session-gate.js"></script>
-  <script src="/js/community.js"></script>
+  <script src="/js/app-core.js"></script>
+  <script>
+    window.XiaomaCore?.applyNavState();
+  </script>
 </body>
 </html>

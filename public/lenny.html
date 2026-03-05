@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lenny | 技术社区</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/hub.css" />
+</head>
+<body class="accent-lenny">
+  <main class="hub-shell">
+    <header class="hub-top">
+      <div class="hub-brand">
+        <strong>Lenny</strong>
+        <span>技术社区 · 类 GitHub 风格沉淀</span>
+      </div>
+      <nav class="hub-nav">
+        <a class="pill m" href="/m.html">M</a>
+        <a class="pill mi" href="/mi.html">Mi</a>
+        <a class="pill lenny" href="/lenny.html">Lenny</a>
+        <a href="/">门户</a>
+        <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+        <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
+        <a href="/auth.html" id="loginNav">账号入口</a>
+        <a href="#" id="logoutNav" style="display:none">退出账号</a>
+      </nav>
+    </header>
+
+    <section class="hub-layout">
+      <aside class="panel">
+        <h3>内容分区</h3>
+        <ul class="list-text">
+          <li>技术博客</li>
+          <li>学习教程</li>
+          <li>分析文章</li>
+          <li>项目复盘</li>
+        </ul>
+        <h4 style="margin-top:14px;">热门标签</h4>
+        <div id="lennyTags" class="tag-list"></div>
+      </aside>
+
+      <section class="panel">
+        <h2>发布文章</h2>
+        <p id="userHint" class="muted" style="margin:0 0 8px;">加载中...</p>
+        <form id="lennyPublisher">
+          <div class="field">
+            <label for="lennyTitle">标题（最多 160 字）</label>
+            <input id="lennyTitle" maxlength="160" placeholder="请输入文章标题" />
+          </div>
+          <div class="field">
+            <label for="lennyType">类型</label>
+            <select id="lennyType">
+              <option value="blog">技术博客</option>
+              <option value="tutorial">学习教程</option>
+              <option value="analysis">分析文章</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="lennyTagsInput">标签（逗号分隔）</label>
+            <input id="lennyTagsInput" maxlength="260" placeholder="javascript, 架构, 性能优化" />
+          </div>
+          <div class="field">
+            <label for="lennySummary">摘要（可选）</label>
+            <textarea id="lennySummary" maxlength="1200" placeholder="一句话概括文章价值与目标读者"></textarea>
+          </div>
+          <div class="field">
+            <label for="lennyContent">正文</label>
+            <textarea id="lennyContent" maxlength="20000" placeholder="支持纯文本或 Markdown 风格内容"></textarea>
+          </div>
+          <div style="margin-top:10px;">
+            <button class="action-btn" type="submit">发布文章</button>
+          </div>
+        </form>
+
+        <div id="lennyStatus" class="status">准备就绪</div>
+
+        <div class="tool-row">
+          <select id="lennyFilterType">
+            <option value="all">全部类型</option>
+            <option value="blog">技术博客</option>
+            <option value="tutorial">学习教程</option>
+            <option value="analysis">分析文章</option>
+          </select>
+          <input id="lennySearch" maxlength="100" placeholder="搜索标题 / 标签 / 摘要" />
+        </div>
+
+        <div id="lennyList" class="article-list" style="margin-top:10px;"></div>
+      </section>
+
+      <aside class="panel">
+        <h3>文章阅读区</h3>
+        <div id="lennyViewer" class="article-view">
+          <h4 id="lennyViewerTitle" style="margin:0 0 8px;">请选择一篇文章</h4>
+          <div id="lennyViewerMeta" class="meta"></div>
+          <div id="lennyViewerStats" class="stat-line"></div>
+          <div id="lennyViewerTags" class="tag-list"></div>
+          <pre id="lennyViewerContent" style="margin-top:10px;">暂无文章内容</pre>
+
+          <div class="comment-wrap" style="margin-top:10px;">
+            <div id="lennyCommentList" class="comment-list"></div>
+            <form id="lennyCommentForm" class="comment-form">
+              <input id="lennyCommentInput" maxlength="800" placeholder="参与技术讨论（800字以内）" />
+              <button type="submit">发送</button>
+            </form>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <template id="lennyArticleTemplate">
+    <article class="article-card">
+      <div class="article-head">
+        <strong class="title"></strong>
+        <span class="chip type"></span>
+      </div>
+      <div class="meta"></div>
+      <p class="body-text summary"></p>
+      <div class="tag-list"></div>
+      <div class="actions">
+        <button class="read-btn">📖 阅读</button>
+        <button class="like-btn">👍 <span>0</span></button>
+        <button class="bookmark-btn">🔖 <span>0</span></button>
+        <button class="comment-btn">💬 评论</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/app-core.js"></script>
+  <script src="/js/lenny.js"></script>
+</body>
+</html>

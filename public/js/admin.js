@@ -27,8 +27,26 @@
     return;
   }
 
-  const sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+  function createClient(storage) {
+    return window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+      auth: { persistSession: true, autoRefreshToken: true, storage }
+    });
+  }
+
+  const sbLocal = createClient(window.localStorage);
+  const sbSession = createClient(window.sessionStorage);
+  let activeClient = sbLocal;
   let currentUser = null;
+
+  async function getContext() {
+    const local = (await sbLocal.auth.getSession()).data.session;
+    if (local?.user) return { client: sbLocal, session: local };
+
+    const sessionOnly = (await sbSession.auth.getSession()).data.session;
+    if (sessionOnly?.user) return { client: sbSession, session: sessionOnly };
+
+    return { client: sbLocal, session: null };
+  }
 
   function setStatus(text, kind) {
     statusEl.textContent = text;
@@ -59,18 +77,20 @@
       detail: detail || ""
     };
 
-    await sb.from("operation_logs").insert(payload);
+    await activeClient.from("operation_logs").insert(payload);
   }
 
   async function requireAdmin() {
-    const session = (await sb.auth.getSession()).data.session;
-    if (!session?.user) {
+    const context = await getContext();
+    if (!context.session?.user) {
       window.location.href = "/auth.html?next=/admin.html";
       return false;
     }
 
-    currentUser = session.user;
-    const roleRes = await sb.from("profiles").select("role").eq("id", currentUser.id).maybeSingle();
+    activeClient = context.client;
+    currentUser = context.session.user;
+
+    const roleRes = await activeClient.from("profiles").select("role").eq("id", currentUser.id).maybeSingle();
     if (roleRes.error) {
       setStatus("权限校验失败：" + roleRes.error.message + "，请先执行最新 SQL 迁移", "err");
       refreshBtn.disabled = true;
@@ -88,11 +108,11 @@
 
   async function loadMetrics() {
     const [postRes, commentRes, userRes, queueRes, logRes] = await Promise.all([
-      sb.from("community_posts").select("id", { count: "exact", head: true }),
-      sb.from("community_comments").select("id", { count: "exact", head: true }),
-      sb.from("profiles").select("id", { count: "exact", head: true }),
-      sb.from("moderation_queue").select("id", { count: "exact", head: true }).eq("status", "pending"),
-      sb.from("operation_logs").select("id", { count: "exact", head: true })
+      activeClient.from("community_posts").select("id", { count: "exact", head: true }),
+      activeClient.from("community_comments").select("id", { count: "exact", head: true }),
+      activeClient.from("profiles").select("id", { count: "exact", head: true }),
+      activeClient.from("moderation_queue").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      activeClient.from("operation_logs").select("id", { count: "exact", head: true })
     ]);
 
     postCountEl.textContent = postRes.error ? "-" : String(postRes.count || 0);
@@ -103,7 +123,7 @@
   }
 
   async function loadPosts() {
-    const postRes = await sb
+    const postRes = await activeClient
       .from("community_posts")
       .select("id,title,author_name,community,created_at")
       .order("created_at", { ascending: false })
@@ -135,7 +155,7 @@
         const postId = button.getAttribute("data-post-id");
         if (!confirm("确定删除这条帖子吗？")) return;
 
-        const result = await sb.from("community_posts").delete().eq("id", postId);
+        const result = await activeClient.from("community_posts").delete().eq("id", postId);
         if (result.error) {
           setStatus("删除帖子失败：" + result.error.message, "err");
           return;
@@ -148,7 +168,7 @@
   }
 
   async function loadComments() {
-    const commentRes = await sb
+    const commentRes = await activeClient
       .from("community_comments")
       .select("id,post_id,text,author_name,created_at")
       .order("created_at", { ascending: false })
@@ -180,7 +200,7 @@
         const commentId = button.getAttribute("data-comment-id");
         if (!confirm("确定删除这条评论吗？")) return;
 
-        const result = await sb.from("community_comments").delete().eq("id", commentId);
+        const result = await activeClient.from("community_comments").delete().eq("id", commentId);
         if (result.error) {
           setStatus("删除评论失败：" + result.error.message, "err");
           return;
@@ -193,7 +213,7 @@
   }
 
   async function loadUsers() {
-    const userRes = await sb
+    const userRes = await activeClient
       .from("profiles")
       .select("id,display_name,role")
       .order("id", { ascending: true })
@@ -232,7 +252,7 @@
         const select = userTableEl.querySelector("select[data-role-id='" + userId + "']");
         const nextRole = select.value;
 
-        const result = await sb.from("profiles").update({ role: nextRole }).eq("id", userId);
+        const result = await activeClient.from("profiles").update({ role: nextRole }).eq("id", userId);
         if (result.error) {
           setStatus("更新角色失败：" + result.error.message, "err");
           return;
@@ -244,7 +264,7 @@
   }
 
   async function loadQueue() {
-    const queueRes = await sb
+    const queueRes = await activeClient
       .from("moderation_queue")
       .select("id,content_preview,reason,source_type,source_id,submitter_name,status,created_at")
       .eq("status", "pending")
@@ -278,7 +298,7 @@
     queueTableEl.querySelectorAll("button[data-approve]").forEach(function (button) {
       button.addEventListener("click", async function () {
         const id = button.getAttribute("data-approve");
-        const result = await sb.from("moderation_queue").update({ status: "approved", reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq("id", id);
+        const result = await activeClient.from("moderation_queue").update({ status: "approved", reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq("id", id);
         if (result.error) {
           setStatus("放行失败：" + result.error.message, "err");
           return;
@@ -295,17 +315,17 @@
         const sourceType = button.getAttribute("data-source-type");
         const sourceId = button.getAttribute("data-source-id");
 
-        const markRes = await sb.from("moderation_queue").update({ status: "rejected", reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq("id", id);
+        const markRes = await activeClient.from("moderation_queue").update({ status: "rejected", reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq("id", id);
         if (markRes.error) {
           setStatus("驳回失败：" + markRes.error.message, "err");
           return;
         }
 
         if (sourceType === "post" && sourceId) {
-          await sb.from("community_posts").delete().eq("id", sourceId);
+          await activeClient.from("community_posts").delete().eq("id", sourceId);
         }
         if (sourceType === "comment" && sourceId) {
-          await sb.from("community_comments").delete().eq("id", sourceId);
+          await activeClient.from("community_comments").delete().eq("id", sourceId);
         }
 
         await logAction("reject_queue", "moderation_queue", id, "驳回并删除源内容: " + sourceType + "#" + sourceId);
@@ -316,7 +336,7 @@
   }
 
   async function loadLogs() {
-    const logRes = await sb
+    const logRes = await activeClient
       .from("operation_logs")
       .select("id,admin_email,action,target_type,target_id,detail,created_at")
       .order("created_at", { ascending: false })
@@ -352,7 +372,8 @@
 
   refreshBtn.addEventListener("click", refreshData);
   logoutBtn.addEventListener("click", async function () {
-    await sb.auth.signOut();
+    await sbLocal.auth.signOut();
+    await sbSession.auth.signOut();
     window.location.href = "/auth.html";
   });
 

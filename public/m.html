@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>M | 实时社交发布</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/hub.css" />
+</head>
+<body class="accent-m">
+  <main class="hub-shell">
+    <header class="hub-top">
+      <div class="hub-brand">
+        <strong>M</strong>
+        <span>实时社交发布 · 类推特体验</span>
+      </div>
+      <nav class="hub-nav">
+        <a class="pill m" href="/m.html">M</a>
+        <a class="pill mi" href="/mi.html">Mi</a>
+        <a class="pill lenny" href="/lenny.html">Lenny</a>
+        <a href="/">门户</a>
+        <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+        <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
+        <a href="/auth.html" id="loginNav">账号入口</a>
+        <a href="#" id="logoutNav" style="display:none">退出账号</a>
+      </nav>
+    </header>
+
+    <section class="hub-layout">
+      <aside class="panel">
+        <h3>频道导航</h3>
+        <ul class="list-text">
+          <li>推荐动态</li>
+          <li>关注动态</li>
+          <li>技术热议</li>
+          <li>活动公告</li>
+        </ul>
+        <h4 style="margin-top:14px;">热门话题</h4>
+        <div id="mTopics" class="tag-list"></div>
+      </aside>
+
+      <section class="panel">
+        <h2>发布动态</h2>
+        <p id="userHint" class="muted" style="margin:0 0 8px;">加载中...</p>
+
+        <form id="mComposer">
+          <div class="field">
+            <label for="mContent">内容（最多 280 字）</label>
+            <textarea id="mContent" maxlength="280" placeholder="你现在在想什么？分享你的观点、进展或灵感。"></textarea>
+            <div id="mCounter" class="counter">0 / 280</div>
+          </div>
+          <div class="field">
+            <label for="mMedia">图片链接（可选）</label>
+            <input id="mMedia" maxlength="500" placeholder="https://..." />
+          </div>
+          <div style="margin-top:10px;">
+            <button class="action-btn" type="submit">发布动态</button>
+          </div>
+        </form>
+
+        <div id="mStatus" class="status">准备就绪</div>
+        <div id="mFeed" class="feed-list" style="margin-top:10px;"></div>
+      </section>
+
+      <aside class="panel">
+        <h3>动态说明</h3>
+        <div class="hint">M 提供快速发布与互动能力：点赞、评论、转发，适合日常即时交流。</div>
+        <h4 style="margin-top:14px;">建议</h4>
+        <ul class="list-text">
+          <li>优先写清观点，提升互动率</li>
+          <li>尽量用短句，阅读体验更好</li>
+          <li>配图可显著提升曝光</li>
+          <li>登录后可点赞、评论与转发</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+
+  <template id="mPostTemplate">
+    <article class="post">
+      <div class="post-head">
+        <div>
+          <strong class="title"></strong>
+          <div class="meta"></div>
+        </div>
+        <span class="chip">M 动态</span>
+      </div>
+      <p class="body-text"></p>
+      <div class="media-preview"></div>
+      <div class="actions">
+        <button class="like-btn">👍 <span>0</span></button>
+        <button class="repost-btn">🔁 <span>0</span></button>
+        <button class="comment-btn">💬 评论 <span>0</span></button>
+      </div>
+      <div class="comment-wrap hidden">
+        <div class="comment-list"></div>
+        <form class="comment-form">
+          <input maxlength="300" placeholder="说点什么..." />
+          <button type="submit">发送</button>
+        </form>
+      </div>
+    </article>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/app-core.js"></script>
+  <script src="/js/m.js"></script>
+</body>
+</html>
