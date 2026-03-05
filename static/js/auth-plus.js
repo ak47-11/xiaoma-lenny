@@ -110,6 +110,10 @@
   const sbSession = createClient(window.sessionStorage);
   setInterval(renderOtpButtonState, 1000);
 
+  let otpPurpose = "login";
+  let pendingRegisterEmail = "";
+  let pendingRegisterPassword = "";
+
   async function getAuthContext() {
     const localSession = (await sbLocal.auth.getSession()).data.session;
     if (localSession) return { client: sbLocal, session: localSession, mode: "local" };
@@ -186,6 +190,53 @@
     return remember ? sbLocal : sbSession;
   }
 
+  function switchToOtpTab() {
+    document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
+    const otpTab = document.querySelector('.tab[data-tab="otp"]');
+    if (otpTab) otpTab.classList.add("active");
+
+    document.querySelectorAll(".form-panel").forEach((panel) => panel.classList.remove("active"));
+    const otpPanel = document.getElementById("panel-otp");
+    if (otpPanel) otpPanel.classList.add("active");
+  }
+
+  async function sendEmailOtp(identity) {
+    if (!identity) return setStatus("请输入邮箱", "err");
+    if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
+
+    const left = getCooldownLeft(identity);
+    if (left > 0) return setStatus("该邮箱发送过于频繁，请 " + left + " 秒后重试", "err");
+
+    const client = getActiveClient();
+    setLoading(sendOtpBtn, true, "发送验证码", "发送中...");
+    if (resendOtpBtn) resendOtpBtn.disabled = true;
+
+    const result = await client.auth.signInWithOtp({
+      email: identity,
+      options: {
+        shouldCreateUser: true
+      }
+    });
+
+    setLoading(sendOtpBtn, false, "发送验证码", "发送中...");
+
+    if (result.error) {
+      const msg = otpFriendlyError(result.error);
+      if (msg.includes("请求太频繁")) {
+        localStorage.setItem(otpTimestampKey, String(Date.now()));
+        localStorage.setItem(otpIdentityKey, identity.toLowerCase());
+      }
+      renderOtpButtonState();
+      return setStatus(msg, "err");
+    }
+
+    localStorage.setItem(otpTimestampKey, String(Date.now()));
+    localStorage.setItem(otpIdentityKey, identity.toLowerCase());
+    renderOtpButtonState();
+    setStatus(otpPurpose === "register" ? "注册验证码已发送，请输入验证码完成注册" : "验证码已发送，请查收邮箱并输入验证码", "ok");
+    otpCodeEl.focus();
+  }
+
   document.querySelectorAll(".tab").forEach((button) => {
     button.addEventListener("click", function () {
       document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
@@ -227,12 +278,15 @@
     if (!email || !password) return setStatus("请先填写邮箱和密码", "err");
     if (!isEmail(email)) return setStatus("请输入正确的邮箱格式", "err");
 
-    const client = getActiveClient();
-    setLoading(registerBtn, true, "创建账号", "创建中...");
-    const { error } = await client.auth.signUp({ email, password });
-    setLoading(registerBtn, false, "创建账号", "创建中...");
-    if (error) return setStatus("注册失败：" + error.message, "err");
-    setStatus("注册成功，请到邮箱查收验证链接", "ok");
+    otpPurpose = "register";
+    pendingRegisterEmail = email.toLowerCase();
+    pendingRegisterPassword = password;
+    otpIdentityEl.value = email;
+
+    switchToOtpTab();
+    setLoading(registerBtn, true, "创建账号", "发送验证码...");
+    await sendEmailOtp(email);
+    setLoading(registerBtn, false, "创建账号", "发送验证码...");
   });
 
   forgotBtn.addEventListener("click", async function () {
@@ -250,40 +304,14 @@
 
   sendOtpBtn.addEventListener("click", async function () {
     const identity = (otpIdentityEl.value || "").trim();
-    if (!identity) return setStatus("请输入邮箱", "err");
-    if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
-    const left = getCooldownLeft(identity);
-    if (left > 0) return setStatus("该邮箱发送过于频繁，请 " + left + " 秒后重试", "err");
-
-    const client = getActiveClient();
-    setLoading(sendOtpBtn, true, "发送验证码", "发送中...");
-    const result = await client.auth.signInWithOtp({
-      email: identity,
-      options: {
-        shouldCreateUser: true
-      }
-    });
-    setLoading(sendOtpBtn, false, "发送验证码", "发送中...");
-    if (result.error) {
-      const msg = otpFriendlyError(result.error);
-      if (msg.includes("请求太频繁")) {
-        localStorage.setItem(otpTimestampKey, String(Date.now()));
-        localStorage.setItem(otpIdentityKey, identity.toLowerCase());
-        renderOtpButtonState();
-      }
-      return setStatus(msg, "err");
-    }
-
-    localStorage.setItem(otpTimestampKey, String(Date.now()));
-    localStorage.setItem(otpIdentityKey, identity.toLowerCase());
-    renderOtpButtonState();
-    setStatus("验证码已发送，请查收邮箱并输入验证码", "ok");
-    otpCodeEl.focus();
+    otpPurpose = "login";
+    await sendEmailOtp(identity);
   });
 
   if (resendOtpBtn) {
-    resendOtpBtn.addEventListener("click", function () {
-      sendOtpBtn.click();
+    resendOtpBtn.addEventListener("click", async function () {
+      const identity = (otpIdentityEl.value || "").trim();
+      await sendEmailOtp(identity);
     });
   }
 
@@ -300,6 +328,26 @@
     const result = await client.auth.verifyOtp({ email: identity, token, type: "email" });
     setLoading(verifyOtpBtn, false, "验证并登录", "验证中...");
     if (result.error) return setStatus("验证失败：" + result.error.message, "err");
+
+    if (otpPurpose === "register") {
+      if (identity.toLowerCase() !== pendingRegisterEmail || !pendingRegisterPassword) {
+        return setStatus("注册验证码与待注册账号不匹配，请重新点击创建账号", "err");
+      }
+
+      const updateResult = await client.auth.updateUser({ password: pendingRegisterPassword });
+      if (updateResult.error) {
+        return setStatus("验证码通过，但设置密码失败：" + updateResult.error.message, "err");
+      }
+
+      pendingRegisterEmail = "";
+      pendingRegisterPassword = "";
+      otpPurpose = "login";
+      setStatus("注册成功，正在跳转", "ok");
+      setTimeout(function () {
+        window.location.href = getNextPath();
+      }, 700);
+      return;
+    }
 
     setStatus("登录成功，正在跳转", "ok");
     setTimeout(function () {
