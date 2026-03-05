@@ -7,8 +7,11 @@
     user: null,
     displayName: "游客",
     posts: [],
+    follows: new Set(),
     reactions: new Map(),
     comments: new Map(),
+    menuMode: "home",
+    followOnly: false,
     tableReady: true
   };
 
@@ -19,6 +22,9 @@
   const statusEl = document.getElementById("mStatus");
   const feedEl = document.getElementById("mFeed");
   const topicsEl = document.getElementById("mTopics");
+  const sideMenu = document.getElementById("mSideMenu");
+  const sidePanelTitle = document.getElementById("mSidePanelTitle");
+  const sidePanelBody = document.getElementById("mSidePanelBody");
   const template = document.getElementById("mPostTemplate");
   const userHint = document.getElementById("userHint");
 
@@ -31,6 +37,29 @@
 
   function setUserHint(text) {
     if (userHint) userHint.textContent = text;
+  }
+
+  function clearNode(node) {
+    if (!node) return;
+    while (node.firstChild) node.removeChild(node.firstChild);
+  }
+
+  function setSidePanel(title, renderFn) {
+    if (sidePanelTitle) sidePanelTitle.textContent = title;
+    if (!sidePanelBody) return;
+    clearNode(sidePanelBody);
+    if (typeof renderFn === "function") renderFn(sidePanelBody);
+  }
+
+  function setSideText(title, text) {
+    setSidePanel(title, function (root) {
+      root.textContent = text;
+    });
+  }
+
+  function applyCompactMode() {
+    const enabled = localStorage.getItem("xiaoma_m_compact") === "1";
+    document.body.classList.toggle("compact-view", enabled);
   }
 
   function formatTime(input) {
@@ -152,6 +181,7 @@
     state.tableReady = true;
     state.posts = postsRes.data || [];
     await loadMetaData(client);
+    await loadFollowMap(client);
     renderTopics();
     renderFeed();
 
@@ -211,6 +241,59 @@
         setStatus("互动数据加载不完整：" + err.message, "err");
       }
     }
+  }
+
+  async function loadFollowMap(client) {
+    state.follows = new Set();
+    if (!state.user) return;
+
+    const authorIds = [...new Set(state.posts.map(function (post) {
+      return post.author_id;
+    }).filter(Boolean))].filter(function (id) {
+      return id !== state.user.id;
+    });
+
+    if (!authorIds.length) return;
+
+    const followRes = await client
+      .from("follows")
+      .select("followee_id")
+      .eq("follower_id", state.user.id)
+      .in("followee_id", authorIds);
+
+    if (!followRes.error) {
+      (followRes.data || []).forEach(function (row) {
+        if (row.followee_id) state.follows.add(row.followee_id);
+      });
+    }
+  }
+
+  function postScore(post) {
+    const reaction = state.reactions.get(post.id) || { likeCount: 0, repostCount: 0 };
+    const comments = state.comments.get(post.id) || [];
+    return reaction.likeCount * 2 + reaction.repostCount * 3 + comments.length;
+  }
+
+  function getDisplayPosts() {
+    let list = state.posts.slice();
+
+    if (state.followOnly && state.user) {
+      list = list.filter(function (post) {
+        if (!post.author_id) return false;
+        if (post.author_id === state.user.id) return true;
+        return state.follows.has(post.author_id);
+      });
+    }
+
+    if (state.menuMode === "explore") {
+      list.sort(function (first, second) {
+        const diff = postScore(second) - postScore(first);
+        if (diff !== 0) return diff;
+        return new Date(second.created_at).getTime() - new Date(first.created_at).getTime();
+      });
+    }
+
+    return list;
   }
 
   function renderTopics() {
@@ -273,12 +356,20 @@
     if (!feedEl || !template) return;
     feedEl.innerHTML = "";
 
-    if (!state.posts.length) {
-      feedEl.innerHTML = "<div class='empty'>暂无动态，等你来发布第一条。</div>";
+    const displayPosts = getDisplayPosts();
+
+    if (!displayPosts.length) {
+      if (!state.posts.length) {
+        feedEl.innerHTML = "<div class='empty'>暂无动态，等你来发布第一条。</div>";
+      } else if (state.followOnly) {
+        feedEl.innerHTML = "<div class='empty'>你关注的作者暂时没有动态，或先关注更多作者。</div>";
+      } else {
+        feedEl.innerHTML = "<div class='empty'>当前筛选下暂无动态。</div>";
+      }
       return;
     }
 
-    state.posts.forEach((post) => {
+    displayPosts.forEach((post) => {
       const card = template.content.firstElementChild.cloneNode(true);
       const reaction = state.reactions.get(post.id) || {
         likeCount: 0,
@@ -296,6 +387,7 @@
       const likeBtn = card.querySelector(".like-btn");
       const repostBtn = card.querySelector(".repost-btn");
       const commentBtn = card.querySelector(".comment-btn");
+      const followBtn = card.querySelector(".follow-btn");
       const commentWrap = card.querySelector(".comment-wrap");
       const commentList = card.querySelector(".comment-list");
       const commentForm = card.querySelector(".comment-form");
@@ -306,6 +398,23 @@
       commentBtn.querySelector("span").textContent = String(comments.length);
       likeBtn.classList.toggle("on", !!reaction.userLiked);
       repostBtn.classList.toggle("on", !!reaction.userReposted);
+
+      if (followBtn) {
+        if (!post.author_id) {
+          followBtn.disabled = true;
+          followBtn.textContent = "作者未知";
+        } else if (state.user && post.author_id === state.user.id) {
+          followBtn.disabled = true;
+          followBtn.textContent = "我自己";
+        } else {
+          const followed = state.follows.has(post.author_id);
+          followBtn.classList.toggle("on", followed);
+          followBtn.textContent = followed ? "✓ 已关注" : "+ 关注";
+          followBtn.addEventListener("click", async function () {
+            await toggleFollow(post.author_id, authorLabel(post));
+          });
+        }
+      }
 
       if (!comments.length) {
         commentList.innerHTML = "<div class='comment'>还没有评论，来抢沙发吧。</div>";
@@ -390,6 +499,55 @@
     await loadPosts();
   }
 
+  async function toggleFollow(followeeId, followeeName) {
+    if (!canWrite("关注作者")) return;
+    if (!followeeId || followeeId === state.user.id) return;
+
+    const client = state.context.client;
+    const followed = state.follows.has(followeeId);
+
+    if (followed) {
+      const removeRes = await client
+        .from("follows")
+        .delete()
+        .eq("follower_id", state.user.id)
+        .eq("followee_id", followeeId);
+
+      if (removeRes.error) {
+        setStatus("取消关注失败：" + removeRes.error.message, "err");
+        return;
+      }
+
+      state.follows.delete(followeeId);
+      setStatus("已取消关注 " + (followeeName || "该作者"), "ok");
+      renderFeed();
+      return;
+    }
+
+    const insertRes = await client.from("follows").insert({
+      follower_id: state.user.id,
+      followee_id: followeeId
+    });
+
+    if (insertRes.error) {
+      const msg = String(insertRes.error.message || "").toLowerCase();
+      if (!(insertRes.error.code === "23505" || msg.includes("duplicate"))) {
+        setStatus("关注失败：" + insertRes.error.message, "err");
+        return;
+      }
+    }
+
+    state.follows.add(followeeId);
+    setStatus("已关注 " + (followeeName || "该作者"), "ok");
+
+    await client.from("notifications").insert({
+      user_id: followeeId,
+      text: (state.displayName || "有用户") + " 关注了你"
+    });
+
+    renderFeed();
+  }
+
   async function submitComment(postId, rawText) {
     if (!canWrite("评论")) return;
     const text = String(rawText || "").trim();
@@ -464,10 +622,288 @@
     });
   }
 
+  function setActiveMenu(action) {
+    if (!sideMenu) return;
+    sideMenu.querySelectorAll("button[data-action]").forEach(function (button) {
+      button.classList.toggle("active", button.dataset.action === action);
+    });
+  }
+
+  function renderExplorePanel() {
+    setSidePanel("Explore", function (root) {
+      const posts = getDisplayPosts().slice(0, 5);
+      if (!posts.length) {
+        root.textContent = "暂无可探索内容。";
+        return;
+      }
+
+      posts.forEach(function (post) {
+        const row = document.createElement("div");
+        row.className = "side-item";
+        row.textContent = authorLabel(post) + " · 热度 " + postScore(post);
+        root.appendChild(row);
+      });
+    });
+  }
+
+  async function renderNotificationsPanel() {
+    if (!state.user) {
+      setSideText("Notifications", "请先登录后查看通知。登录后这里会显示被关注、互动等消息。");
+      return;
+    }
+
+    const result = await state.context.client
+      .from("notifications")
+      .select("text,created_at")
+      .eq("user_id", state.user.id)
+      .order("created_at", { ascending: false })
+      .limit(8);
+
+    if (result.error) {
+      setSideText("Notifications", "通知读取失败：" + result.error.message);
+      return;
+    }
+
+    setSidePanel("Notifications", function (root) {
+      const rows = result.data || [];
+      if (!rows.length) {
+        root.textContent = "暂无通知。";
+        return;
+      }
+
+      rows.forEach(function (row) {
+        const item = document.createElement("div");
+        item.className = "side-item";
+
+        const text = document.createElement("div");
+        text.textContent = row.text || "";
+        item.appendChild(text);
+
+        const time = document.createElement("small");
+        time.textContent = formatTime(row.created_at);
+        item.appendChild(time);
+
+        root.appendChild(item);
+      });
+    });
+  }
+
+  function renderFollowPanel() {
+    setSidePanel("Follow", function (root) {
+      if (!state.user) {
+        root.textContent = "登录后可关注作者并开启“仅看关注”过滤。";
+        return;
+      }
+
+      const status = document.createElement("div");
+      status.className = "side-item";
+      status.textContent =
+        "已关注作者：" + state.follows.size + " 人；当前过滤：" + (state.followOnly ? "仅看关注" : "全部内容");
+      root.appendChild(status);
+
+      const tip = document.createElement("small");
+      tip.textContent = "在动态卡片点击“+ 关注”可管理关注关系。";
+      root.appendChild(tip);
+    });
+  }
+
+  function renderChatPanel() {
+    const chatKey = "xiaoma_chat_m_v1";
+    let rows = [];
+    try {
+      rows = JSON.parse(localStorage.getItem(chatKey) || "[]");
+      if (!Array.isArray(rows)) rows = [];
+    } catch (error) {
+      rows = [];
+    }
+
+    setSidePanel("Chat", function (root) {
+      const list = document.createElement("div");
+      list.className = "side-panel-body";
+
+      rows.slice(-6).forEach(function (row) {
+        const item = document.createElement("div");
+        item.className = "side-item";
+        item.textContent = (row.name || "用户") + "：" + (row.text || "");
+        list.appendChild(item);
+      });
+
+      root.appendChild(list);
+
+      const form = document.createElement("form");
+      form.className = "side-form";
+
+      const input = document.createElement("input");
+      input.maxLength = 120;
+      input.placeholder = "发送一条社区留言";
+
+      const submit = document.createElement("button");
+      submit.type = "submit";
+      submit.textContent = "发送";
+
+      form.appendChild(input);
+      form.appendChild(submit);
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const text = String(input.value || "").trim();
+        if (!text) return;
+
+        rows.push({
+          name: state.displayName || "游客",
+          text: text,
+          time: new Date().toISOString()
+        });
+        rows = rows.slice(-30);
+        localStorage.setItem(chatKey, JSON.stringify(rows));
+        renderChatPanel();
+      });
+
+      root.appendChild(form);
+    });
+  }
+
+  function renderMorePanel() {
+    setSidePanel("More", function (root) {
+      const linkWrap = document.createElement("div");
+      linkWrap.className = "side-links";
+
+      [
+        { href: "/m-publish.html", label: "前往 M 个人发布页" },
+        { href: "/community.html", label: "返回社区入口" },
+        { href: "/profile.html", label: "打开个人中心" },
+        { href: "/mi.html", label: "切换到 Mi" },
+        { href: "/lenny.html", label: "切换到 Lenny" }
+      ].forEach(function (item) {
+        const link = document.createElement("a");
+        link.href = item.href;
+        link.textContent = item.label;
+        linkWrap.appendChild(link);
+      });
+
+      root.appendChild(linkWrap);
+    });
+  }
+
+  function renderSettingPanel() {
+    setSidePanel("Setting", function (root) {
+      const compactForm = document.createElement("form");
+      compactForm.className = "side-form";
+
+      const compactSelect = document.createElement("select");
+      const compactEnabled = localStorage.getItem("xiaoma_m_compact") === "1";
+      compactSelect.innerHTML = "<option value='0'>标准布局</option><option value='1'>紧凑布局</option>";
+      compactSelect.value = compactEnabled ? "1" : "0";
+
+      const compactSave = document.createElement("button");
+      compactSave.type = "submit";
+      compactSave.textContent = "应用";
+
+      compactForm.appendChild(compactSelect);
+      compactForm.appendChild(compactSave);
+      compactForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        localStorage.setItem("xiaoma_m_compact", compactSelect.value === "1" ? "1" : "0");
+        applyCompactMode();
+      });
+
+      const exploreForm = document.createElement("form");
+      exploreForm.className = "side-form";
+
+      const exploreSelect = document.createElement("select");
+      const defaultExplore = localStorage.getItem("xiaoma_m_default_explore") === "1";
+      exploreSelect.innerHTML = "<option value='0'>默认 Home</option><option value='1'>默认 Explore</option>";
+      exploreSelect.value = defaultExplore ? "1" : "0";
+
+      const exploreSave = document.createElement("button");
+      exploreSave.type = "submit";
+      exploreSave.textContent = "保存";
+
+      exploreForm.appendChild(exploreSelect);
+      exploreForm.appendChild(exploreSave);
+      exploreForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        localStorage.setItem("xiaoma_m_default_explore", exploreSelect.value === "1" ? "1" : "0");
+      });
+
+      root.appendChild(compactForm);
+      root.appendChild(exploreForm);
+    });
+  }
+
+  async function handleMenuAction(action) {
+    setActiveMenu(action);
+
+    if (action === "home") {
+      state.menuMode = "home";
+      state.followOnly = false;
+      renderFeed();
+      setSideText("Home", "这是公开时间线，向下滚动可查看所有用户动态。");
+      return;
+    }
+
+    if (action === "explore") {
+      state.menuMode = "explore";
+      state.followOnly = false;
+      renderFeed();
+      renderExplorePanel();
+      return;
+    }
+
+    if (action === "notifications") {
+      await renderNotificationsPanel();
+      return;
+    }
+
+    if (action === "follow") {
+      if (!state.user) {
+        setSideText("Follow", "请先登录后管理关注关系。登录后可切换“仅看关注”。");
+        return;
+      }
+      state.followOnly = !state.followOnly;
+      state.menuMode = "home";
+      renderFeed();
+      renderFollowPanel();
+      return;
+    }
+
+    if (action === "chat") {
+      renderChatPanel();
+      return;
+    }
+
+    if (action === "more") {
+      renderMorePanel();
+      return;
+    }
+
+    if (action === "setting") {
+      renderSettingPanel();
+    }
+  }
+
+  function bindSideMenu() {
+    if (!sideMenu) return;
+    sideMenu.addEventListener("click", async function (event) {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      await handleMenuAction(button.dataset.action);
+    });
+  }
+
   async function init() {
+    applyCompactMode();
+    if (localStorage.getItem("xiaoma_m_default_explore") === "1") {
+      state.menuMode = "explore";
+    }
+    bindSideMenu();
     bindComposer();
     await loadViewer();
     await loadPosts();
+    if (state.menuMode === "explore") {
+      setActiveMenu("explore");
+      renderExplorePanel();
+    }
   }
 
   init();

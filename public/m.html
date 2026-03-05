@@ -30,7 +30,21 @@
 
     <section class="hub-layout">
       <aside class="panel">
-        <h3>频道导航</h3>
+        <h3>社区功能</h3>
+        <div id="mSideMenu" class="side-menu">
+          <button data-action="home" class="active">Home</button>
+          <button data-action="explore">Explore</button>
+          <button data-action="notifications">Notifications</button>
+          <button data-action="follow">Follow</button>
+          <button data-action="chat">Chat</button>
+          <button data-action="more">More</button>
+          <button data-action="setting">Setting</button>
+        </div>
+        <div class="side-panel">
+          <strong id="mSidePanelTitle">Home</strong>
+          <div id="mSidePanelBody" class="side-panel-body">这是公开时间线，向下滚动可查看所有用户动态。</div>
+        </div>
+        <h4 style="margin-top:14px;">频道导航</h4>
         <ul class="list-text">
           <li>推荐动态</li>
           <li>关注动态</li>
@@ -83,6 +97,7 @@
         <button class="like-btn">👍 <span>0</span></button>
         <button class="repost-btn">🔁 <span>0</span></button>
         <button class="comment-btn">💬 评论 <span>0</span></button>
+        <button class="follow-btn">+ 关注</button>
       </div>
       <div class="comment-wrap hidden">
         <div class="comment-list"></div>

@@ -7,11 +7,14 @@
     user: null,
     displayName: "游客",
     videos: [],
+    follows: new Set(),
     actionSet: new Set(),
     countsMap: new Map(),
     commentsMap: new Map(),
     currentVideoId: null,
     playedSet: new Set(),
+    menuMode: "home",
+    followOnly: false,
     tableReady: true
   };
 
@@ -21,6 +24,9 @@
   const template = document.getElementById("miVideoTemplate");
   const tagsEl = document.getElementById("miTags");
   const userHint = document.getElementById("userHint");
+  const sideMenu = document.getElementById("miSideMenu");
+  const sidePanelTitle = document.getElementById("miSidePanelTitle");
+  const sidePanelBody = document.getElementById("miSidePanelBody");
 
   const playerTitle = document.getElementById("miPlayerTitle");
   const playerShell = document.getElementById("miPlayerShell");
@@ -40,6 +46,29 @@
 
   function setUserHint(text) {
     if (userHint) userHint.textContent = text;
+  }
+
+  function clearNode(node) {
+    if (!node) return;
+    while (node.firstChild) node.removeChild(node.firstChild);
+  }
+
+  function setSidePanel(title, renderFn) {
+    if (sidePanelTitle) sidePanelTitle.textContent = title;
+    if (!sidePanelBody) return;
+    clearNode(sidePanelBody);
+    if (typeof renderFn === "function") renderFn(sidePanelBody);
+  }
+
+  function setSideText(title, text) {
+    setSidePanel(title, function (root) {
+      root.textContent = text;
+    });
+  }
+
+  function applyCompactMode() {
+    const enabled = localStorage.getItem("xiaoma_mi_compact") === "1";
+    document.body.classList.toggle("compact-view", enabled);
   }
 
   function formatTime(input) {
@@ -175,6 +204,7 @@
     }
 
     await loadMetaData(client);
+    await loadFollowMap(client);
     renderTags();
     renderGrid();
     renderPlayer();
@@ -247,6 +277,59 @@
     }
   }
 
+  async function loadFollowMap(client) {
+    state.follows = new Set();
+    if (!state.user) return;
+
+    const authorIds = [...new Set(state.videos.map(function (video) {
+      return video.author_id;
+    }).filter(Boolean))].filter(function (id) {
+      return id !== state.user.id;
+    });
+
+    if (!authorIds.length) return;
+
+    const followRes = await client
+      .from("follows")
+      .select("followee_id")
+      .eq("follower_id", state.user.id)
+      .in("followee_id", authorIds);
+
+    if (!followRes.error) {
+      (followRes.data || []).forEach(function (row) {
+        if (row.followee_id) state.follows.add(row.followee_id);
+      });
+    }
+  }
+
+  function videoScore(video) {
+    const counts = getCounts(video.id);
+    const comments = state.commentsMap.get(video.id) || [];
+    return Number(counts.likeCount || 0) * 2 + Number(counts.favoriteCount || 0) * 3 + Number(counts.playCount || 0) + comments.length;
+  }
+
+  function getDisplayVideos() {
+    let list = state.videos.slice();
+
+    if (state.followOnly && state.user) {
+      list = list.filter(function (video) {
+        if (!video.author_id) return false;
+        if (video.author_id === state.user.id) return true;
+        return state.follows.has(video.author_id);
+      });
+    }
+
+    if (state.menuMode === "explore") {
+      list.sort(function (first, second) {
+        const diff = videoScore(second) - videoScore(first);
+        if (diff !== 0) return diff;
+        return new Date(second.created_at).getTime() - new Date(first.created_at).getTime();
+      });
+    }
+
+    return list;
+  }
+
   function renderTags() {
     if (!tagsEl) return;
     const map = {};
@@ -299,12 +382,24 @@
   function renderGrid() {
     if (!gridEl || !template) return;
     gridEl.innerHTML = "";
-    if (!state.videos.length) {
-      gridEl.innerHTML = "<div class='empty'>暂无视频，快来发布第一条。</div>";
+
+    const displayVideos = getDisplayVideos();
+    if (!displayVideos.length) {
+      if (!state.videos.length) {
+        gridEl.innerHTML = "<div class='empty'>暂无视频，快来发布第一条。</div>";
+      } else if (state.followOnly) {
+        gridEl.innerHTML = "<div class='empty'>关注作者暂未更新视频，或先关注更多创作者。</div>";
+      } else {
+        gridEl.innerHTML = "<div class='empty'>当前筛选下暂无视频。</div>";
+      }
       return;
     }
 
-    state.videos.forEach(function (video) {
+    if (!displayVideos.some(function (video) { return video.id === state.currentVideoId; })) {
+      state.currentVideoId = displayVideos[0]?.id || null;
+    }
+
+    displayVideos.forEach(function (video) {
       const card = template.content.firstElementChild.cloneNode(true);
       card.classList.toggle("active", state.currentVideoId === video.id);
       const counts = getCounts(video.id);
@@ -334,6 +429,7 @@
       const favBtn = card.querySelector(".fav-btn");
       const playBtn = card.querySelector(".play-btn");
       const commentBtn = card.querySelector(".comment-btn");
+      const followBtn = card.querySelector(".follow-btn");
 
       likeBtn.querySelector("span").textContent = String(Number(counts.likeCount || 0));
       favBtn.querySelector("span").textContent = String(Number(counts.favoriteCount || 0));
@@ -356,6 +452,23 @@
         await openVideo(video.id, false);
         commentInput?.focus();
       });
+
+      if (followBtn) {
+        if (!video.author_id) {
+          followBtn.disabled = true;
+          followBtn.textContent = "作者未知";
+        } else if (state.user && video.author_id === state.user.id) {
+          followBtn.disabled = true;
+          followBtn.textContent = "我自己";
+        } else {
+          const followed = state.follows.has(video.author_id);
+          followBtn.classList.toggle("on", followed);
+          followBtn.textContent = followed ? "✓ 已关注" : "+ 关注";
+          followBtn.addEventListener("click", async function () {
+            await toggleFollow(video.author_id, video.author_name || "该作者");
+          });
+        }
+      }
 
       gridEl.appendChild(card);
     });
@@ -567,6 +680,55 @@
     renderPlayer();
   }
 
+  async function toggleFollow(followeeId, followeeName) {
+    if (!canWrite("关注创作者")) return;
+    if (!followeeId || followeeId === state.user.id) return;
+
+    const client = state.context.client;
+    const followed = state.follows.has(followeeId);
+
+    if (followed) {
+      const removeRes = await client
+        .from("follows")
+        .delete()
+        .eq("follower_id", state.user.id)
+        .eq("followee_id", followeeId);
+
+      if (removeRes.error) {
+        setStatus("取消关注失败：" + removeRes.error.message, "err");
+        return;
+      }
+
+      state.follows.delete(followeeId);
+      setStatus("已取消关注 " + (followeeName || "该作者"), "ok");
+      renderGrid();
+      return;
+    }
+
+    const insertRes = await client.from("follows").insert({
+      follower_id: state.user.id,
+      followee_id: followeeId
+    });
+
+    if (insertRes.error) {
+      const msg = String(insertRes.error.message || "").toLowerCase();
+      if (!(insertRes.error.code === "23505" || msg.includes("duplicate"))) {
+        setStatus("关注失败：" + insertRes.error.message, "err");
+        return;
+      }
+    }
+
+    state.follows.add(followeeId);
+    setStatus("已关注 " + (followeeName || "该作者"), "ok");
+
+    await client.from("notifications").insert({
+      user_id: followeeId,
+      text: (state.displayName || "有用户") + " 关注了你"
+    });
+
+    renderGrid();
+  }
+
   async function submitComment(rawText) {
     if (!canWrite("评论")) return;
     const video = getVideoById(state.currentVideoId);
@@ -670,11 +832,276 @@
     });
   }
 
+  function setActiveMenu(action) {
+    if (!sideMenu) return;
+    sideMenu.querySelectorAll("button[data-action]").forEach(function (button) {
+      button.classList.toggle("active", button.dataset.action === action);
+    });
+  }
+
+  function renderExplorePanel() {
+    setSidePanel("Explore", function (root) {
+      const videos = getDisplayVideos().slice(0, 5);
+      if (!videos.length) {
+        root.textContent = "暂无可探索视频。";
+        return;
+      }
+
+      videos.forEach(function (video) {
+        const row = document.createElement("div");
+        row.className = "side-item";
+        row.textContent = (video.title || "未命名视频") + " · 热度 " + videoScore(video);
+        root.appendChild(row);
+      });
+    });
+  }
+
+  async function renderNotificationsPanel() {
+    if (!state.user) {
+      setSideText("Notifications", "请先登录后查看通知。登录后会显示关注与互动消息。");
+      return;
+    }
+
+    const result = await state.context.client
+      .from("notifications")
+      .select("text,created_at")
+      .eq("user_id", state.user.id)
+      .order("created_at", { ascending: false })
+      .limit(8);
+
+    if (result.error) {
+      setSideText("Notifications", "通知读取失败：" + result.error.message);
+      return;
+    }
+
+    setSidePanel("Notifications", function (root) {
+      const rows = result.data || [];
+      if (!rows.length) {
+        root.textContent = "暂无通知。";
+        return;
+      }
+
+      rows.forEach(function (row) {
+        const item = document.createElement("div");
+        item.className = "side-item";
+        const text = document.createElement("div");
+        text.textContent = row.text || "";
+        item.appendChild(text);
+
+        const time = document.createElement("small");
+        time.textContent = formatTime(row.created_at);
+        item.appendChild(time);
+        root.appendChild(item);
+      });
+    });
+  }
+
+  function renderFollowPanel() {
+    setSidePanel("Follow", function (root) {
+      if (!state.user) {
+        root.textContent = "登录后可关注创作者并启用“仅看关注”过滤。";
+        return;
+      }
+
+      const item = document.createElement("div");
+      item.className = "side-item";
+      item.textContent = "已关注创作者：" + state.follows.size + " 人；当前过滤：" + (state.followOnly ? "仅看关注" : "全部视频");
+      root.appendChild(item);
+
+      const tip = document.createElement("small");
+      tip.textContent = "在视频卡片点击“+ 关注”可管理关注关系。";
+      root.appendChild(tip);
+    });
+  }
+
+  function renderChatPanel() {
+    const chatKey = "xiaoma_chat_mi_v1";
+    let rows = [];
+    try {
+      rows = JSON.parse(localStorage.getItem(chatKey) || "[]");
+      if (!Array.isArray(rows)) rows = [];
+    } catch (error) {
+      rows = [];
+    }
+
+    setSidePanel("Chat", function (root) {
+      rows.slice(-6).forEach(function (row) {
+        const item = document.createElement("div");
+        item.className = "side-item";
+        item.textContent = (row.name || "用户") + "：" + (row.text || "");
+        root.appendChild(item);
+      });
+
+      const form = document.createElement("form");
+      form.className = "side-form";
+
+      const input = document.createElement("input");
+      input.maxLength = 120;
+      input.placeholder = "发送一条讨论消息";
+
+      const submit = document.createElement("button");
+      submit.type = "submit";
+      submit.textContent = "发送";
+
+      form.appendChild(input);
+      form.appendChild(submit);
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const text = String(input.value || "").trim();
+        if (!text) return;
+
+        rows.push({ name: state.displayName || "游客", text: text, time: new Date().toISOString() });
+        rows = rows.slice(-30);
+        localStorage.setItem(chatKey, JSON.stringify(rows));
+        renderChatPanel();
+      });
+
+      root.appendChild(form);
+    });
+  }
+
+  function renderMorePanel() {
+    setSidePanel("More", function (root) {
+      const links = document.createElement("div");
+      links.className = "side-links";
+
+      [
+        { href: "/mi-publish.html", label: "前往 Mi 个人发布页" },
+        { href: "/community.html", label: "返回社区入口" },
+        { href: "/profile.html", label: "打开个人中心" },
+        { href: "/m.html", label: "切换到 M" },
+        { href: "/lenny.html", label: "切换到 Lenny" }
+      ].forEach(function (item) {
+        const link = document.createElement("a");
+        link.href = item.href;
+        link.textContent = item.label;
+        links.appendChild(link);
+      });
+
+      root.appendChild(links);
+    });
+  }
+
+  function renderSettingPanel() {
+    setSidePanel("Setting", function (root) {
+      const compactForm = document.createElement("form");
+      compactForm.className = "side-form";
+
+      const compactSelect = document.createElement("select");
+      compactSelect.innerHTML = "<option value='0'>标准布局</option><option value='1'>紧凑布局</option>";
+      compactSelect.value = localStorage.getItem("xiaoma_mi_compact") === "1" ? "1" : "0";
+
+      const compactSave = document.createElement("button");
+      compactSave.type = "submit";
+      compactSave.textContent = "应用";
+      compactForm.appendChild(compactSelect);
+      compactForm.appendChild(compactSave);
+      compactForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        localStorage.setItem("xiaoma_mi_compact", compactSelect.value === "1" ? "1" : "0");
+        applyCompactMode();
+      });
+
+      const exploreForm = document.createElement("form");
+      exploreForm.className = "side-form";
+
+      const exploreSelect = document.createElement("select");
+      exploreSelect.innerHTML = "<option value='0'>默认 Home</option><option value='1'>默认 Explore</option>";
+      exploreSelect.value = localStorage.getItem("xiaoma_mi_default_explore") === "1" ? "1" : "0";
+
+      const exploreSave = document.createElement("button");
+      exploreSave.type = "submit";
+      exploreSave.textContent = "保存";
+      exploreForm.appendChild(exploreSelect);
+      exploreForm.appendChild(exploreSave);
+      exploreForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        localStorage.setItem("xiaoma_mi_default_explore", exploreSelect.value === "1" ? "1" : "0");
+      });
+
+      root.appendChild(compactForm);
+      root.appendChild(exploreForm);
+    });
+  }
+
+  async function handleMenuAction(action) {
+    setActiveMenu(action);
+
+    if (action === "home") {
+      state.menuMode = "home";
+      state.followOnly = false;
+      renderGrid();
+      renderPlayer();
+      setSideText("Home", "这是公开视频广场，浏览全部用户上传作品。");
+      return;
+    }
+
+    if (action === "explore") {
+      state.menuMode = "explore";
+      state.followOnly = false;
+      renderGrid();
+      renderPlayer();
+      renderExplorePanel();
+      return;
+    }
+
+    if (action === "notifications") {
+      await renderNotificationsPanel();
+      return;
+    }
+
+    if (action === "follow") {
+      if (!state.user) {
+        setSideText("Follow", "请先登录后管理关注关系。登录后可切换“仅看关注”。");
+        return;
+      }
+      state.followOnly = !state.followOnly;
+      state.menuMode = "home";
+      renderGrid();
+      renderPlayer();
+      renderFollowPanel();
+      return;
+    }
+
+    if (action === "chat") {
+      renderChatPanel();
+      return;
+    }
+
+    if (action === "more") {
+      renderMorePanel();
+      return;
+    }
+
+    if (action === "setting") {
+      renderSettingPanel();
+    }
+  }
+
+  function bindSideMenu() {
+    if (!sideMenu) return;
+    sideMenu.addEventListener("click", async function (event) {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      await handleMenuAction(button.dataset.action);
+    });
+  }
+
   async function init() {
+    applyCompactMode();
+    if (localStorage.getItem("xiaoma_mi_default_explore") === "1") {
+      state.menuMode = "explore";
+    }
+    bindSideMenu();
     bindUploader();
     bindCommentForm();
     await loadViewer();
     await loadVideos();
+    if (state.menuMode === "explore") {
+      setActiveMenu("explore");
+      renderExplorePanel();
+    }
   }
 
   init();
