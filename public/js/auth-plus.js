@@ -11,6 +11,7 @@
 
   const emailEl = document.getElementById("email");
   const passwordEl = document.getElementById("password");
+  const passwordConfirmEl = document.getElementById("passwordConfirm");
   const rememberMeEl = document.getElementById("rememberMe");
 
   const otpIdentityEl = document.getElementById("otpIdentity");
@@ -60,6 +61,12 @@
   function otpFriendlyError(error) {
     const raw = String(error?.message || "");
     const text = raw.toLowerCase();
+    if (text.includes("user") && text.includes("not") && text.includes("found")) {
+      return "该邮箱尚未注册，请先在账号密码页点击“创建账号”";
+    }
+    if (text.includes("signups") && text.includes("disabled")) {
+      return "当前注册功能已关闭，请联系管理员";
+    }
     if (text.includes("rate") || text.includes("too many")) {
       return "请求太频繁，请 60 秒后重试；也请检查垃圾邮箱";
     }
@@ -232,7 +239,7 @@
     const result = await client.auth.signInWithOtp({
       email: identity,
       options: {
-        shouldCreateUser: true
+        shouldCreateUser: otpPurpose === "register"
       }
     });
 
@@ -251,7 +258,7 @@
     localStorage.setItem(otpTimestampKey, String(Date.now()));
     localStorage.setItem(otpIdentityKey, identity.toLowerCase());
     renderOtpButtonState();
-    setStatus(otpPurpose === "register" ? "注册验证码已发送，请输入验证码完成注册" : "验证码已发送，请查收邮箱并输入验证码", "ok");
+    setStatus(otpPurpose === "register" ? "注册验证码已发送，请输入验证码完成注册" : "登录验证码已发送，请查收邮箱并输入验证码", "ok");
     otpCodeEl.focus();
   }
 
@@ -293,8 +300,12 @@
   registerBtn.addEventListener("click", async function () {
     const email = (emailEl.value || "").trim();
     const password = passwordEl.value || "";
+    const passwordConfirm = passwordConfirmEl ? passwordConfirmEl.value || "" : "";
     if (!email || !password) return setStatus("请先填写邮箱和密码", "err");
     if (!isEmail(email)) return setStatus("请输入正确的邮箱格式", "err");
+    if (password.length < 6) return setStatus("密码至少 6 位", "err");
+    if (!passwordConfirm) return setStatus("请填写确认密码", "err");
+    if (password !== passwordConfirm) return setStatus("两次输入的密码不一致", "err");
 
     otpPurpose = "register";
     pendingRegisterEmail = email.toLowerCase();
