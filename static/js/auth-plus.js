@@ -12,6 +12,7 @@
   const emailEl = document.getElementById("email");
   const passwordEl = document.getElementById("password");
   const passwordConfirmEl = document.getElementById("passwordConfirm");
+  const registerOnlyFieldEl = document.getElementById("registerOnlyField");
   const rememberMeEl = document.getElementById("rememberMe");
 
   const otpIdentityEl = document.getElementById("otpIdentity");
@@ -150,6 +151,7 @@
   let otpPurpose = "login";
   let pendingRegisterEmail = "";
   let pendingRegisterPassword = "";
+  let registerMode = false;
 
   async function getAuthContext() {
     const localSession = (await sbLocal.auth.getSession()).data.session;
@@ -242,6 +244,12 @@
     });
   }
 
+  function setRegisterMode(enabled) {
+    registerMode = enabled;
+    if (registerOnlyFieldEl) registerOnlyFieldEl.style.display = enabled ? "block" : "none";
+    if (registerBtn) registerBtn.textContent = enabled ? "发送注册验证码" : "创建账号";
+  }
+
   function switchToOtpTab() {
     document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
     const otpTab = document.querySelector('.tab[data-tab="otp"]');
@@ -296,6 +304,7 @@
       const activeTab = button.dataset.tab;
       document.querySelectorAll(".form-panel").forEach((panel) => panel.classList.remove("active"));
       document.getElementById("panel-" + activeTab).classList.add("active");
+      if (activeTab !== "password") setRegisterMode(false);
       setStatus(activeTab === "password" ? "请输入邮箱和密码" : "请输入邮箱并获取验证码");
     });
   });
@@ -307,6 +316,7 @@
   otpIdentityEl.addEventListener("input", renderOtpButtonState);
 
   loginBtn.addEventListener("click", async function () {
+    if (registerMode) setRegisterMode(false);
     const email = (emailEl.value || "").trim();
     const password = passwordEl.value || "";
     if (!email || !password) return setStatus("请输入邮箱和密码", "err");
@@ -325,6 +335,13 @@
   });
 
   registerBtn.addEventListener("click", async function () {
+    if (!registerMode) {
+      setRegisterMode(true);
+      setStatus("请先填写确认密码，再次点击“发送注册验证码”继续", "");
+      if (passwordConfirmEl) passwordConfirmEl.focus();
+      return;
+    }
+
     const email = (emailEl.value || "").trim();
     const password = passwordEl.value || "";
     const passwordConfirm = passwordConfirmEl ? passwordConfirmEl.value || "" : "";
@@ -425,5 +442,6 @@
   });
 
   renderOtpButtonState();
+  setRegisterMode(false);
   renderSessionBar();
 })();
