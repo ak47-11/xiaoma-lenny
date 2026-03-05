@@ -16,7 +16,12 @@
   const rememberMeEl = document.getElementById("rememberMe");
 
   const otpIdentityEl = document.getElementById("otpIdentity");
+  const otpIdentityLabelEl = document.getElementById("otpIdentityLabel");
   const otpCodeEl = document.getElementById("otpCode");
+  const resetPasswordFieldEl = document.getElementById("resetPasswordField");
+  const resetPasswordConfirmFieldEl = document.getElementById("resetPasswordConfirmField");
+  const resetNewPasswordEl = document.getElementById("resetNewPassword");
+  const resetNewPasswordConfirmEl = document.getElementById("resetNewPasswordConfirm");
 
   const loginBtn = document.getElementById("loginBtn");
   const registerBtn = document.getElementById("registerLink");
@@ -151,7 +156,9 @@
   let otpPurpose = "login";
   let pendingRegisterEmail = "";
   let pendingRegisterPassword = "";
+  let pendingResetEmail = "";
   let registerMode = false;
+  let resetMode = false;
 
   async function getAuthContext() {
     const localSession = (await sbLocal.auth.getSession()).data.session;
@@ -250,6 +257,15 @@
     if (registerBtn) registerBtn.textContent = enabled ? "发送注册验证码" : "创建账号";
   }
 
+  function setResetMode(enabled) {
+    resetMode = enabled;
+    if (resetPasswordFieldEl) resetPasswordFieldEl.style.display = enabled ? "block" : "none";
+    if (resetPasswordConfirmFieldEl) resetPasswordConfirmFieldEl.style.display = enabled ? "block" : "none";
+    if (otpIdentityLabelEl) otpIdentityLabelEl.textContent = enabled ? "邮箱 / 用户名" : "邮箱";
+    if (verifyOtpBtn) verifyOtpBtn.textContent = enabled ? "校验并重置密码" : "验证并登录";
+    if (forgotBtn) forgotBtn.textContent = enabled ? "取消找回" : "忘记密码？";
+  }
+
   function switchToOtpTab() {
     document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
     const otpTab = document.querySelector('.tab[data-tab="otp"]');
@@ -260,11 +276,36 @@
     if (otpPanel) otpPanel.classList.add("active");
   }
 
-  async function sendEmailOtp(identity) {
-    if (!identity) return setStatus("请输入邮箱", "err");
-    if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
+  async function resolveIdentity(input) {
+    const value = String(input || "").trim();
+    if (!value) return { email: "", error: "请输入邮箱或用户名" };
+    if (isEmail(value)) return { email: value.toLowerCase(), error: "" };
 
-    const left = getCooldownLeft(identity);
+    if (!resetMode) {
+      return { email: "", error: "请直接输入注册邮箱" };
+    }
+
+    const client = getActiveClient();
+    const profile = await client
+      .from("profiles")
+      .select("contact")
+      .eq("display_name", value)
+      .maybeSingle();
+
+    const contact = profile.data?.contact || "";
+    if (!profile.error && isEmail(contact)) {
+      return { email: contact.toLowerCase(), error: "" };
+    }
+
+    return { email: "", error: "用户名找不到对应邮箱，请直接输入邮箱" };
+  }
+
+  async function sendEmailOtp(identity) {
+    const resolved = await resolveIdentity(identity);
+    if (resolved.error) return setStatus(resolved.error, "err");
+    const email = resolved.email;
+
+    const left = getCooldownLeft(email);
     if (left > 0) return setStatus("该邮箱发送过于频繁，请 " + left + " 秒后重试", "err");
 
     const client = getActiveClient();
@@ -272,7 +313,7 @@
     if (resendOtpBtn) resendOtpBtn.disabled = true;
 
     const result = await client.auth.signInWithOtp({
-      email: identity,
+      email,
       options: {
         shouldCreateUser: otpPurpose === "register"
       }
@@ -284,16 +325,24 @@
       const msg = otpFriendlyError(result.error);
       if (msg.includes("请求太频繁")) {
         localStorage.setItem(otpTimestampKey, String(Date.now()));
-        localStorage.setItem(otpIdentityKey, identity.toLowerCase());
+        localStorage.setItem(otpIdentityKey, email);
       }
       renderOtpButtonState();
       return setStatus(msg, "err");
     }
 
     localStorage.setItem(otpTimestampKey, String(Date.now()));
-    localStorage.setItem(otpIdentityKey, identity.toLowerCase());
+    localStorage.setItem(otpIdentityKey, email);
+    pendingResetEmail = otpPurpose === "reset" ? email : pendingResetEmail;
     renderOtpButtonState();
-    setStatus(otpPurpose === "register" ? "注册验证码已发送，请输入验证码完成注册" : "登录验证码已发送，请查收邮箱并输入验证码", "ok");
+    setStatus(
+      otpPurpose === "register"
+        ? "注册验证码已发送，请输入验证码完成注册"
+        : otpPurpose === "reset"
+          ? "找回验证码已发送，请输入验证码并设置新密码"
+          : "登录验证码已发送，请查收邮箱并输入验证码",
+      "ok"
+    );
     otpCodeEl.focus();
   }
 
@@ -305,6 +354,7 @@
       document.querySelectorAll(".form-panel").forEach((panel) => panel.classList.remove("active"));
       document.getElementById("panel-" + activeTab).classList.add("active");
       if (activeTab !== "password") setRegisterMode(false);
+      if (activeTab !== "otp") setResetMode(false);
       setStatus(activeTab === "password" ? "请输入邮箱和密码" : "请输入邮箱并获取验证码");
     });
   });
@@ -317,6 +367,7 @@
 
   loginBtn.addEventListener("click", async function () {
     if (registerMode) setRegisterMode(false);
+    if (resetMode) setResetMode(false);
     const email = (emailEl.value || "").trim();
     const password = passwordEl.value || "";
     if (!email || !password) return setStatus("请输入邮箱和密码", "err");
@@ -363,21 +414,23 @@
   });
 
   forgotBtn.addEventListener("click", async function () {
-    const email = (emailEl.value || "").trim();
-    if (!email) return setStatus("请输入邮箱后再找回密码", "err");
-    if (!isEmail(email)) return setStatus("请输入正确的邮箱格式", "err");
+    if (resetMode) {
+      setResetMode(false);
+      setStatus("已取消找回密码", "");
+      return;
+    }
 
-    const client = getActiveClient();
-    setLoading(forgotBtn, true, "忘记密码？", "发送中...");
-    const { error } = await client.auth.resetPasswordForEmail(email);
-    setLoading(forgotBtn, false, "忘记密码？", "发送中...");
-    if (error) return setStatus(authFriendlyError("reset", error), "err");
-    setStatus("重置链接已发送到邮箱", "ok");
+    otpPurpose = "reset";
+    setRegisterMode(false);
+    setResetMode(true);
+    switchToOtpTab();
+    otpIdentityEl.value = (emailEl.value || "").trim();
+    setStatus("请输入邮箱或用户名，发送验证码后输入新密码完成重置", "");
   });
 
   sendOtpBtn.addEventListener("click", async function () {
     const identity = (otpIdentityEl.value || "").trim();
-    otpPurpose = "login";
+    if (otpPurpose !== "register" && otpPurpose !== "reset") otpPurpose = "login";
     await sendEmailOtp(identity);
   });
 
@@ -389,7 +442,10 @@
   }
 
   verifyOtpBtn.addEventListener("click", async function () {
-    const identity = (otpIdentityEl.value || "").trim();
+    const identityInput = (otpIdentityEl.value || "").trim();
+    const resolved = await resolveIdentity(identityInput);
+    if (resolved.error) return setStatus(resolved.error, "err");
+    const identity = resolved.email;
     const token = (otpCodeEl.value || "").trim();
     if (!identity) return setStatus("请先输入邮箱", "err");
     if (!isEmail(identity)) return setStatus("验证码登录仅支持邮箱，请输入正确邮箱", "err");
@@ -397,9 +453,10 @@
     if (!token) return setStatus("请输入邮箱验证码", "err");
 
     const client = getActiveClient();
-    setLoading(verifyOtpBtn, true, "验证并登录", "验证中...");
+    const verifyDefaultText = otpPurpose === "reset" ? "校验并重置密码" : "验证并登录";
+    setLoading(verifyOtpBtn, true, verifyDefaultText, "验证中...");
     const result = await client.auth.verifyOtp({ email: identity, token, type: "email" });
-    setLoading(verifyOtpBtn, false, "验证并登录", "验证中...");
+    setLoading(verifyOtpBtn, false, verifyDefaultText, "验证中...");
     if (result.error) return setStatus(authFriendlyError("verify", result.error), "err");
 
     if (otpPurpose === "register") {
@@ -419,6 +476,28 @@
       setTimeout(function () {
         window.location.href = getNextPath();
       }, 700);
+      return;
+    }
+
+    if (otpPurpose === "reset") {
+      const nextPassword = (resetNewPasswordEl?.value || "").trim();
+      const nextPasswordConfirm = (resetNewPasswordConfirmEl?.value || "").trim();
+      if (!nextPassword || !nextPasswordConfirm) return setStatus("请填写新密码和确认密码", "err");
+      if (nextPassword.length < 6) return setStatus("新密码至少 6 位", "err");
+      if (nextPassword !== nextPasswordConfirm) return setStatus("两次新密码不一致", "err");
+      if (pendingResetEmail && pendingResetEmail !== identity) return setStatus("验证码邮箱与重置账号不匹配，请重新发送验证码", "err");
+
+      const updateResult = await client.auth.updateUser({ password: nextPassword });
+      if (updateResult.error) return setStatus("重置密码失败：" + authFriendlyError("reset", updateResult.error), "err");
+
+      pendingResetEmail = "";
+      otpPurpose = "login";
+      setResetMode(false);
+      setStatus("密码重置成功，请使用新密码登录", "ok");
+      switchToOtpTab();
+      setTimeout(function () {
+        document.querySelector('.tab[data-tab="password"]')?.click();
+      }, 600);
       return;
     }
 
@@ -443,5 +522,6 @@
 
   renderOtpButtonState();
   setRegisterMode(false);
+  setResetMode(false);
   renderSessionBar();
 })();

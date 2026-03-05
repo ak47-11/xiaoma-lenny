@@ -411,7 +411,7 @@
 
       <div id="panel-otp" class="form-panel">
         <div class="field">
-          <label for="otpIdentity">邮箱</label>
+          <label for="otpIdentity" id="otpIdentityLabel">邮箱</label>
           <input type="text" id="otpIdentity" placeholder="name@example.com" autocomplete="username" />
         </div>
         <div class="actions">
@@ -421,6 +421,14 @@
         <div class="field">
           <label for="otpCode">邮箱验证码</label>
           <input type="text" id="otpCode" placeholder="输入邮箱中的验证码" maxlength="12" autocomplete="one-time-code" />
+        </div>
+        <div class="field" id="resetPasswordField" style="display:none">
+          <label for="resetNewPassword">新密码</label>
+          <input type="password" id="resetNewPassword" placeholder="请输入新密码（至少6位）" autocomplete="new-password" />
+        </div>
+        <div class="field" id="resetPasswordConfirmField" style="display:none">
+          <label for="resetNewPasswordConfirm">确认新密码</label>
+          <input type="password" id="resetNewPasswordConfirm" placeholder="再次输入新密码" autocomplete="new-password" />
         </div>
         <div class="actions">
           <button class="btn primary" id="verifyOtpBtn">验证并登录</button>
