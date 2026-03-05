@@ -93,7 +93,7 @@
     state.user = state.context.session?.user || null;
     if (!state.user) {
       state.displayName = "游客";
-      setUserHint("游客模式：可浏览动态，发布与互动需登录");
+      setUserHint("游客模式：可浏览公开动态；发布请先登录并进入个人发布页");
       return;
     }
 
@@ -122,7 +122,7 @@
     }
 
     state.displayName = displayName;
-    setUserHint("当前账号：" + displayName + "（可发布、点赞、评论、转发）");
+    setUserHint("当前账号：" + displayName + "（可互动；发布请前往个人发布页）");
   }
 
   async function loadPosts() {
@@ -156,7 +156,7 @@
     renderFeed();
 
     if (!state.posts.length) {
-      setStatus("还没有动态，发布第一条内容吧", "");
+      setStatus("公开广场还没有动态，去个人发布页发第一条吧", "");
     } else {
       setStatus("已加载 " + state.posts.length + " 条动态", "ok");
     }

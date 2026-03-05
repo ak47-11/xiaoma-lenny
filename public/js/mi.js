@@ -110,7 +110,7 @@
 
     if (!state.user) {
       state.displayName = "游客";
-      setUserHint("游客模式：可看视频，点赞/收藏/评论/发布需登录");
+      setUserHint("游客模式：可看视频；点赞/收藏/评论需登录，发布请先登录后前往个人发布页");
       return;
     }
 
@@ -139,7 +139,7 @@
     }
 
     state.displayName = displayName;
-    setUserHint("当前账号：" + displayName + "（可发布、点赞、收藏、评论）");
+    setUserHint("当前账号：" + displayName + "（可互动；发布请前往个人发布页）");
   }
 
   async function loadVideos() {
@@ -180,7 +180,7 @@
     renderPlayer();
 
     if (!state.videos.length) {
-      setStatus("还没有视频，发布第一条内容吧", "");
+      setStatus("公开社区还没有视频，去个人发布页上传第一条吧", "");
     } else {
       setStatus("已加载 " + state.videos.length + " 条视频", "ok");
     }

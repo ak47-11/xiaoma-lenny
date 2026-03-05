@@ -42,48 +42,15 @@
       </aside>
 
       <section class="panel">
-        <h2>发布视频</h2>
+        <h2>公开视频社区</h2>
         <p id="userHint" class="muted" style="margin:0 0 8px;">加载中...</p>
-        <form id="miUploader">
-          <div class="field">
-            <label for="miTitle">标题（最多 120 字）</label>
-            <input id="miTitle" maxlength="120" placeholder="请输入视频标题" />
-          </div>
-          <div class="field">
-            <label for="miSummary">简介（可选）</label>
-            <textarea id="miSummary" maxlength="1000" placeholder="分享视频亮点、内容提要或学习笔记"></textarea>
-          </div>
-          <div class="field">
-            <label for="miVideoUrl">视频链接</label>
-            <input id="miVideoUrl" maxlength="500" placeholder="https://..." />
-          </div>
-          <div class="field">
-            <label for="miCoverUrl">封面链接（可选）</label>
-            <input id="miCoverUrl" maxlength="500" placeholder="https://..." />
-          </div>
-          <div class="field">
-            <label for="miCategory">分类</label>
-            <select id="miCategory">
-              <option value="综合推荐">综合推荐</option>
-              <option value="技术教程">技术教程</option>
-              <option value="开源项目">开源项目</option>
-              <option value="实战复盘">实战复盘</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="miDuration">时长（可选）</label>
-            <input id="miDuration" maxlength="24" placeholder="例如 12:35" />
-          </div>
-          <div class="field">
-            <label for="miTagsInput">标签（逗号分隔）</label>
-            <input id="miTagsInput" maxlength="220" placeholder="前端, 教程, 实战" />
-          </div>
-          <div style="margin-top:10px;">
-            <button class="action-btn" type="submit">发布视频</button>
-          </div>
-        </form>
+        <div class="hint">这里展示所有用户公开视频作品。发布与管理请进入个人发布页，公开社区和个人页分开。</div>
+        <div class="actions" style="margin-top:10px;">
+          <a class="action-btn" href="/mi-publish.html">进入个人发布页</a>
+          <a href="/profile.html">个人中心</a>
+        </div>
 
-        <div id="miStatus" class="status">准备就绪</div>
+        <div id="miStatus" class="status">正在加载公开视频...</div>
 
         <div id="miPlayerView" class="article-view" style="margin-top:10px;">
           <h3 id="miPlayerTitle" style="margin:0 0 8px;">请选择一个视频</h3>

@@ -125,6 +125,10 @@ body {
   padding: 0 14px;
   font-weight: 800;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .status {
@@ -253,6 +257,20 @@ body {
   display: inline-flex;
   align-items: center;
   cursor: pointer;
+}
+
+.actions .action-btn {
+  border: none;
+  color: #fff;
+}
+
+.actions a.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.stat-chip {
+  min-height: 30px;
 }
 
 .actions button.on { background: #eff6ff; color: #244d8b; border-color: #bcd0ef; }

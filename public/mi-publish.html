@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mi 发布中心 | 个人页</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/hub.css" />
+</head>
+<body class="accent-mi">
+  <main class="hub-shell">
+    <header class="hub-top">
+      <div class="hub-brand">
+        <strong>Mi 发布中心</strong>
+        <span>个人页面 · 上传与管理我的视频</span>
+      </div>
+      <nav class="hub-nav">
+        <a class="pill mi" href="/mi.html">Mi 公共社区</a>
+        <a class="pill m" href="/m.html">M</a>
+        <a class="pill lenny" href="/lenny.html">Lenny</a>
+        <a href="/community.html">社区入口</a>
+        <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+        <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
+        <a href="/auth.html" id="loginNav">账号入口</a>
+        <a href="#" id="logoutNav" style="display:none">退出账号</a>
+      </nav>
+    </header>
+
+    <section class="hub-layout">
+      <aside class="panel">
+        <h3>页面说明</h3>
+        <div class="hint">这是 Mi 的个人发布页。公开浏览请返回 Mi 公共社区，两个页面职责分离。</div>
+        <div class="actions" style="margin-top:10px;">
+          <a href="/mi.html">返回公开社区</a>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <h2>上传视频信息</h2>
+        <p id="userHint" class="muted" style="margin:0 0 8px;">正在验证登录状态...</p>
+        <form id="miUploader">
+          <div class="field">
+            <label for="miTitle">标题（最多 120 字）</label>
+            <input id="miTitle" maxlength="120" placeholder="请输入视频标题" />
+          </div>
+          <div class="field">
+            <label for="miSummary">简介（可选）</label>
+            <textarea id="miSummary" maxlength="1000" placeholder="分享视频亮点、内容提要或学习笔记"></textarea>
+          </div>
+          <div class="field">
+            <label for="miVideoUrl">视频链接</label>
+            <input id="miVideoUrl" maxlength="500" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label for="miCoverUrl">封面链接（可选）</label>
+            <input id="miCoverUrl" maxlength="500" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label for="miCategory">分类</label>
+            <select id="miCategory">
+              <option value="综合推荐">综合推荐</option>
+              <option value="技术教程">技术教程</option>
+              <option value="开源项目">开源项目</option>
+              <option value="实战复盘">实战复盘</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="miDuration">时长（可选）</label>
+            <input id="miDuration" maxlength="24" placeholder="例如 12:35" />
+          </div>
+          <div class="field">
+            <label for="miTagsInput">标签（逗号分隔）</label>
+            <input id="miTagsInput" maxlength="220" placeholder="前端, 教程, 实战" />
+          </div>
+          <div style="margin-top:10px;">
+            <button class="action-btn" type="submit">发布视频</button>
+          </div>
+        </form>
+
+        <div id="miStatus" class="status">准备就绪</div>
+
+        <h3 style="margin-top:12px;">我的视频作品</h3>
+        <div id="miMineGrid" class="video-grid"></div>
+      </section>
+
+      <aside class="panel">
+        <h3>上传建议</h3>
+        <ul class="list-text">
+          <li>标题尽量说明“看完学到什么”</li>
+          <li>封面建议突出主题关键词</li>
+          <li>分类和标签会影响曝光效率</li>
+          <li>发布后在下方可管理删除</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+
+  <template id="miMineVideoTemplate">
+    <article class="video-card">
+      <div class="video-cover"></div>
+      <div class="video-head" style="margin-top:8px;">
+        <strong class="title"></strong>
+        <span class="chip category"></span>
+      </div>
+      <div class="meta"></div>
+      <p class="body-text summary"></p>
+      <div class="tag-list"></div>
+      <div class="actions">
+        <a class="open-link" target="_blank" rel="noopener noreferrer">打开视频</a>
+        <button class="delete-btn">删除</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/app-core.js"></script>
+  <script src="/js/mi-publish.js"></script>
+</body>
+</html>

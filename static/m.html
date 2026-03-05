@@ -42,25 +42,15 @@
       </aside>
 
       <section class="panel">
-        <h2>发布动态</h2>
+        <h2>公开社区广场</h2>
         <p id="userHint" class="muted" style="margin:0 0 8px;">加载中...</p>
+        <div class="hint">这里是公开动态流，任何访客都可以浏览全部用户内容。发布内容请进入个人发布页。</div>
+        <div class="actions" style="margin-top:10px;">
+          <a class="action-btn" href="/m-publish.html">进入个人发布页</a>
+          <a href="/profile.html">个人中心</a>
+        </div>
 
-        <form id="mComposer">
-          <div class="field">
-            <label for="mContent">内容（最多 280 字）</label>
-            <textarea id="mContent" maxlength="280" placeholder="你现在在想什么？分享你的观点、进展或灵感。"></textarea>
-            <div id="mCounter" class="counter">0 / 280</div>
-          </div>
-          <div class="field">
-            <label for="mMedia">图片链接（可选）</label>
-            <input id="mMedia" maxlength="500" placeholder="https://..." />
-          </div>
-          <div style="margin-top:10px;">
-            <button class="action-btn" type="submit">发布动态</button>
-          </div>
-        </form>
-
-        <div id="mStatus" class="status">准备就绪</div>
+        <div id="mStatus" class="status">正在加载公开动态...</div>
         <div id="mFeed" class="feed-list" style="margin-top:10px;"></div>
       </section>
 

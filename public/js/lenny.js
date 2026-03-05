@@ -110,7 +110,7 @@
 
     if (!state.user) {
       state.displayName = "游客";
-      setUserHint("游客模式：可阅读文章，发布/点赞/收藏/评论需登录");
+      setUserHint("游客模式：可阅读公开文章；点赞/收藏/评论需登录，发布请先登录后前往个人发布页");
       return;
     }
 
@@ -139,7 +139,7 @@
     }
 
     state.displayName = displayName;
-    setUserHint("当前账号：" + displayName + "（可发文、点赞、收藏、评论）");
+    setUserHint("当前账号：" + displayName + "（可互动；发布请前往个人发布页）");
   }
 
   async function loadArticles() {
@@ -181,7 +181,7 @@
     renderViewer();
 
     if (!state.articles.length) {
-      setStatus("还没有文章，发布第一篇技术内容吧", "");
+      setStatus("公开技术社区还没有文章，去个人发布页写第一篇吧", "");
     } else {
       setStatus("已加载 " + state.articles.length + " 篇文章", "ok");
     }

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lenny 发布中心 | 个人页</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/hub.css" />
+</head>
+<body class="accent-lenny">
+  <main class="hub-shell">
+    <header class="hub-top">
+      <div class="hub-brand">
+        <strong>Lenny 发布中心</strong>
+        <span>个人页面 · 发布与管理我的技术文章</span>
+      </div>
+      <nav class="hub-nav">
+        <a class="pill lenny" href="/lenny.html">Lenny 公共社区</a>
+        <a class="pill m" href="/m.html">M</a>
+        <a class="pill mi" href="/mi.html">Mi</a>
+        <a href="/community.html">社区入口</a>
+        <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+        <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
+        <a href="/auth.html" id="loginNav">账号入口</a>
+        <a href="#" id="logoutNav" style="display:none">退出账号</a>
+      </nav>
+    </header>
+
+    <section class="hub-layout">
+      <aside class="panel">
+        <h3>页面说明</h3>
+        <div class="hint">这是 Lenny 的个人发布页。公开阅读区与个人管理区分开，便于内容管理与展示。</div>
+        <div class="actions" style="margin-top:10px;">
+          <a href="/lenny.html">返回公开社区</a>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <h2>发布技术文章</h2>
+        <p id="userHint" class="muted" style="margin:0 0 8px;">正在验证登录状态...</p>
+        <form id="lennyPublisher">
+          <div class="field">
+            <label for="lennyTitle">标题（最多 160 字）</label>
+            <input id="lennyTitle" maxlength="160" placeholder="请输入文章标题" />
+          </div>
+          <div class="field">
+            <label for="lennyType">类型</label>
+            <select id="lennyType">
+              <option value="blog">技术博客</option>
+              <option value="tutorial">学习教程</option>
+              <option value="analysis">分析文章</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="lennyTagsInput">标签（逗号分隔）</label>
+            <input id="lennyTagsInput" maxlength="260" placeholder="javascript, 架构, 性能优化" />
+          </div>
+          <div class="field">
+            <label for="lennySummary">摘要（可选）</label>
+            <textarea id="lennySummary" maxlength="1200" placeholder="一句话概括文章价值与目标读者"></textarea>
+          </div>
+          <div class="field">
+            <label for="lennyContent">正文</label>
+            <textarea id="lennyContent" maxlength="20000" placeholder="支持纯文本或 Markdown 风格内容"></textarea>
+          </div>
+          <div style="margin-top:10px;">
+            <button class="action-btn" type="submit">发布文章</button>
+          </div>
+        </form>
+
+        <div id="lennyStatus" class="status">准备就绪</div>
+
+        <h3 style="margin-top:12px;">我的文章</h3>
+        <div id="lennyMineList" class="article-list"></div>
+      </section>
+
+      <aside class="panel">
+        <h3>写作建议</h3>
+        <ul class="list-text">
+          <li>标题清晰说明问题与价值</li>
+          <li>摘要突出目标读者与收益</li>
+          <li>正文建议分章节，便于阅读</li>
+          <li>发布后可在下方管理删除</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+
+  <template id="lennyMineArticleTemplate">
+    <article class="article-card">
+      <div class="article-head">
+        <strong class="title"></strong>
+        <span class="chip type"></span>
+      </div>
+      <div class="meta"></div>
+      <p class="body-text summary"></p>
+      <div class="tag-list"></div>
+      <div class="article-view" style="margin-top:8px; padding:10px;">
+        <pre class="content"></pre>
+      </div>
+      <div class="actions">
+        <button class="delete-btn">删除</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/app-core.js"></script>
+  <script src="/js/lenny-publish.js"></script>
+</body>
+</html>

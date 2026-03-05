@@ -42,39 +42,15 @@
       </aside>
 
       <section class="panel">
-        <h2>发布文章</h2>
+        <h2>公开技术社区</h2>
         <p id="userHint" class="muted" style="margin:0 0 8px;">加载中...</p>
-        <form id="lennyPublisher">
-          <div class="field">
-            <label for="lennyTitle">标题（最多 160 字）</label>
-            <input id="lennyTitle" maxlength="160" placeholder="请输入文章标题" />
-          </div>
-          <div class="field">
-            <label for="lennyType">类型</label>
-            <select id="lennyType">
-              <option value="blog">技术博客</option>
-              <option value="tutorial">学习教程</option>
-              <option value="analysis">分析文章</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="lennyTagsInput">标签（逗号分隔）</label>
-            <input id="lennyTagsInput" maxlength="260" placeholder="javascript, 架构, 性能优化" />
-          </div>
-          <div class="field">
-            <label for="lennySummary">摘要（可选）</label>
-            <textarea id="lennySummary" maxlength="1200" placeholder="一句话概括文章价值与目标读者"></textarea>
-          </div>
-          <div class="field">
-            <label for="lennyContent">正文</label>
-            <textarea id="lennyContent" maxlength="20000" placeholder="支持纯文本或 Markdown 风格内容"></textarea>
-          </div>
-          <div style="margin-top:10px;">
-            <button class="action-btn" type="submit">发布文章</button>
-          </div>
-        </form>
+        <div class="hint">这里是公开技术内容流，所有访客都可以阅读全部用户文章。发布与个人管理请进入独立发布页。</div>
+        <div class="actions" style="margin-top:10px;">
+          <a class="action-btn" href="/lenny-publish.html">进入个人发布页</a>
+          <a href="/profile.html">个人中心</a>
+        </div>
 
-        <div id="lennyStatus" class="status">准备就绪</div>
+        <div id="lennyStatus" class="status">正在加载公开文章...</div>
 
         <div class="tool-row">
           <select id="lennyFilterType">
