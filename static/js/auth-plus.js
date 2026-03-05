@@ -4,6 +4,7 @@
   const supabaseAnonKey = script?.dataset?.supabaseAnonKey || "";
 
   const statusEl = document.getElementById("status");
+  const statusActionEl = document.getElementById("statusAction");
   const sessionBarEl = document.getElementById("sessionBar");
   const tabsEl = document.querySelector(".tabs");
   const panelsEl = document.querySelectorAll(".form-panel");
@@ -34,6 +35,7 @@
 
 
   const ADMIN_EMAILS = ["3102850054@qq.com"];
+  const SUPPORT_EMAIL = "3102850054@qq.com";
   const OTP_COOLDOWN_SECONDS = 60;
   const otpTimestampKey = "xiaoma_otp_last_sent_at";
   const otpIdentityKey = "xiaoma_otp_last_identity";
@@ -46,6 +48,21 @@
     statusEl.textContent = text;
     statusEl.className = "status";
     if (kind) statusEl.classList.add(kind);
+    setStatusAction("");
+  }
+
+  function setStatusAction(action) {
+    if (!statusActionEl) return;
+    if (action === "contact_admin") {
+      const subject = encodeURIComponent("用户名找回邮箱支持");
+      const body = encodeURIComponent("你好，我忘记了注册邮箱，用户名是：\n\n请帮我协助找回，谢谢。");
+      statusActionEl.innerHTML = "<a class='status-link' href='mailto:" + SUPPORT_EMAIL + "?subject=" + subject + "&body=" + body + "'>联系管理员协助找回邮箱</a>";
+      statusActionEl.style.display = "flex";
+      return;
+    }
+
+    statusActionEl.innerHTML = "";
+    statusActionEl.style.display = "none";
   }
 
   function setLoading(button, loading, defaultText, loadingText) {
@@ -297,12 +314,16 @@
       return { email: contact.toLowerCase(), error: "" };
     }
 
-    return { email: "", error: "用户名找不到对应邮箱，请直接输入邮箱" };
+    return { email: "", error: "用户名找不到对应邮箱，请直接输入邮箱或联系管理员", action: "contact_admin" };
   }
 
   async function sendEmailOtp(identity) {
     const resolved = await resolveIdentity(identity);
-    if (resolved.error) return setStatus(resolved.error, "err");
+    if (resolved.error) {
+      setStatus(resolved.error, "err");
+      if (resolved.action) setStatusAction(resolved.action);
+      return;
+    }
     const email = resolved.email;
 
     const left = getCooldownLeft(email);
@@ -444,7 +465,11 @@
   verifyOtpBtn.addEventListener("click", async function () {
     const identityInput = (otpIdentityEl.value || "").trim();
     const resolved = await resolveIdentity(identityInput);
-    if (resolved.error) return setStatus(resolved.error, "err");
+    if (resolved.error) {
+      setStatus(resolved.error, "err");
+      if (resolved.action) setStatusAction(resolved.action);
+      return;
+    }
     const identity = resolved.email;
     const token = (otpCodeEl.value || "").trim();
     if (!identity) return setStatus("请先输入邮箱", "err");

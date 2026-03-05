@@ -331,6 +331,26 @@
       background: rgba(191, 29, 24, 0.08);
     }
 
+    .status-action {
+      margin-top: 8px;
+      display: none;
+      justify-content: center;
+    }
+
+    .status-link {
+      border: 1px solid #c8d7ed;
+      border-radius: 999px;
+      background: #fff;
+      color: #33558b;
+      font-size: 12px;
+      font-weight: 600;
+      min-height: 30px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
     @keyframes fade {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -439,6 +459,7 @@
       </div>
 
       <div id="status" class="status">请选择登录方式</div>
+      <div id="statusAction" class="status-action"></div>
     </section>
   </main>
 
