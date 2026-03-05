@@ -55,16 +55,11 @@ url = "/community.html"
 weight = 3
 
 [[menu.main]]
-name = "管理台"
-url = "/admin.html"
-weight = 4
-
-[[menu.main]]
 name = "标签"
 url = "/tags/"
-weight = 5
+weight = 4
 
 [[menu.main]]
 name = "注册/登录"
 url = "/auth.html"
-weight = 6
+weight = 5

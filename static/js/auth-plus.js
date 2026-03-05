@@ -5,6 +5,9 @@
 
   const statusEl = document.getElementById("status");
   const sessionBarEl = document.getElementById("sessionBar");
+  const tabsEl = document.querySelector(".tabs");
+  const panelsEl = document.querySelectorAll(".form-panel");
+  const dividerEl = document.querySelector(".divider");
 
   const emailEl = document.getElementById("email");
   const passwordEl = document.getElementById("password");
@@ -146,6 +149,7 @@
 
     if (!user) {
       sessionBarEl.style.display = "none";
+      setAuthFormVisible(true);
       return;
     }
 
@@ -156,6 +160,7 @@
       "<div class='session-text'>当前已登录：" + (user.email || "未命名用户") + "</div>" +
       "<div class='session-actions'>" +
       "<button type='button' class='mini-btn' id='goNextBtn'>继续访问</button>" +
+      "<button type='button' class='mini-btn' id='goProfileBtn'>个人中心</button>" +
       "<button type='button' class='mini-btn' id='goCommunityBtn'>社区首页</button>" +
       (isAdmin ? "<button type='button' class='mini-btn' id='goAdminBtn'>管理台</button>" : "") +
       "<button type='button' class='mini-btn' id='logoutBtn'>退出登录</button>" +
@@ -165,6 +170,9 @@
 
     document.getElementById("goNextBtn").addEventListener("click", function () {
       window.location.href = nextPath;
+    });
+    document.getElementById("goProfileBtn").addEventListener("click", function () {
+      window.location.href = "/profile.html";
     });
     document.getElementById("goCommunityBtn").addEventListener("click", function () {
       window.location.href = "/community.html";
@@ -179,15 +187,25 @@
       await sbSession.auth.signOut();
       setStatus("已退出登录", "ok");
       sessionBarEl.style.display = "none";
+      setAuthFormVisible(true);
     });
 
     setStatus("检测到登录状态，可直接继续访问", "ok");
+    setAuthFormVisible(false);
   }
 
   function getActiveClient() {
     const remember = !!rememberMeEl.checked;
     localStorage.setItem("xiaoma_remember_auth", remember ? "1" : "0");
     return remember ? sbLocal : sbSession;
+  }
+
+  function setAuthFormVisible(visible) {
+    if (tabsEl) tabsEl.style.display = visible ? "grid" : "none";
+    if (dividerEl) dividerEl.style.display = visible ? "flex" : "none";
+    panelsEl.forEach(function (panel) {
+      panel.style.display = visible ? "" : "none";
+    });
   }
 
   function switchToOtpTab() {

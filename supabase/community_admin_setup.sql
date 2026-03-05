@@ -3,9 +3,14 @@
 create table if not exists profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   display_name text,
+  bio text,
+  contact text,
   role text default 'user' check (role in ('user', 'moderator', 'admin')),
   created_at timestamptz default now()
 );
+
+alter table profiles add column if not exists bio text;
+alter table profiles add column if not exists contact text;
 
 create table if not exists community_posts (
   id uuid primary key default gen_random_uuid(),
