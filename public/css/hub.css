@@ -427,6 +427,60 @@ body {
   padding: 0 10px;
 }
 
+body.lock-scroll {
+  overflow: hidden;
+}
+
+.detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.detail-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.detail-card {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  border: 1px solid #2f3336;
+  border-radius: 16px;
+  background: #111214;
+  padding: 14px;
+}
+
+.detail-close {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  border: 1px solid #2f3336;
+  background: #0f1012;
+  color: #e7e9ea;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.detail-content {
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.8;
+  color: #e0e2e5;
+  font: inherit;
+}
+
 .hidden { display: none; }
 
 .player-shell {

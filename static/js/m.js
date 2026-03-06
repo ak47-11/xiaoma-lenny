@@ -12,6 +12,7 @@
     comments: new Map(),
     menuMode: "home",
     followOnly: false,
+    activeDetailPostId: null,
     tableReady: true
   };
 
@@ -27,6 +28,16 @@
   const sidePanelBody = document.getElementById("mSidePanelBody");
   const template = document.getElementById("mPostTemplate");
   const userHint = document.getElementById("userHint");
+  const detailModal = document.getElementById("mDetailModal");
+  const detailClose = document.getElementById("mDetailClose");
+  const detailAuthor = document.getElementById("mDetailAuthor");
+  const detailMeta = document.getElementById("mDetailMeta");
+  const detailContent = document.getElementById("mDetailContent");
+  const detailMedia = document.getElementById("mDetailMedia");
+  const detailStats = document.getElementById("mDetailStats");
+  const detailComments = document.getElementById("mDetailComments");
+  const detailCommentForm = document.getElementById("mDetailCommentForm");
+  const detailCommentInput = document.getElementById("mDetailCommentInput");
 
   function setStatus(text, kind) {
     if (!statusEl) return;
@@ -72,6 +83,43 @@
     if (post.author_name) return post.author_name;
     if (!post.author_id) return "匿名用户";
     return "用户 " + post.author_id.slice(0, 8);
+  }
+
+  function getPostById(postId) {
+    return state.posts.find(function (post) {
+      return post.id === postId;
+    });
+  }
+
+  function renderCommentRows(container, comments, emptyText, limit) {
+    container.innerHTML = "";
+
+    const list = (comments || []).slice(0, typeof limit === "number" ? limit : comments.length);
+    if (!list.length) {
+      const empty = document.createElement("div");
+      empty.className = "comment";
+      empty.textContent = emptyText;
+      container.appendChild(empty);
+      return;
+    }
+
+    list.forEach(function (comment) {
+      const row = document.createElement("div");
+      row.className = "comment";
+
+      const authorEl = document.createElement("b");
+      authorEl.textContent = comment.author_name || "匿名用户";
+      row.appendChild(authorEl);
+
+      row.appendChild(document.createTextNode("：" + (comment.text || "")));
+      row.appendChild(document.createElement("br"));
+
+      const timeEl = document.createElement("small");
+      timeEl.textContent = formatTime(comment.created_at);
+      row.appendChild(timeEl);
+
+      container.appendChild(row);
+    });
   }
 
   function normalizeUrl(raw) {
@@ -175,6 +223,7 @@
       }
       renderTopics();
       renderFeed();
+      if (state.activeDetailPostId) renderDetail();
       return;
     }
 
@@ -184,6 +233,7 @@
     await loadFollowMap(client);
     renderTopics();
     renderFeed();
+    if (state.activeDetailPostId) renderDetail();
 
     if (!state.posts.length) {
       setStatus("公开广场还没有动态，去个人发布页发第一条吧", "");
@@ -352,6 +402,75 @@
     node.appendChild(image);
   }
 
+  function closeDetail() {
+    if (!detailModal) return;
+    state.activeDetailPostId = null;
+    detailModal.classList.add("hidden");
+    document.body.classList.remove("lock-scroll");
+  }
+
+  function renderDetail() {
+    if (!detailModal || !state.activeDetailPostId) return;
+
+    const post = getPostById(state.activeDetailPostId);
+    if (!post) {
+      closeDetail();
+      return;
+    }
+
+    const reaction = state.reactions.get(post.id) || {
+      likeCount: 0,
+      repostCount: 0
+    };
+    const comments = state.comments.get(post.id) || [];
+
+    if (detailAuthor) detailAuthor.textContent = authorLabel(post);
+
+    if (detailMeta) {
+      const authorId = post.author_id ? ("作者ID: " + post.author_id.slice(0, 8) + "...") : "作者ID: 未知";
+      detailMeta.textContent = formatTime(post.created_at) + " · " + authorId;
+    }
+
+    if (detailContent) detailContent.textContent = post.content || "";
+    if (detailMedia) renderMedia(detailMedia, post.media_url || "");
+
+    if (detailStats) {
+      detailStats.innerHTML = "";
+      [
+        "点赞 " + Number(reaction.likeCount || 0),
+        "转发 " + Number(reaction.repostCount || 0),
+        "评论 " + comments.length
+      ].forEach(function (text) {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.textContent = text;
+        detailStats.appendChild(chip);
+      });
+    }
+
+    if (detailComments) {
+      renderCommentRows(detailComments, comments, "暂无评论，欢迎来抢沙发。", 200);
+    }
+
+    if (detailCommentInput) {
+      detailCommentInput.disabled = !state.user;
+      detailCommentInput.placeholder = state.user ? "写下你的评论..." : "登录后可参与评论";
+    }
+
+    if (detailCommentForm) {
+      const submitBtn = detailCommentForm.querySelector("button[type='submit']");
+      if (submitBtn) submitBtn.disabled = !state.user;
+    }
+  }
+
+  function openDetail(postId) {
+    if (!detailModal) return;
+    state.activeDetailPostId = postId;
+    renderDetail();
+    detailModal.classList.remove("hidden");
+    document.body.classList.add("lock-scroll");
+  }
+
   function renderFeed() {
     if (!feedEl || !template) return;
     feedEl.innerHTML = "";
@@ -378,15 +497,18 @@
         userReposted: false
       };
       const comments = state.comments.get(post.id) || [];
+      const fullText = post.content || "";
+      const previewText = fullText.length > 180 ? fullText.slice(0, 180).trim() + "..." : fullText;
 
       card.querySelector(".title").textContent = authorLabel(post);
       card.querySelector(".meta").textContent = formatTime(post.created_at) + " · " + comments.length + " 条评论";
-      card.querySelector(".body-text").textContent = post.content || "";
+      card.querySelector(".body-text").textContent = previewText;
       renderMedia(card.querySelector(".media-preview"), post.media_url || "");
 
       const likeBtn = card.querySelector(".like-btn");
       const repostBtn = card.querySelector(".repost-btn");
       const commentBtn = card.querySelector(".comment-btn");
+      const viewBtn = card.querySelector(".view-btn");
       const followBtn = card.querySelector(".follow-btn");
       const commentWrap = card.querySelector(".comment-wrap");
       const commentList = card.querySelector(".comment-list");
@@ -416,26 +538,12 @@
         }
       }
 
-      if (!comments.length) {
-        commentList.innerHTML = "<div class='comment'>还没有评论，来抢沙发吧。</div>";
-      } else {
-        commentList.innerHTML = "";
-        comments.slice(0, 8).forEach(function (comment) {
-          const row = document.createElement("div");
-          row.className = "comment";
+      renderCommentRows(commentList, comments, "还没有评论，来抢沙发吧。", 8);
 
-          const authorEl = document.createElement("b");
-          authorEl.textContent = comment.author_name || "匿名用户";
-          row.appendChild(authorEl);
-
-          row.appendChild(document.createTextNode("：" + (comment.text || "")));
-          row.appendChild(document.createElement("br"));
-
-          const timeEl = document.createElement("small");
-          timeEl.textContent = formatTime(comment.created_at);
-          row.appendChild(timeEl);
-
-          commentList.appendChild(row);
+      if (viewBtn) {
+        viewBtn.textContent = fullText.length > 180 ? "查看全部" : "查看详情";
+        viewBtn.addEventListener("click", function () {
+          openDetail(post.id);
         });
       }
 
@@ -891,12 +999,46 @@
     });
   }
 
+  function bindDetailModal() {
+    if (!detailModal) return;
+
+    if (detailClose) {
+      detailClose.addEventListener("click", function () {
+        closeDetail();
+      });
+    }
+
+    detailModal.addEventListener("click", function (event) {
+      if (event.target?.dataset?.close === "1") {
+        closeDetail();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !detailModal.classList.contains("hidden")) {
+        closeDetail();
+      }
+    });
+
+    if (detailCommentForm && detailCommentInput) {
+      detailCommentForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if (!state.activeDetailPostId) return;
+
+        const text = detailCommentInput.value;
+        await submitComment(state.activeDetailPostId, text);
+        detailCommentInput.value = "";
+      });
+    }
+  }
+
   async function init() {
     applyCompactMode();
     if (localStorage.getItem("xiaoma_m_default_explore") === "1") {
       state.menuMode = "explore";
     }
     bindSideMenu();
+    bindDetailModal();
     bindComposer();
     await loadViewer();
     await loadPosts();
