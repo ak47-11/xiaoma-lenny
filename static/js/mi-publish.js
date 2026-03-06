@@ -241,17 +241,21 @@
       button.disabled = true;
       button.textContent = "发布中...";
 
-      const insertRes = await state.context.client.from("mi_videos").insert({
-        title: title,
-        summary: summary || null,
-        video_url: videoUrl,
-        cover_url: coverUrl || null,
-        category: category || "综合推荐",
-        duration_text: duration || null,
-        tags: tags,
-        author_id: state.user.id,
-        author_name: state.displayName
-      });
+      const insertRes = await state.context.client
+        .from("mi_videos")
+        .insert({
+          title: title,
+          summary: summary || null,
+          video_url: videoUrl,
+          cover_url: coverUrl || null,
+          category: category || "综合推荐",
+          duration_text: duration || null,
+          tags: tags,
+          author_id: state.user.id,
+          author_name: state.displayName
+        })
+        .select("id")
+        .single();
 
       button.disabled = false;
       button.textContent = "发布视频";
@@ -262,8 +266,17 @@
       }
 
       uploader.reset();
-      setStatus("发布成功，已同步到 Mi 公开社区", "ok");
-      await loadMineVideos();
+      setStatus("发布成功，正在返回 Mi 公开社区", "ok");
+
+      localStorage.setItem("xiaoma_flash_mi", JSON.stringify({
+        id: insertRes.data?.id || "",
+        at: Date.now(),
+        message: "Mi 视频发布成功"
+      }));
+
+      setTimeout(function () {
+        window.location.href = "/mi.html";
+      }, 650);
     });
   }
 

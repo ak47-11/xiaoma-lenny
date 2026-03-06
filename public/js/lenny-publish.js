@@ -203,15 +203,19 @@
       button.disabled = true;
       button.textContent = "发布中...";
 
-      const insertRes = await state.context.client.from("lenny_articles").insert({
-        title: title,
-        article_type: type,
-        tags: tags,
-        summary: summary || null,
-        content: content,
-        author_id: state.user.id,
-        author_name: state.displayName
-      });
+      const insertRes = await state.context.client
+        .from("lenny_articles")
+        .insert({
+          title: title,
+          article_type: type,
+          tags: tags,
+          summary: summary || null,
+          content: content,
+          author_id: state.user.id,
+          author_name: state.displayName
+        })
+        .select("id")
+        .single();
 
       button.disabled = false;
       button.textContent = "发布文章";
@@ -222,8 +226,17 @@
       }
 
       publisher.reset();
-      setStatus("发布成功，已同步到 Lenny 公开社区", "ok");
-      await loadMineArticles();
+      setStatus("发布成功，正在返回 Lenny 公开社区", "ok");
+
+      localStorage.setItem("xiaoma_flash_lenny", JSON.stringify({
+        id: insertRes.data?.id || "",
+        at: Date.now(),
+        message: "Lenny 文章发布成功"
+      }));
+
+      setTimeout(function () {
+        window.location.href = "/lenny.html";
+      }, 650);
     });
   }
 

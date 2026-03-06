@@ -23,6 +23,9 @@
     keyword: "",
     menuMode: "home",
     followOnly: false,
+    flashArticleId: null,
+    flashExpireAt: 0,
+    flashRetryCount: 0,
     tableReady: true
   };
 
@@ -35,6 +38,7 @@
   const sideMenu = document.getElementById("lennySideMenu");
   const sidePanelTitle = document.getElementById("lennySidePanelTitle");
   const sidePanelBody = document.getElementById("lennySidePanelBody");
+  const retryBtn = document.getElementById("lennyRetryBtn");
 
   const viewerTitle = document.getElementById("lennyViewerTitle");
   const viewerMeta = document.getElementById("lennyViewerMeta");
@@ -49,6 +53,8 @@
   const filterTypeEl = document.getElementById("lennyFilterType");
   const searchEl = document.getElementById("lennySearch");
 
+  const LOAD_TIMEOUT_MS = 8000;
+
   function setStatus(text, kind) {
     if (!statusEl) return;
     statusEl.textContent = text;
@@ -58,6 +64,79 @@
 
   function setUserHint(text) {
     if (userHint) userHint.textContent = text;
+  }
+
+  function setRetryVisible(visible) {
+    if (!retryBtn) return;
+    retryBtn.classList.toggle("hidden", !visible);
+  }
+
+  function showToast(text) {
+    const node = document.createElement("div");
+    node.className = "flash-toast";
+    node.textContent = text;
+    document.body.appendChild(node);
+    setTimeout(function () {
+      node.remove();
+    }, 2500);
+  }
+
+  async function withTimeout(promise, timeoutMs) {
+    let timer = null;
+    try {
+      return await Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+          timer = setTimeout(function () {
+            const err = new Error("REQUEST_TIMEOUT");
+            err.code = "REQUEST_TIMEOUT";
+            reject(err);
+          }, timeoutMs);
+        })
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  function restorePublishFeedback() {
+    try {
+      const raw = localStorage.getItem("xiaoma_flash_lenny");
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!parsed?.id || !parsed?.at) return;
+      if (Date.now() - Number(parsed.at) > 60 * 1000) {
+        localStorage.removeItem("xiaoma_flash_lenny");
+        return;
+      }
+
+      state.flashArticleId = parsed.id;
+      state.flashExpireAt = Date.now() + 3000;
+      state.flashRetryCount = 0;
+      showToast(parsed.message || "发布成功，已回到公开流");
+      localStorage.removeItem("xiaoma_flash_lenny");
+    } catch (error) {
+      localStorage.removeItem("xiaoma_flash_lenny");
+    }
+  }
+
+  function clearFlashLater() {
+    if (!state.flashArticleId || !state.flashExpireAt) return;
+    const wait = state.flashExpireAt - Date.now();
+    if (wait <= 0) {
+      state.flashArticleId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderList();
+      return;
+    }
+
+    setTimeout(function () {
+      state.flashArticleId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderList();
+    }, wait);
   }
 
   function clearNode(node) {
@@ -171,13 +250,40 @@
     setUserHint("当前账号：" + displayName + "（可互动；发布请前往个人发布页）");
   }
 
-  async function loadArticles() {
+  async function loadArticles(options) {
+    const opts = options || {};
     const client = state.context?.client || core.localClient;
-    const result = await client
-      .from("lenny_articles")
-      .select("id,title,summary,content,article_type,tags,read_count,like_count,bookmark_count,author_id,author_name,created_at")
-      .order("created_at", { ascending: false })
-      .limit(120);
+
+    if (!opts.silent) {
+      setStatus("正在加载公开文章...", "");
+    }
+    setRetryVisible(false);
+
+    let result;
+    try {
+      result = await withTimeout(
+        client
+          .from("lenny_articles")
+          .select("id,title,summary,content,article_type,tags,read_count,like_count,bookmark_count,author_id,author_name,created_at")
+          .order("created_at", { ascending: false })
+          .limit(120),
+        LOAD_TIMEOUT_MS
+      );
+    } catch (error) {
+      state.articles = [];
+      state.actionSet = new Set();
+      state.countsMap = new Map();
+      state.commentsMap = new Map();
+      renderTags();
+      renderList();
+      renderViewer();
+      if (listEl) {
+        listEl.innerHTML = "<div class='empty'>加载超时，请点击“重试加载”按钮。</div>";
+      }
+      setStatus("加载超时，网络较慢，请重试", "err");
+      setRetryVisible(true);
+      return;
+    }
 
     if (result.error) {
       state.tableReady = false;
@@ -194,6 +300,7 @@
       renderTags();
       renderList();
       renderViewer();
+      setRetryVisible(true);
       return;
     }
 
@@ -204,17 +311,40 @@
       state.currentArticleId = state.articles[0]?.id || null;
     }
 
-    await loadMetaData(client);
-    await loadFollowMap(client);
+    let partialDataIssue = false;
+    try {
+      await withTimeout(loadMetaData(client), LOAD_TIMEOUT_MS);
+      await withTimeout(loadFollowMap(client), LOAD_TIMEOUT_MS);
+    } catch (error) {
+      partialDataIssue = true;
+      setRetryVisible(true);
+    }
     renderTags();
     renderList();
     renderViewer();
 
     if (!state.articles.length) {
       setStatus("公开技术社区还没有文章，去个人发布页写第一篇吧", "");
+    } else if (partialDataIssue) {
+      setStatus("已加载 " + state.articles.length + " 篇文章，互动数据加载较慢，可点击重试", "err");
     } else {
       setStatus("已加载 " + state.articles.length + " 篇文章", "ok");
     }
+
+    if (state.flashArticleId && !state.articles.some(function (article) { return article.id === state.flashArticleId; })) {
+      if (state.flashRetryCount < 3) {
+        state.flashRetryCount += 1;
+        setTimeout(function () {
+          loadArticles({ silent: true });
+        }, 900);
+      } else {
+        state.flashArticleId = null;
+        state.flashExpireAt = 0;
+      }
+      return;
+    }
+
+    clearFlashLater();
   }
 
   async function loadMetaData(client) {
@@ -404,6 +534,9 @@
 
     list.forEach(function (article) {
       const card = template.content.firstElementChild.cloneNode(true);
+      if (state.flashArticleId && article.id === state.flashArticleId) {
+        card.classList.add("highlight-new");
+      }
       card.classList.toggle("active", article.id === state.currentArticleId);
       const counts = getCounts(article.id);
 
@@ -429,10 +562,12 @@
       const comments = state.commentsMap.get(article.id) || [];
       const likeBtn = card.querySelector(".like-btn");
       const bookmarkBtn = card.querySelector(".bookmark-btn");
+      const commentBtn = card.querySelector(".comment-btn");
       const followBtn = card.querySelector(".follow-btn");
 
       likeBtn.querySelector("span").textContent = String(Number(counts.likeCount || 0));
       bookmarkBtn.querySelector("span").textContent = String(Number(counts.bookmarkCount || 0));
+      commentBtn.textContent = "💬 评论 " + comments.length;
       likeBtn.classList.toggle("on", state.actionSet.has(article.id + ":like"));
       bookmarkBtn.classList.toggle("on", state.actionSet.has(article.id + ":bookmark"));
 
@@ -448,7 +583,7 @@
         await toggleAction(article, "bookmark");
       });
 
-      card.querySelector(".comment-btn").addEventListener("click", async function () {
+      commentBtn.addEventListener("click", async function () {
         await openArticle(article.id, false);
         commentInput?.focus();
       });
@@ -1044,10 +1179,16 @@
 
   async function init() {
     applyCompactMode();
+    restorePublishFeedback();
     if (localStorage.getItem("xiaoma_lenny_default_explore") === "1") {
       state.menuMode = "explore";
     }
     bindSideMenu();
+    if (retryBtn) {
+      retryBtn.addEventListener("click", function () {
+        loadArticles();
+      });
+    }
     bindPublisher();
     bindFilters();
     bindCommentForm();

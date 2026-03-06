@@ -13,6 +13,9 @@
     menuMode: "home",
     followOnly: false,
     activeDetailPostId: null,
+    flashPostId: null,
+    flashExpireAt: 0,
+    flashRetryCount: 0,
     tableReady: true
   };
 
@@ -38,6 +41,9 @@
   const detailComments = document.getElementById("mDetailComments");
   const detailCommentForm = document.getElementById("mDetailCommentForm");
   const detailCommentInput = document.getElementById("mDetailCommentInput");
+  const retryBtn = document.getElementById("mRetryBtn");
+
+  const LOAD_TIMEOUT_MS = 8000;
 
   function setStatus(text, kind) {
     if (!statusEl) return;
@@ -48,6 +54,79 @@
 
   function setUserHint(text) {
     if (userHint) userHint.textContent = text;
+  }
+
+  function setRetryVisible(visible) {
+    if (!retryBtn) return;
+    retryBtn.classList.toggle("hidden", !visible);
+  }
+
+  function showToast(text) {
+    const node = document.createElement("div");
+    node.className = "flash-toast";
+    node.textContent = text;
+    document.body.appendChild(node);
+    setTimeout(function () {
+      node.remove();
+    }, 2500);
+  }
+
+  async function withTimeout(promise, timeoutMs) {
+    let timer = null;
+    try {
+      return await Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+          timer = setTimeout(function () {
+            const err = new Error("REQUEST_TIMEOUT");
+            err.code = "REQUEST_TIMEOUT";
+            reject(err);
+          }, timeoutMs);
+        })
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  function restorePublishFeedback() {
+    try {
+      const raw = localStorage.getItem("xiaoma_flash_m");
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!parsed?.id || !parsed?.at) return;
+      if (Date.now() - Number(parsed.at) > 60 * 1000) {
+        localStorage.removeItem("xiaoma_flash_m");
+        return;
+      }
+
+      state.flashPostId = parsed.id;
+      state.flashExpireAt = Date.now() + 3000;
+      state.flashRetryCount = 0;
+      showToast(parsed.message || "发布成功，已回到公开流");
+      localStorage.removeItem("xiaoma_flash_m");
+    } catch (error) {
+      localStorage.removeItem("xiaoma_flash_m");
+    }
+  }
+
+  function clearFlashLater() {
+    if (!state.flashPostId || !state.flashExpireAt) return;
+    const wait = state.flashExpireAt - Date.now();
+    if (wait <= 0) {
+      state.flashPostId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderFeed();
+      return;
+    }
+
+    setTimeout(function () {
+      state.flashPostId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderFeed();
+    }, wait);
   }
 
   function clearNode(node) {
@@ -202,13 +281,34 @@
     setUserHint("当前账号：" + displayName + "（可互动；发布请前往个人发布页）");
   }
 
-  async function loadPosts() {
+  async function loadPosts(options) {
+    const opts = options || {};
     const client = state.context?.client || core.localClient;
-    const postsRes = await client
-      .from("m_posts")
-      .select("id,content,media_url,author_id,author_name,created_at")
-      .order("created_at", { ascending: false })
-      .limit(80);
+
+    if (!opts.silent) {
+      setStatus("正在加载公开动态...", "");
+    }
+    setRetryVisible(false);
+
+    let postsRes;
+    try {
+      postsRes = await withTimeout(
+        client
+          .from("m_posts")
+          .select("id,content,media_url,author_id,author_name,created_at")
+          .order("created_at", { ascending: false })
+          .limit(80),
+        LOAD_TIMEOUT_MS
+      );
+    } catch (error) {
+      state.posts = [];
+      state.reactions = new Map();
+      state.comments = new Map();
+      feedEl.innerHTML = "<div class='empty'>加载超时，请点击“重试加载”按钮。</div>";
+      setStatus("加载超时，网络较慢，请重试", "err");
+      setRetryVisible(true);
+      return;
+    }
 
     if (postsRes.error) {
       state.tableReady = false;
@@ -224,22 +324,47 @@
       renderTopics();
       renderFeed();
       if (state.activeDetailPostId) renderDetail();
+      setRetryVisible(true);
       return;
     }
 
     state.tableReady = true;
     state.posts = postsRes.data || [];
-    await loadMetaData(client);
-    await loadFollowMap(client);
+    let partialDataIssue = false;
+    try {
+      await withTimeout(loadMetaData(client), LOAD_TIMEOUT_MS);
+      await withTimeout(loadFollowMap(client), LOAD_TIMEOUT_MS);
+    } catch (error) {
+      partialDataIssue = true;
+      setRetryVisible(true);
+    }
+
     renderTopics();
     renderFeed();
     if (state.activeDetailPostId) renderDetail();
 
     if (!state.posts.length) {
       setStatus("公开广场还没有动态，去个人发布页发第一条吧", "");
+    } else if (partialDataIssue) {
+      setStatus("已加载 " + state.posts.length + " 条动态，互动数据加载较慢，可点击重试", "err");
     } else {
       setStatus("已加载 " + state.posts.length + " 条动态", "ok");
     }
+
+    if (state.flashPostId && !state.posts.some(function (post) { return post.id === state.flashPostId; })) {
+      if (state.flashRetryCount < 3) {
+        state.flashRetryCount += 1;
+        setTimeout(function () {
+          loadPosts({ silent: true });
+        }, 900);
+      } else {
+        state.flashPostId = null;
+        state.flashExpireAt = 0;
+      }
+      return;
+    }
+
+    clearFlashLater();
   }
 
   async function loadMetaData(client) {
@@ -490,6 +615,9 @@
 
     displayPosts.forEach((post) => {
       const card = template.content.firstElementChild.cloneNode(true);
+      if (state.flashPostId && post.id === state.flashPostId) {
+        card.classList.add("highlight-new");
+      }
       const reaction = state.reactions.get(post.id) || {
         likeCount: 0,
         repostCount: 0,
@@ -1034,11 +1162,17 @@
 
   async function init() {
     applyCompactMode();
+    restorePublishFeedback();
     if (localStorage.getItem("xiaoma_m_default_explore") === "1") {
       state.menuMode = "explore";
     }
     bindSideMenu();
     bindDetailModal();
+    if (retryBtn) {
+      retryBtn.addEventListener("click", function () {
+        loadPosts();
+      });
+    }
     bindComposer();
     await loadViewer();
     await loadPosts();

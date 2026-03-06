@@ -15,6 +15,9 @@
     playedSet: new Set(),
     menuMode: "home",
     followOnly: false,
+    flashVideoId: null,
+    flashExpireAt: 0,
+    flashRetryCount: 0,
     tableReady: true
   };
 
@@ -27,6 +30,7 @@
   const sideMenu = document.getElementById("miSideMenu");
   const sidePanelTitle = document.getElementById("miSidePanelTitle");
   const sidePanelBody = document.getElementById("miSidePanelBody");
+  const retryBtn = document.getElementById("miRetryBtn");
 
   const playerTitle = document.getElementById("miPlayerTitle");
   const playerShell = document.getElementById("miPlayerShell");
@@ -37,6 +41,8 @@
   const commentInput = document.getElementById("miCommentInput");
   const commentList = document.getElementById("miCommentList");
 
+  const LOAD_TIMEOUT_MS = 8000;
+
   function setStatus(text, kind) {
     if (!statusEl) return;
     statusEl.textContent = text;
@@ -46,6 +52,79 @@
 
   function setUserHint(text) {
     if (userHint) userHint.textContent = text;
+  }
+
+  function setRetryVisible(visible) {
+    if (!retryBtn) return;
+    retryBtn.classList.toggle("hidden", !visible);
+  }
+
+  function showToast(text) {
+    const node = document.createElement("div");
+    node.className = "flash-toast";
+    node.textContent = text;
+    document.body.appendChild(node);
+    setTimeout(function () {
+      node.remove();
+    }, 2500);
+  }
+
+  async function withTimeout(promise, timeoutMs) {
+    let timer = null;
+    try {
+      return await Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+          timer = setTimeout(function () {
+            const err = new Error("REQUEST_TIMEOUT");
+            err.code = "REQUEST_TIMEOUT";
+            reject(err);
+          }, timeoutMs);
+        })
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  function restorePublishFeedback() {
+    try {
+      const raw = localStorage.getItem("xiaoma_flash_mi");
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!parsed?.id || !parsed?.at) return;
+      if (Date.now() - Number(parsed.at) > 60 * 1000) {
+        localStorage.removeItem("xiaoma_flash_mi");
+        return;
+      }
+
+      state.flashVideoId = parsed.id;
+      state.flashExpireAt = Date.now() + 3000;
+      state.flashRetryCount = 0;
+      showToast(parsed.message || "发布成功，已回到公开流");
+      localStorage.removeItem("xiaoma_flash_mi");
+    } catch (error) {
+      localStorage.removeItem("xiaoma_flash_mi");
+    }
+  }
+
+  function clearFlashLater() {
+    if (!state.flashVideoId || !state.flashExpireAt) return;
+    const wait = state.flashExpireAt - Date.now();
+    if (wait <= 0) {
+      state.flashVideoId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderGrid();
+      return;
+    }
+
+    setTimeout(function () {
+      state.flashVideoId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderGrid();
+    }, wait);
   }
 
   function clearNode(node) {
@@ -171,13 +250,40 @@
     setUserHint("当前账号：" + displayName + "（可互动；发布请前往个人发布页）");
   }
 
-  async function loadVideos() {
+  async function loadVideos(options) {
+    const opts = options || {};
     const client = state.context?.client || core.localClient;
-    const result = await client
-      .from("mi_videos")
-      .select("id,title,summary,video_url,cover_url,category,duration_text,tags,play_count,like_count,favorite_count,author_id,author_name,created_at")
-      .order("created_at", { ascending: false })
-      .limit(100);
+
+    if (!opts.silent) {
+      setStatus("正在加载公开视频...", "");
+    }
+    setRetryVisible(false);
+
+    let result;
+    try {
+      result = await withTimeout(
+        client
+          .from("mi_videos")
+          .select("id,title,summary,video_url,cover_url,category,duration_text,tags,play_count,like_count,favorite_count,author_id,author_name,created_at")
+          .order("created_at", { ascending: false })
+          .limit(100),
+        LOAD_TIMEOUT_MS
+      );
+    } catch (error) {
+      state.videos = [];
+      state.actionSet = new Set();
+      state.countsMap = new Map();
+      state.commentsMap = new Map();
+      renderTags();
+      renderGrid();
+      renderPlayer();
+      if (gridEl) {
+        gridEl.innerHTML = "<div class='empty'>加载超时，请点击“重试加载”按钮。</div>";
+      }
+      setStatus("加载超时，网络较慢，请重试", "err");
+      setRetryVisible(true);
+      return;
+    }
 
     if (result.error) {
       state.tableReady = false;
@@ -194,6 +300,7 @@
       renderTags();
       renderGrid();
       renderPlayer();
+      setRetryVisible(true);
       return;
     }
 
@@ -203,17 +310,40 @@
       state.currentVideoId = state.videos[0]?.id || null;
     }
 
-    await loadMetaData(client);
-    await loadFollowMap(client);
+    let partialDataIssue = false;
+    try {
+      await withTimeout(loadMetaData(client), LOAD_TIMEOUT_MS);
+      await withTimeout(loadFollowMap(client), LOAD_TIMEOUT_MS);
+    } catch (error) {
+      partialDataIssue = true;
+      setRetryVisible(true);
+    }
     renderTags();
     renderGrid();
     renderPlayer();
 
     if (!state.videos.length) {
       setStatus("公开社区还没有视频，去个人发布页上传第一条吧", "");
+    } else if (partialDataIssue) {
+      setStatus("已加载 " + state.videos.length + " 条视频，互动数据加载较慢，可点击重试", "err");
     } else {
       setStatus("已加载 " + state.videos.length + " 条视频", "ok");
     }
+
+    if (state.flashVideoId && !state.videos.some(function (video) { return video.id === state.flashVideoId; })) {
+      if (state.flashRetryCount < 3) {
+        state.flashRetryCount += 1;
+        setTimeout(function () {
+          loadVideos({ silent: true });
+        }, 900);
+      } else {
+        state.flashVideoId = null;
+        state.flashExpireAt = 0;
+      }
+      return;
+    }
+
+    clearFlashLater();
   }
 
   async function loadMetaData(client) {
@@ -401,8 +531,12 @@
 
     displayVideos.forEach(function (video) {
       const card = template.content.firstElementChild.cloneNode(true);
+      if (state.flashVideoId && video.id === state.flashVideoId) {
+        card.classList.add("highlight-new");
+      }
       card.classList.toggle("active", state.currentVideoId === video.id);
       const counts = getCounts(video.id);
+      const comments = state.commentsMap.get(video.id) || [];
 
       renderCover(card.querySelector(".video-cover"), video);
       card.querySelector(".title").textContent = video.title || "未命名视频";
@@ -433,6 +567,7 @@
 
       likeBtn.querySelector("span").textContent = String(Number(counts.likeCount || 0));
       favBtn.querySelector("span").textContent = String(Number(counts.favoriteCount || 0));
+      commentBtn.textContent = "💬 评论 " + comments.length;
       likeBtn.classList.toggle("on", state.actionSet.has(video.id + ":like"));
       favBtn.classList.toggle("on", state.actionSet.has(video.id + ":favorite"));
 
@@ -1090,10 +1225,16 @@
 
   async function init() {
     applyCompactMode();
+    restorePublishFeedback();
     if (localStorage.getItem("xiaoma_mi_default_explore") === "1") {
       state.menuMode = "explore";
     }
     bindSideMenu();
+    if (retryBtn) {
+      retryBtn.addEventListener("click", function () {
+        loadVideos();
+      });
+    }
     bindUploader();
     bindCommentForm();
     await loadViewer();

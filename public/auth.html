@@ -261,7 +261,16 @@
       font-size: 12px;
       cursor: pointer;
       padding: 0;
-      margin-left: auto;
+      margin: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .minor-links {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .session-bar {
@@ -351,6 +360,10 @@
       text-decoration: none;
     }
 
+    .minimal-hidden {
+      display: none !important;
+    }
+
     @keyframes fade {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -383,26 +396,23 @@
     <section class="hero">
       <div>
         <div class="brand-tag">Xiaoma ID</div>
-        <h1><strong>一个姓马马马的创建的第一个网站</strong>，希望大家多多提意见，<span>完善社区功能与修复BUG，谢谢大家~。</span></h1>
-        <p>在这里记录游戏战术、图文灵感和成长日常。登录后即可发布、互动、收藏，沉淀你的个人影响力。</p>
+        <h1><strong>欢迎回来</strong>，<span>继续你的社区创作。</span></h1>
+        <p>使用邮箱和密码快速登录。验证码登录保留在次级入口，减少首次操作犹豫。</p>
       </div>
       <div class="feature-list">
-        <div class="feature"><span class="feature-dot"></span>一键登录后即可发帖、评论、点赞和收藏</div>
-        <div class="feature"><span class="feature-dot"></span>支持密码登录与邮箱验证码登录，回访更顺滑</div>
-        <div class="feature"><span class="feature-dot"></span>个人中心可持续完善昵称、简介和联系方式</div>
+        <div class="feature"><span class="feature-dot"></span>默认密码登录，主路径更直接</div>
+        <div class="feature"><span class="feature-dot"></span>验证码登录保留为次级选项</div>
       </div>
     </section>
 
     <section class="panel">
       <h2>登录 xiaoma.cyou</h2>
-      <p class="sub">继续访问你的专属页面与功能</p>
+      <p class="sub">输入邮箱和密码后点击主按钮即可登录</p>
       <div id="sessionBar" class="session-bar"></div>
-
-      <div class="divider">使用账号登录</div>
 
       <div class="tabs">
         <button class="tab active" data-tab="password">密码登录</button>
-        <button class="tab" data-tab="otp">验证码登录</button>
+        <button class="tab" data-tab="otp">验证码（次级）</button>
       </div>
 
       <div id="panel-password" class="form-panel active">
@@ -418,14 +428,16 @@
           <label for="passwordConfirm">确认密码（注册时）</label>
           <input type="password" id="passwordConfirm" placeholder="再次输入密码" autocomplete="new-password" />
         </div>
-        <div class="inline-row">
-          <label class="toggle"><input type="checkbox" id="showPassword" />显示密码</label>
-          <label class="toggle"><input type="checkbox" id="rememberMe" checked />记住我</label>
-          <button class="link-btn" id="forgotLink">忘记密码？</button>
-        </div>
+
+        <input class="minimal-hidden" type="checkbox" id="showPassword" />
+        <input class="minimal-hidden" type="checkbox" id="rememberMe" checked />
+
         <div class="actions">
           <button class="btn primary" id="loginBtn">登录</button>
-          <button class="btn secondary" id="registerLink">创建账号</button>
+        </div>
+        <div class="minor-links">
+          <button class="link-btn" id="registerLink" type="button">创建账号</button>
+          <button class="link-btn" id="forgotLink" type="button">忘记密码？</button>
         </div>
       </div>
 
@@ -458,7 +470,7 @@
         </div>
       </div>
 
-      <div id="status" class="status">请选择登录方式</div>
+      <div id="status" class="status">请输入邮箱和密码</div>
       <div id="statusAction" class="status-action"></div>
     </section>
   </main>

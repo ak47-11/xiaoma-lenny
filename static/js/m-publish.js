@@ -249,12 +249,16 @@
       submitBtn.disabled = true;
       submitBtn.textContent = "发布中...";
 
-      const insertRes = await state.context.client.from("m_posts").insert({
-        content: content,
-        media_url: mediaUrl || null,
-        author_id: state.user.id,
-        author_name: state.displayName
-      });
+      const insertRes = await state.context.client
+        .from("m_posts")
+        .insert({
+          content: content,
+          media_url: mediaUrl || null,
+          author_id: state.user.id,
+          author_name: state.displayName
+        })
+        .select("id")
+        .single();
 
       submitBtn.disabled = false;
       submitBtn.textContent = "发布动态";
@@ -267,8 +271,17 @@
       contentInput.value = "";
       if (mediaInput) mediaInput.value = "";
       counter.textContent = "0 / 280";
-      setStatus("发布成功，已同步到 M 公共社区", "ok");
-      await loadMinePosts();
+      setStatus("发布成功，正在返回 M 公共社区", "ok");
+
+      localStorage.setItem("xiaoma_flash_m", JSON.stringify({
+        id: insertRes.data?.id || "",
+        at: Date.now(),
+        message: "M 动态发布成功"
+      }));
+
+      setTimeout(function () {
+        window.location.href = "/m.html";
+      }, 650);
     });
   }
 

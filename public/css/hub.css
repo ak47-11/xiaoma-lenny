@@ -361,6 +361,12 @@ body {
   cursor: pointer;
 }
 
+.retry-btn {
+  border: 1px solid #1d9bf0;
+  background: rgba(29, 155, 240, 0.16);
+  color: #d7ecff;
+}
+
 .actions .action-btn {
   border: none;
   color: #fff;
@@ -479,6 +485,37 @@ body.lock-scroll {
   line-height: 1.8;
   color: #e0e2e5;
   font: inherit;
+}
+
+.flash-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 95;
+  border: 1px solid rgba(29, 155, 240, 0.55);
+  border-radius: 999px;
+  background: rgba(17, 18, 20, 0.96);
+  color: #d7ecff;
+  font-size: 12px;
+  font-weight: 700;
+  min-height: 34px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+}
+
+.highlight-new {
+  border-color: #1d9bf0 !important;
+  box-shadow: 0 0 0 1px rgba(29, 155, 240, 0.35);
+  animation: pulse-new 1s ease-in-out 3;
+}
+
+@keyframes pulse-new {
+  0% { box-shadow: 0 0 0 1px rgba(29, 155, 240, 0.35), 0 0 0 0 rgba(29, 155, 240, 0.1); }
+  50% { box-shadow: 0 0 0 1px rgba(29, 155, 240, 0.45), 0 0 0 10px rgba(29, 155, 240, 0.04); }
+  100% { box-shadow: 0 0 0 1px rgba(29, 155, 240, 0.35), 0 0 0 0 rgba(29, 155, 240, 0); }
 }
 
 .hidden { display: none; }
