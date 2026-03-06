@@ -36,7 +36,7 @@ body {
     var(--bg);
 }
 
-.hub-shell { width: min(680px, calc(100% - 32px)); margin: var(--space-24) auto var(--space-32); }
+.hub-shell { width: min(1220px, 94%); margin: var(--space-16) auto var(--space-32); }
 
 .hub-top {
   border: 1px solid var(--line);
@@ -104,8 +104,8 @@ body {
 .hub-layout {
   margin-top: var(--space-24);
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-24);
+  grid-template-columns: 250px minmax(0, 1fr) 300px;
+  gap: var(--space-16);
   align-items: start;
 }
 

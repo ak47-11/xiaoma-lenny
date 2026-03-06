@@ -5,172 +5,186 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>登录 | xiaoma.cyou</title>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
-
     :root {
-      --bg: #f5f7fb;
-      --surface: #ffffff;
-      --surface-soft: #f7f9fc;
-      --text: #0f1419;
-      --muted: #5f6b7a;
-      --line: #dde3ec;
-      --line-strong: #bdc8d8;
-      --x-blue: #1d9bf0;
-      --tesla-red: #e82127;
-      --ok: #0b8a5a;
-      --err: #bf1d18;
+      --bg: #0f1419;
+      --surface: #161b22;
+      --surface-soft: #121922;
+      --line: rgba(83, 100, 113, 0.34);
+      --text: #e7e9ea;
+      --muted: #536471;
+      --primary: #1d9bf0;
+      --accent: #f91880;
+      --radius: 12px;
+      --space-16: 16px;
+      --space-24: 24px;
+      --space-32: 32px;
+      --title-size: 20px;
+      --body-size: 16px;
+      --meta-size: 13px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.26);
+      --transition: 150ms ease;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
 
     body {
+      margin: 0;
       min-height: 100vh;
       font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(1200px 500px at -10% 10%, rgba(29, 155, 240, 0.11), transparent 70%),
-        radial-gradient(800px 360px at 110% 90%, rgba(232, 33, 39, 0.09), transparent 70%),
-        linear-gradient(180deg, #f8fafd 0%, #eef2f7 100%);
-      display: grid;
-      place-items: center;
-      padding: 24px;
+        radial-gradient(980px 460px at 100% -20%, rgba(29, 155, 240, 0.12), transparent 62%),
+        var(--bg);
+      font-size: var(--body-size);
+      line-height: 1.6;
     }
 
     .shell {
-      width: min(1040px, 100%);
-      min-height: min(700px, calc(100vh - 48px));
-      background: rgba(255, 255, 255, 0.82);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      border-radius: 28px;
-      box-shadow: 0 28px 90px rgba(31, 52, 87, 0.18);
-      backdrop-filter: blur(10px);
+      width: min(680px, calc(100% - 32px));
+      margin: var(--space-24) auto var(--space-32);
       display: grid;
-      grid-template-columns: 1fr 420px;
-      overflow: hidden;
-      animation: rise 0.6s ease;
+      gap: var(--space-24);
     }
 
-    .hero {
-      position: relative;
-      padding: 52px;
-      background:
-        linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(246, 250, 255, 0.86)),
-        repeating-linear-gradient(120deg, rgba(26, 41, 61, 0.03) 0 2px, transparent 2px 14px);
-      border-right: 1px solid rgba(188, 201, 220, 0.42);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 26px;
-    }
-
-    .brand-tag {
-      width: fit-content;
+    .hero,
+    .panel,
+    .session-bar,
+    .status {
       border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 8px 14px;
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      background: rgba(255, 255, 255, 0.9);
-    }
-
-    .hero h1 {
-      margin-top: 18px;
-      font-family: "Sora", "IBM Plex Sans", sans-serif;
-      font-size: clamp(30px, 4.5vw, 42px);
-      line-height: 1.12;
-      letter-spacing: -0.02em;
-    }
-
-    .hero h1 strong { color: var(--x-blue); }
-    .hero h1 span { color: var(--tesla-red); }
-
-    .hero p {
-      margin-top: 16px;
-      max-width: 480px;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.72;
-    }
-
-    .feature-list {
-      display: grid;
-      gap: 12px;
-      max-width: 420px;
-    }
-
-    .feature {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: #2f3f54;
-    }
-
-    .feature-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: linear-gradient(160deg, var(--x-blue), var(--tesla-red));
-    }
-
-    .panel {
+      border-radius: var(--radius);
       background: var(--surface);
-      padding: 38px 30px 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 14px;
+      box-shadow: var(--shadow);
     }
 
-    .panel h2 {
-      font-family: "Sora", "IBM Plex Sans", sans-serif;
-      font-size: 26px;
-      margin-bottom: 2px;
+    .hero,
+    .panel {
+      padding: var(--space-24);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(249, 24, 128, 0.48);
+      background: rgba(249, 24, 128, 0.12);
+      color: #ffcce6;
+      font-size: var(--meta-size);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      font-size: var(--title-size);
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin-top: var(--space-16);
     }
 
     .sub {
-      font-size: 14px;
+      margin: 0;
       color: var(--muted);
-      margin-bottom: 10px;
+      font-size: var(--meta-size);
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      margin-top: var(--space-24);
+      display: flex;
+      gap: var(--space-16);
+    }
+
+    .btn,
+    .mini-btn,
+    .status-link,
+    .tab,
+    .field input {
+      transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        color var(--transition),
+        box-shadow var(--transition);
+    }
+
+    .btn,
+    .mini-btn,
+    .status-link {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      min-height: 36px;
+      padding: 0 14px;
+      font-size: var(--meta-size);
+      font-weight: 600;
+      background: var(--surface-soft);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
     }
 
     .btn {
       width: 100%;
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 999px;
-      min-height: 46px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
     }
 
-    .btn:hover { transform: translateY(-1px); border-color: var(--line-strong); }
-    .btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
-    .btn.primary { border: none; background: #0f1419; color: #fff; }
-    .btn.primary:hover { background: #1c2733; }
-    .btn.secondary { border-color: #cfd8e4; background: #f9fbfd; }
+    .btn:hover,
+    .mini-btn:hover,
+    .status-link:hover,
+    .tab:hover {
+      background: rgba(231, 233, 234, 0.08);
+    }
 
-    .divider {
+    .btn.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn.primary:hover {
+      background: #188cd8;
+    }
+
+    .btn.secondary {
+      border-style: solid;
+    }
+
+    .btn:disabled,
+    .mini-btn:disabled {
+      opacity: 0.62;
+      cursor: not-allowed;
+    }
+
+    .panel {
+      display: grid;
+      gap: var(--space-16);
+    }
+
+    .session-bar {
+      display: none;
+      padding: var(--space-16);
+      background: var(--surface-soft);
+    }
+
+    .session-text {
+      font-size: var(--meta-size);
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .session-actions {
+      margin-top: var(--space-16);
       display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #7a8798;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: 6px 0;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: "";
-      flex: 1;
-      border-top: 1px solid var(--line);
+      flex-wrap: wrap;
+      gap: var(--space-16);
     }
 
     .tabs {
@@ -178,241 +192,180 @@
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       padding: 4px;
-      background: var(--surface-soft);
       border: 1px solid var(--line);
       border-radius: 999px;
+      background: var(--surface-soft);
     }
 
     .tab {
-      border: none;
+      border: 1px solid transparent;
       border-radius: 999px;
-      background: transparent;
       min-height: 36px;
-      font-size: 13px;
+      padding: 0 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: var(--meta-size);
       font-weight: 600;
-      color: #6c7a8c;
       cursor: pointer;
+      font-family: inherit;
     }
 
     .tab.active {
+      border-color: var(--line);
+      background: var(--surface);
       color: var(--text);
-      background: #fff;
-      box-shadow: 0 8px 16px rgba(24, 39, 61, 0.09);
     }
 
-    .form-panel { display: none; margin-top: 4px; }
-    .form-panel.active { display: block; animation: fade 0.2s ease; }
+    .form-panel {
+      display: none;
+    }
 
-    .field { margin-top: 10px; }
+    .form-panel.active {
+      display: block;
+    }
+
+    .field {
+      margin-top: var(--space-16);
+    }
 
     .field label {
       display: block;
-      font-size: 12px;
-      color: #5f6c7d;
       margin-bottom: 6px;
+      color: var(--muted);
+      font-size: var(--meta-size);
+      line-height: 1.6;
       font-weight: 500;
     }
 
     .field input {
       width: 100%;
       min-height: 44px;
-      border-radius: 12px;
-      border: 1px solid #ccd6e3;
-      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
       padding: 0 14px;
-      font-size: 14px;
       color: var(--text);
+      font: inherit;
       outline: none;
-      transition: border-color 0.16s ease, box-shadow 0.16s ease;
     }
 
-    .field input::placeholder { color: #9aa7b8; }
+    .field input::placeholder {
+      color: var(--muted);
+      opacity: 0.9;
+    }
 
     .field input:focus {
-      border-color: var(--x-blue);
-      box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.17);
-    }
-
-    .inline-row {
-      margin: 10px 2px 4px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      color: #5e6c7d;
-      font-size: 12px;
-    }
-
-    .toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .toggle input { accent-color: #111; }
-
-    .link-btn {
-      border: none;
-      background: transparent;
-      color: var(--x-blue);
-      font-size: 12px;
-      cursor: pointer;
-      padding: 0;
-      margin: 0;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    .minor-links {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .session-bar {
-      margin-top: 2px;
-      border: 1px solid #dce4ef;
-      border-radius: 12px;
-      background: #f8fbff;
-      padding: 10px;
-      display: none;
-      gap: 8px;
-    }
-
-    .session-text {
-      font-size: 12px;
-      color: #5d6c80;
-    }
-
-    .session-actions {
-      margin-top: 7px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
-
-    .mini-btn {
-      border: 1px solid #ced9e9;
-      background: #fff;
-      color: #243247;
-      border-radius: 999px;
-      min-height: 30px;
-      padding: 0 12px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+      border-color: rgba(29, 155, 240, 0.66);
+      box-shadow: 0 0 0 1px rgba(29, 155, 240, 0.2);
     }
 
     .actions {
-      margin-top: 10px;
+      margin-top: var(--space-16);
       display: grid;
-      gap: 8px;
+      gap: var(--space-16);
+    }
+
+    .minor-links {
+      margin-top: var(--space-16);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-16);
+    }
+
+    .link-btn {
+      border: none;
+      padding: 0;
+      background: transparent;
+      color: var(--primary);
+      font-size: var(--meta-size);
+      line-height: 1.6;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-family: inherit;
+    }
+
+    .inline-row {
+      margin-top: var(--space-16);
+      color: var(--muted);
+      font-size: var(--meta-size);
+      line-height: 1.6;
+      font-weight: 500;
     }
 
     .status {
       min-height: 44px;
-      border: 1px solid #d8e1ec;
-      border-radius: 12px;
-      background: #f8fbff;
-      padding: 11px 12px;
-      color: #55667a;
-      font-size: 13px;
+      padding: 10px 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      margin-top: 4px;
+      color: var(--muted);
+      font-size: var(--meta-size);
+      line-height: 1.6;
+      font-weight: 500;
+      background: var(--surface-soft);
     }
 
     .status.ok {
-      color: var(--ok);
-      border-color: rgba(11, 138, 90, 0.28);
-      background: rgba(11, 138, 90, 0.08);
+      color: #d7ecff;
+      border-color: rgba(29, 155, 240, 0.66);
+      background: rgba(29, 155, 240, 0.14);
     }
 
     .status.err {
-      color: var(--err);
-      border-color: rgba(191, 29, 24, 0.3);
-      background: rgba(191, 29, 24, 0.08);
+      color: #ffd5e8;
+      border-color: rgba(249, 24, 128, 0.58);
+      background: rgba(249, 24, 128, 0.14);
     }
 
     .status-action {
-      margin-top: 8px;
       display: none;
       justify-content: center;
-    }
-
-    .status-link {
-      border: 1px solid #c8d7ed;
-      border-radius: 999px;
-      background: #fff;
-      color: #33558b;
-      font-size: 12px;
-      font-weight: 600;
-      min-height: 30px;
-      padding: 0 12px;
-      display: inline-flex;
-      align-items: center;
-      text-decoration: none;
     }
 
     .minimal-hidden {
       display: none !important;
     }
 
-    @keyframes fade {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(18px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 960px) {
+    @media (max-width: 640px) {
       .shell {
+        width: calc(100% - 24px);
+        margin: var(--space-16) auto var(--space-24);
+      }
+
+      .hero,
+      .panel {
+        padding: var(--space-16);
+      }
+
+      .tabs {
         grid-template-columns: 1fr;
-        min-height: auto;
       }
-
-      .hero {
-        padding: 32px 24px;
-        border-right: 0;
-        border-bottom: 1px solid rgba(188, 201, 220, 0.42);
-      }
-
-      .hero p { max-width: none; }
-      .panel { padding: 28px 20px 22px; }
     }
   </style>
 </head>
 <body>
   <main class="shell">
     <section class="hero">
-      <div>
-        <div class="brand-tag">Xiaoma ID</div>
-        <h1><strong>欢迎回来</strong>，<span>继续你的社区创作。</span></h1>
-        <p>使用邮箱和密码快速登录。验证码登录保留在次级入口，减少首次操作犹豫。</p>
-      </div>
-      <div class="feature-list">
-        <div class="feature"><span class="feature-dot"></span>默认密码登录，主路径更直接</div>
-        <div class="feature"><span class="feature-dot"></span>验证码登录保留为次级选项</div>
+      <span class="badge">Xiaoma ID</span>
+      <h1>登录后继续你的社区发布与互动。</h1>
+      <p class="sub">密码登录为主路径，验证码保留为次级入口。</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="/community.html">先浏览社区</a>
       </div>
     </section>
 
     <section class="panel">
       <h2>登录 xiaoma.cyou</h2>
-      <p class="sub">输入邮箱和密码后点击主按钮即可登录</p>
+      <p class="sub">输入邮箱和密码后点击主按钮即可继续。</p>
+
       <div id="sessionBar" class="session-bar"></div>
 
       <div class="tabs">
-        <button class="tab active" data-tab="password">密码登录</button>
-        <button class="tab" data-tab="otp">验证码（次级）</button>
+        <button class="tab active" data-tab="password" type="button">密码登录</button>
+        <button class="tab" data-tab="otp" type="button">验证码（次级）</button>
       </div>
 
       <div id="panel-password" class="form-panel active">
@@ -433,7 +386,7 @@
         <input class="minimal-hidden" type="checkbox" id="rememberMe" checked />
 
         <div class="actions">
-          <button class="btn primary" id="loginBtn">登录</button>
+          <button class="btn primary" id="loginBtn" type="button">登录</button>
         </div>
         <div class="minor-links">
           <button class="link-btn" id="registerLink" type="button">创建账号</button>
@@ -447,7 +400,7 @@
           <input type="text" id="otpIdentity" placeholder="name@example.com" autocomplete="username" />
         </div>
         <div class="actions">
-          <button class="btn" id="sendOtpBtn">发送验证码</button>
+          <button class="btn" id="sendOtpBtn" type="button">发送验证码</button>
           <button class="btn secondary" id="resendOtpBtn" type="button">重新发送</button>
         </div>
         <div class="field">
@@ -463,10 +416,10 @@
           <input type="password" id="resetNewPasswordConfirm" placeholder="再次输入新密码" autocomplete="new-password" />
         </div>
         <div class="actions">
-          <button class="btn primary" id="verifyOtpBtn">验证并登录</button>
+          <button class="btn primary" id="verifyOtpBtn" type="button">验证并登录</button>
         </div>
-        <div class="inline-row" style="margin-top:8px">
-          <span style="color:#6f7c8f;font-size:12px">收不到邮件？检查垃圾箱，或 60 秒后重发</span>
+        <div class="inline-row">
+          <span>收不到邮件？检查垃圾箱，或 60 秒后重发。</span>
         </div>
       </div>
 
