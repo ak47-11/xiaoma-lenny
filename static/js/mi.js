@@ -538,26 +538,27 @@
       const counts = getCounts(video.id);
       const comments = state.commentsMap.get(video.id) || [];
 
-      renderCover(card.querySelector(".video-cover"), video);
+      const coverNode = card.querySelector(".video-cover");
+      if (coverNode) renderCover(coverNode, video);
       card.querySelector(".title").textContent = video.title || "未命名视频";
-      card.querySelector(".category").textContent = video.category || "综合推荐";
+      const categoryNode = card.querySelector(".category");
+      if (categoryNode) categoryNode.textContent = video.category || "综合推荐";
       card.querySelector(".summary").textContent = video.summary || "作者暂未填写简介";
       card.querySelector(".meta").textContent =
         (video.author_name || "匿名创作者") +
         " · " +
-        formatTime(video.created_at) +
-        " · 播放 " +
-        Number(counts.playCount || 0) +
-        (video.duration_text ? " · 时长 " + video.duration_text : "");
+        formatTime(video.created_at);
 
       const tagWrap = card.querySelector(".tag-list");
-      tagWrap.innerHTML = "";
-      (video.tags || []).forEach(function (tag) {
-        const tagNode = document.createElement("span");
-        tagNode.className = "tag";
-        tagNode.textContent = tag;
-        tagWrap.appendChild(tagNode);
-      });
+      if (tagWrap) {
+        tagWrap.innerHTML = "";
+        (video.tags || []).forEach(function (tag) {
+          const tagNode = document.createElement("span");
+          tagNode.className = "tag";
+          tagNode.textContent = tag;
+          tagWrap.appendChild(tagNode);
+        });
+      }
 
       const likeBtn = card.querySelector(".like-btn");
       const favBtn = card.querySelector(".fav-btn");

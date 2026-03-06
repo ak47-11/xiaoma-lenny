@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/hub.css" />
 </head>
-<body class="accent-lenny">
+<body>
   <main class="hub-shell">
     <header class="hub-top">
       <div class="hub-brand">
@@ -19,7 +19,7 @@
       <nav class="hub-nav">
         <a class="pill m" href="/m.html">M</a>
         <a class="pill mi" href="/mi.html">Mi</a>
-        <a class="pill lenny" href="/lenny.html">Lenny</a>
+        <a class="pill lenny is-current" href="/lenny.html">Lenny</a>
         <a href="/">门户</a>
         <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
         <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
@@ -107,17 +107,14 @@
     <article class="article-card">
       <div class="article-head">
         <strong class="title"></strong>
-        <span class="chip type"></span>
       </div>
       <div class="meta"></div>
       <p class="body-text summary"></p>
-      <div class="tag-list"></div>
       <div class="actions">
         <button class="read-btn">📖 阅读</button>
         <button class="like-btn">👍 <span>0</span></button>
         <button class="bookmark-btn">🔖 <span>0</span></button>
         <button class="comment-btn">💬 评论</button>
-        <button class="follow-btn">+ 关注</button>
       </div>
     </article>
   </template>

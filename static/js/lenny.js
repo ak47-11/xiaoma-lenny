@@ -541,23 +541,24 @@
       const counts = getCounts(article.id);
 
       card.querySelector(".title").textContent = article.title || "未命名文章";
-      card.querySelector(".type").textContent = TYPE_LABEL[article.article_type] || article.article_type || "技术博客";
+      const typeNode = card.querySelector(".type");
+      if (typeNode) typeNode.textContent = TYPE_LABEL[article.article_type] || article.article_type || "技术博客";
       card.querySelector(".summary").textContent = article.summary || "作者未填写摘要";
       card.querySelector(".meta").textContent =
         (article.author_name || "匿名作者") +
         " · " +
-        formatTime(article.created_at) +
-        " · 阅读 " +
-        Number(counts.readCount || 0);
+        formatTime(article.created_at);
 
       const tagWrap = card.querySelector(".tag-list");
-      tagWrap.innerHTML = "";
-      (article.tags || []).forEach(function (tag) {
-        const tagNode = document.createElement("span");
-        tagNode.className = "tag";
-        tagNode.textContent = tag;
-        tagWrap.appendChild(tagNode);
-      });
+      if (tagWrap) {
+        tagWrap.innerHTML = "";
+        (article.tags || []).forEach(function (tag) {
+          const tagNode = document.createElement("span");
+          tagNode.className = "tag";
+          tagNode.textContent = tag;
+          tagWrap.appendChild(tagNode);
+        });
+      }
 
       const comments = state.commentsMap.get(article.id) || [];
       const likeBtn = card.querySelector(".like-btn");
@@ -604,11 +605,6 @@
           });
         }
       }
-
-      const commentHint = document.createElement("div");
-      commentHint.className = "meta";
-      commentHint.textContent = "评论 " + comments.length;
-      card.appendChild(commentHint);
 
       listEl.appendChild(card);
     });

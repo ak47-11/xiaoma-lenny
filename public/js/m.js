@@ -629,7 +629,7 @@
       const previewText = fullText.length > 180 ? fullText.slice(0, 180).trim() + "..." : fullText;
 
       card.querySelector(".title").textContent = authorLabel(post);
-      card.querySelector(".meta").textContent = formatTime(post.created_at) + " · " + comments.length + " 条评论";
+      card.querySelector(".meta").textContent = formatTime(post.created_at);
       card.querySelector(".body-text").textContent = previewText;
       renderMedia(card.querySelector(".media-preview"), post.media_url || "");
 

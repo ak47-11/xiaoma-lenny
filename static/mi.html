@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/hub.css" />
 </head>
-<body class="accent-mi">
+<body>
   <main class="hub-shell">
     <header class="hub-top">
       <div class="hub-brand">
@@ -18,7 +18,7 @@
       </div>
       <nav class="hub-nav">
         <a class="pill m" href="/m.html">M</a>
-        <a class="pill mi" href="/mi.html">Mi</a>
+        <a class="pill mi is-current" href="/mi.html">Mi</a>
         <a class="pill lenny" href="/lenny.html">Lenny</a>
         <a href="/">门户</a>
         <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
@@ -104,20 +104,16 @@
 
   <template id="miVideoTemplate">
     <article class="video-card">
-      <div class="video-cover"></div>
-      <div class="video-head" style="margin-top:8px;">
+      <div class="video-head">
         <strong class="title"></strong>
-        <span class="chip category"></span>
       </div>
       <div class="meta"></div>
       <p class="body-text summary"></p>
-      <div class="tag-list"></div>
       <div class="actions">
         <button class="play-btn">▶ 播放</button>
         <button class="like-btn">👍 <span>0</span></button>
         <button class="fav-btn">⭐ <span>0</span></button>
         <button class="comment-btn">💬 评论</button>
-        <button class="follow-btn">+ 关注</button>
       </div>
     </article>
   </template>
