@@ -676,13 +676,22 @@
     });
   }
 
-  async function openArticle(articleId, increaseReadCount) {
-    state.currentArticleId = articleId;
-    if (increaseReadCount) {
-      await increaseRead(articleId);
-    }
+  function refreshViews() {
     renderList();
     renderViewer();
+  }
+
+  async function openArticle(articleId, increaseReadCount) {
+    state.currentArticleId = articleId;
+    refreshViews();
+
+    if (increaseReadCount) {
+      increaseRead(articleId)
+        .then(function () {
+          refreshViews();
+        })
+        .catch(function () {});
+    }
   }
 
   async function increaseRead(articleId) {
@@ -717,6 +726,17 @@
     const key = article.id + ":" + actionType;
     const existed = state.actionSet.has(key);
     const client = state.context.client;
+    const countKey = actionType === "like" ? "likeCount" : "bookmarkCount";
+    const counts = getCounts(article.id);
+
+    if (existed) {
+      state.actionSet.delete(key);
+    } else {
+      state.actionSet.add(key);
+    }
+    counts[countKey] = Math.max(0, Number(counts[countKey] || 0) + (existed ? -1 : 1));
+    state.countsMap.set(article.id, counts);
+    refreshViews();
 
     if (existed) {
       const deleteRes = await client
@@ -726,6 +746,10 @@
         .eq("user_id", state.user.id)
         .eq("action_type", actionType);
       if (deleteRes.error) {
+        state.actionSet.add(key);
+        counts[countKey] = Math.max(0, Number(counts[countKey] || 0) + 1);
+        state.countsMap.set(article.id, counts);
+        refreshViews();
         setStatus(actionText + "失败：" + deleteRes.error.message, "err");
         return;
       }
@@ -738,16 +762,17 @@
       if (insertRes.error) {
         const msg = String(insertRes.error.message || "").toLowerCase();
         if (!(insertRes.error.code === "23505" || msg.includes("duplicate"))) {
+          state.actionSet.delete(key);
+          counts[countKey] = Math.max(0, Number(counts[countKey] || 0) - 1);
+          state.countsMap.set(article.id, counts);
+          refreshViews();
           setStatus(actionText + "失败：" + insertRes.error.message, "err");
           return;
         }
       }
     }
 
-    await loadMetaData(client);
     setStatus(actionText + "成功", "ok");
-    renderList();
-    renderViewer();
   }
 
   async function toggleFollow(followeeId, followeeName) {
@@ -758,6 +783,10 @@
     const followed = state.follows.has(followeeId);
 
     if (followed) {
+      state.follows.delete(followeeId);
+      setStatus("已取消关注 " + (followeeName || "该作者"), "ok");
+      renderList();
+
       const removeRes = await client
         .from("follows")
         .delete()
@@ -765,16 +794,18 @@
         .eq("followee_id", followeeId);
 
       if (removeRes.error) {
+        state.follows.add(followeeId);
+        renderList();
         setStatus("取消关注失败：" + removeRes.error.message, "err");
         return;
       }
 
-      state.follows.delete(followeeId);
-      setStatus("已取消关注 " + (followeeName || "该作者"), "ok");
-      renderList();
-      renderViewer();
       return;
     }
+
+    state.follows.add(followeeId);
+    setStatus("已关注 " + (followeeName || "该作者"), "ok");
+    renderList();
 
     const insertRes = await client.from("follows").insert({
       follower_id: state.user.id,
@@ -784,52 +815,65 @@
     if (insertRes.error) {
       const msg = String(insertRes.error.message || "").toLowerCase();
       if (!(insertRes.error.code === "23505" || msg.includes("duplicate"))) {
+        state.follows.delete(followeeId);
+        renderList();
         setStatus("关注失败：" + insertRes.error.message, "err");
         return;
       }
     }
 
-    state.follows.add(followeeId);
-    setStatus("已关注 " + (followeeName || "该作者"), "ok");
-
     await client.from("notifications").insert({
       user_id: followeeId,
       text: (state.displayName || "有用户") + " 关注了你"
     });
-
-    renderList();
-    renderViewer();
   }
 
   async function submitComment(rawText) {
-    if (!canWrite("评论")) return;
+    if (!canWrite("评论")) return false;
     const article = getArticleById(state.currentArticleId);
     if (!article) {
       setStatus("请先选择一篇文章", "err");
-      return;
+      return false;
     }
 
     const text = String(rawText || "").trim();
     if (!text) {
       setStatus("评论内容不能为空", "err");
-      return;
+      return false;
     }
 
-    const insertRes = await state.context.client.from("lenny_article_comments").insert({
-      article_id: article.id,
-      text: text,
-      author_id: state.user.id,
-      author_name: state.displayName
-    });
+    const insertRes = await state.context.client
+      .from("lenny_article_comments")
+      .insert({
+        article_id: article.id,
+        text: text,
+        author_id: state.user.id,
+        author_name: state.displayName
+      })
+      .select("id,article_id,text,author_id,author_name,created_at")
+      .single();
 
     if (insertRes.error) {
       setStatus("评论失败：" + insertRes.error.message, "err");
-      return;
+      return false;
     }
+
+    const created = insertRes.data || {
+      id: "local-" + Date.now(),
+      article_id: article.id,
+      text: text,
+      author_id: state.user.id,
+      author_name: state.displayName,
+      created_at: new Date().toISOString()
+    };
+    const comments = state.commentsMap.get(article.id) || [];
+    comments.unshift(created);
+    state.commentsMap.set(article.id, comments);
 
     commentInput.value = "";
     setStatus("评论成功", "ok");
-    await loadArticles();
+    refreshViews();
+    return true;
   }
 
   function bindPublisher() {

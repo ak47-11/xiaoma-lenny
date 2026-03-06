@@ -742,13 +742,22 @@
     });
   }
 
-  async function openVideo(videoId, countPlay) {
-    state.currentVideoId = videoId;
-    if (countPlay) {
-      await increasePlay(videoId);
-    }
+  function refreshViews() {
     renderGrid();
     renderPlayer();
+  }
+
+  async function openVideo(videoId, countPlay) {
+    state.currentVideoId = videoId;
+    refreshViews();
+
+    if (countPlay) {
+      increasePlay(videoId)
+        .then(function () {
+          refreshViews();
+        })
+        .catch(function () {});
+    }
   }
 
   async function increasePlay(videoId) {
@@ -783,6 +792,17 @@
     const key = video.id + ":" + actionType;
     const existed = state.actionSet.has(key);
     const client = state.context.client;
+    const countKey = actionType === "like" ? "likeCount" : "favoriteCount";
+    const counts = getCounts(video.id);
+
+    if (existed) {
+      state.actionSet.delete(key);
+    } else {
+      state.actionSet.add(key);
+    }
+    counts[countKey] = Math.max(0, Number(counts[countKey] || 0) + (existed ? -1 : 1));
+    state.countsMap.set(video.id, counts);
+    refreshViews();
 
     if (existed) {
       const deleteRes = await client
@@ -792,6 +812,10 @@
         .eq("user_id", state.user.id)
         .eq("action_type", actionType);
       if (deleteRes.error) {
+        state.actionSet.add(key);
+        counts[countKey] = Math.max(0, Number(counts[countKey] || 0) + 1);
+        state.countsMap.set(video.id, counts);
+        refreshViews();
         setStatus(actionText + "失败：" + deleteRes.error.message, "err");
         return;
       }
@@ -804,16 +828,17 @@
       if (insertRes.error) {
         const msg = String(insertRes.error.message || "").toLowerCase();
         if (!(insertRes.error.code === "23505" || msg.includes("duplicate"))) {
+          state.actionSet.delete(key);
+          counts[countKey] = Math.max(0, Number(counts[countKey] || 0) - 1);
+          state.countsMap.set(video.id, counts);
+          refreshViews();
           setStatus(actionText + "失败：" + insertRes.error.message, "err");
           return;
         }
       }
     }
 
-    await loadMetaData(client);
     setStatus(actionText + "成功", "ok");
-    renderGrid();
-    renderPlayer();
   }
 
   async function toggleFollow(followeeId, followeeName) {
@@ -824,6 +849,10 @@
     const followed = state.follows.has(followeeId);
 
     if (followed) {
+      state.follows.delete(followeeId);
+      setStatus("已取消关注 " + (followeeName || "该作者"), "ok");
+      renderGrid();
+
       const removeRes = await client
         .from("follows")
         .delete()
@@ -831,15 +860,18 @@
         .eq("followee_id", followeeId);
 
       if (removeRes.error) {
+        state.follows.add(followeeId);
+        renderGrid();
         setStatus("取消关注失败：" + removeRes.error.message, "err");
         return;
       }
 
-      state.follows.delete(followeeId);
-      setStatus("已取消关注 " + (followeeName || "该作者"), "ok");
-      renderGrid();
       return;
     }
+
+    state.follows.add(followeeId);
+    setStatus("已关注 " + (followeeName || "该作者"), "ok");
+    renderGrid();
 
     const insertRes = await client.from("follows").insert({
       follower_id: state.user.id,
@@ -849,51 +881,65 @@
     if (insertRes.error) {
       const msg = String(insertRes.error.message || "").toLowerCase();
       if (!(insertRes.error.code === "23505" || msg.includes("duplicate"))) {
+        state.follows.delete(followeeId);
+        renderGrid();
         setStatus("关注失败：" + insertRes.error.message, "err");
         return;
       }
     }
 
-    state.follows.add(followeeId);
-    setStatus("已关注 " + (followeeName || "该作者"), "ok");
-
     await client.from("notifications").insert({
       user_id: followeeId,
       text: (state.displayName || "有用户") + " 关注了你"
     });
-
-    renderGrid();
   }
 
   async function submitComment(rawText) {
-    if (!canWrite("评论")) return;
+    if (!canWrite("评论")) return false;
     const video = getVideoById(state.currentVideoId);
     if (!video) {
       setStatus("请先选择一个视频", "err");
-      return;
+      return false;
     }
 
     const text = String(rawText || "").trim();
     if (!text) {
       setStatus("评论内容不能为空", "err");
-      return;
+      return false;
     }
 
-    const insertRes = await state.context.client.from("mi_video_comments").insert({
-      video_id: video.id,
-      text: text,
-      author_id: state.user.id,
-      author_name: state.displayName
-    });
+    const insertRes = await state.context.client
+      .from("mi_video_comments")
+      .insert({
+        video_id: video.id,
+        text: text,
+        author_id: state.user.id,
+        author_name: state.displayName
+      })
+      .select("id,video_id,text,author_id,author_name,created_at")
+      .single();
 
     if (insertRes.error) {
       setStatus("评论失败：" + insertRes.error.message, "err");
-      return;
+      return false;
     }
+
+    const created = insertRes.data || {
+      id: "local-" + Date.now(),
+      video_id: video.id,
+      text: text,
+      author_id: state.user.id,
+      author_name: state.displayName,
+      created_at: new Date().toISOString()
+    };
+    const comments = state.commentsMap.get(video.id) || [];
+    comments.unshift(created);
+    state.commentsMap.set(video.id, comments);
 
     commentInput.value = "";
     setStatus("评论成功", "ok");
-    await loadVideos();
+    refreshViews();
+    return true;
   }
 
   function bindUploader() {

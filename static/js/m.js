@@ -596,6 +596,11 @@
     document.body.classList.add("lock-scroll");
   }
 
+  function refreshViews() {
+    renderFeed();
+    if (state.activeDetailPostId) renderDetail();
+  }
+
   function renderFeed() {
     if (!feedEl || !template) return;
     feedEl.innerHTML = "";
@@ -690,7 +695,8 @@
 
       commentForm.addEventListener("submit", async function (event) {
         event.preventDefault();
-        await submitComment(post.id, commentInput.value);
+        const ok = await submitComment(post.id, commentInput.value);
+        if (ok) commentInput.value = "";
       });
 
       feedEl.appendChild(card);
@@ -701,22 +707,35 @@
     if (!canWrite(reactionType === "like" ? "点赞" : "转发")) return;
 
     const client = state.context.client;
-    const existing = await client
-      .from("m_reactions")
-      .select("id")
-      .eq("post_id", postId)
-      .eq("user_id", state.user.id)
-      .eq("reaction_type", reactionType)
-      .maybeSingle();
+    const reaction = state.reactions.get(postId) || {
+      likeCount: 0,
+      repostCount: 0,
+      userLiked: false,
+      userReposted: false
+    };
 
-    if (existing.error) {
-      setStatus("互动失败：" + existing.error.message, "err");
-      return;
-    }
+    const countKey = reactionType === "like" ? "likeCount" : "repostCount";
+    const flagKey = reactionType === "like" ? "userLiked" : "userReposted";
+    const existed = !!reaction[flagKey];
 
-    if (existing.data?.id) {
-      const removeRes = await client.from("m_reactions").delete().eq("id", existing.data.id);
+    reaction[flagKey] = !existed;
+    reaction[countKey] = Math.max(0, Number(reaction[countKey] || 0) + (existed ? -1 : 1));
+    state.reactions.set(postId, reaction);
+    refreshViews();
+
+    if (existed) {
+      const removeRes = await client
+        .from("m_reactions")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", state.user.id)
+        .eq("reaction_type", reactionType);
+
       if (removeRes.error) {
+        reaction[flagKey] = true;
+        reaction[countKey] = Math.max(0, Number(reaction[countKey] || 0) + 1);
+        state.reactions.set(postId, reaction);
+        refreshViews();
         setStatus("取消互动失败：" + removeRes.error.message, "err");
         return;
       }
@@ -726,13 +745,19 @@
         user_id: state.user.id,
         reaction_type: reactionType
       });
+
       if (addRes.error) {
-        setStatus("互动失败：" + addRes.error.message, "err");
-        return;
+        const msg = String(addRes.error.message || "").toLowerCase();
+        if (!(addRes.error.code === "23505" || msg.includes("duplicate"))) {
+          reaction[flagKey] = false;
+          reaction[countKey] = Math.max(0, Number(reaction[countKey] || 0) - 1);
+          state.reactions.set(postId, reaction);
+          refreshViews();
+          setStatus("互动失败：" + addRes.error.message, "err");
+          return;
+        }
       }
     }
-
-    await loadPosts();
   }
 
   async function toggleFollow(followeeId, followeeName) {
@@ -743,6 +768,10 @@
     const followed = state.follows.has(followeeId);
 
     if (followed) {
+      state.follows.delete(followeeId);
+      setStatus("已取消关注 " + (followeeName || "该作者"), "ok");
+      refreshViews();
+
       const removeRes = await client
         .from("follows")
         .delete()
@@ -750,15 +779,18 @@
         .eq("followee_id", followeeId);
 
       if (removeRes.error) {
+        state.follows.add(followeeId);
+        refreshViews();
         setStatus("取消关注失败：" + removeRes.error.message, "err");
         return;
       }
 
-      state.follows.delete(followeeId);
-      setStatus("已取消关注 " + (followeeName || "该作者"), "ok");
-      renderFeed();
       return;
     }
+
+    state.follows.add(followeeId);
+    setStatus("已关注 " + (followeeName || "该作者"), "ok");
+    refreshViews();
 
     const insertRes = await client.from("follows").insert({
       follower_id: state.user.id,
@@ -768,44 +800,58 @@
     if (insertRes.error) {
       const msg = String(insertRes.error.message || "").toLowerCase();
       if (!(insertRes.error.code === "23505" || msg.includes("duplicate"))) {
+        state.follows.delete(followeeId);
+        refreshViews();
         setStatus("关注失败：" + insertRes.error.message, "err");
         return;
       }
     }
 
-    state.follows.add(followeeId);
-    setStatus("已关注 " + (followeeName || "该作者"), "ok");
-
     await client.from("notifications").insert({
       user_id: followeeId,
       text: (state.displayName || "有用户") + " 关注了你"
     });
-
-    renderFeed();
   }
 
   async function submitComment(postId, rawText) {
-    if (!canWrite("评论")) return;
+    if (!canWrite("评论")) return false;
     const text = String(rawText || "").trim();
     if (!text) {
       setStatus("评论内容不能为空", "err");
-      return;
+      return false;
     }
 
-    const insertRes = await state.context.client.from("m_comments").insert({
-      post_id: postId,
-      text: text,
-      author_id: state.user.id,
-      author_name: state.displayName
-    });
+    const insertRes = await state.context.client
+      .from("m_comments")
+      .insert({
+        post_id: postId,
+        text: text,
+        author_id: state.user.id,
+        author_name: state.displayName
+      })
+      .select("id,post_id,text,author_id,author_name,created_at")
+      .single();
 
     if (insertRes.error) {
       setStatus("评论失败：" + insertRes.error.message, "err");
-      return;
+      return false;
     }
 
+    const created = insertRes.data || {
+      id: "local-" + Date.now(),
+      post_id: postId,
+      text: text,
+      author_id: state.user.id,
+      author_name: state.displayName,
+      created_at: new Date().toISOString()
+    };
+    const list = state.comments.get(postId) || [];
+    list.unshift(created);
+    state.comments.set(postId, list);
+
     setStatus("评论成功", "ok");
-    await loadPosts();
+    refreshViews();
+    return true;
   }
 
   function bindComposer() {
@@ -1154,8 +1200,8 @@
         if (!state.activeDetailPostId) return;
 
         const text = detailCommentInput.value;
-        await submitComment(state.activeDetailPostId, text);
-        detailCommentInput.value = "";
+        const ok = await submitComment(state.activeDetailPostId, text);
+        if (ok) detailCommentInput.value = "";
       });
     }
   }

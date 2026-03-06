@@ -806,7 +806,6 @@ body.lock-scroll {
   transition:
     background-color var(--transition),
     border-color var(--transition),
-    box-shadow var(--transition),
     color var(--transition);
 }
 
