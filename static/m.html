@@ -57,14 +57,14 @@
 
       <section class="panel">
         <h2>公开社区广场</h2>
-        <p id="userHint" class="muted" style="margin:0 0 8px;">加载中...</p>
+        <p id="userHint" class="muted" style="margin:0 0 8px;">游客可浏览公开动态，登录后可立即发布并互动。</p>
         <div class="hint">这里是公开动态流，任何访客都可以浏览全部用户内容。发布内容请进入个人发布页。</div>
         <div class="actions" style="margin-top:10px;">
           <a class="action-btn" href="/m-publish.html">进入个人发布页</a>
           <a href="/profile.html">个人中心</a>
         </div>
 
-        <div id="mStatus" class="status">正在加载公开动态...</div>
+        <div id="mStatus" class="status">正在准备公开动态...</div>
         <div class="actions" style="margin-top:8px;">
           <button id="mRetryBtn" type="button" class="retry-btn hidden">重试加载</button>
         </div>
@@ -88,12 +88,17 @@
   <template id="mPostTemplate">
     <article class="post">
       <div class="post-head">
-        <div>
-          <strong class="title"></strong>
-          <div class="meta"></div>
+        <div class="author-row">
+          <span class="author-avatar"></span>
+          <div class="author-meta">
+            <strong class="author-name"></strong>
+            <div class="meta"></div>
+          </div>
         </div>
       </div>
       <p class="body-text"></p>
+      <div class="tag-list post-tags"></div>
+      <div class="meta card-stats"></div>
       <div class="media-preview"></div>
       <div class="actions">
         <button class="like-btn">👍 <span>0</span></button>

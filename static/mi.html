@@ -57,14 +57,14 @@
 
       <section class="panel">
         <h2>公开视频社区</h2>
-        <p id="userHint" class="muted" style="margin:0 0 8px;">加载中...</p>
+        <p id="userHint" class="muted" style="margin:0 0 8px;">游客可浏览视频流，登录后可立即发布并互动。</p>
         <div class="hint">这里展示所有用户公开视频作品。发布与管理请进入个人发布页，公开社区和个人页分开。</div>
         <div class="actions" style="margin-top:10px;">
           <a class="action-btn" href="/mi-publish.html">进入个人发布页</a>
           <a href="/profile.html">个人中心</a>
         </div>
 
-        <div id="miStatus" class="status">正在加载公开视频...</div>
+        <div id="miStatus" class="status">正在准备公开视频流...</div>
         <div class="actions" style="margin-top:8px;">
           <button id="miRetryBtn" type="button" class="retry-btn hidden">重试加载</button>
         </div>
@@ -104,16 +104,26 @@
 
   <template id="miVideoTemplate">
     <article class="video-card">
+      <div class="video-cover"></div>
       <div class="video-head">
-        <strong class="title"></strong>
+        <div class="author-row">
+          <span class="author-avatar"></span>
+          <div class="author-meta">
+            <strong class="author-name"></strong>
+            <div class="meta"></div>
+          </div>
+        </div>
+        <span class="chip category"></span>
       </div>
-      <div class="meta"></div>
+      <strong class="title"></strong>
       <p class="body-text summary"></p>
+      <div class="tag-list"></div>
+      <div class="meta card-stats"></div>
       <div class="actions">
         <button class="play-btn">▶ 播放</button>
         <button class="like-btn">👍 <span>0</span></button>
         <button class="fav-btn">⭐ <span>0</span></button>
-        <button class="comment-btn">💬 评论</button>
+        <button class="comment-btn">💬 评论 <span>0</span></button>
       </div>
     </article>
   </template>

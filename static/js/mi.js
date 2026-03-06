@@ -42,6 +42,104 @@
   const commentList = document.getElementById("miCommentList");
 
   const LOAD_TIMEOUT_MS = 8000;
+  const DEMO_VIDEOS = [
+    {
+      id: "demo-mi-1",
+      title: "3 分钟看懂 RAG 工作流",
+      summary: "从检索、重排到生成结果的全流程演示，适合产品和工程同学快速建立共同语言。",
+      video_url: "https://www.youtube.com/watch?v=aircAruvnKk",
+      cover_url: "",
+      category: "技术教程",
+      duration_text: "03:28",
+      tags: ["RAG", "LLM", "检索增强"],
+      author_id: null,
+      author_name: "Mira · AI 教学",
+      created_at: "2026-03-05T09:10:00+08:00",
+      demo_counts: { likeCount: 326, favoriteCount: 188, playCount: 4120 },
+      demo_comments: [
+        { id: "demo-mi-1-c1", text: "这个讲解很清楚，收藏了。", author_name: "Rex", created_at: "2026-03-05T09:32:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-mi-2",
+      title: "从 0 到 1 搭建社区运营看板",
+      summary: "实战演示指标定义、事件埋点和看板拆分，适合运营和增长团队。",
+      video_url: "https://www.youtube.com/watch?v=2ePf9rue1Ao",
+      cover_url: "",
+      category: "实战复盘",
+      duration_text: "08:14",
+      tags: ["运营", "数据看板", "增长"],
+      author_id: null,
+      author_name: "Noah · 增长",
+      created_at: "2026-03-05T10:25:00+08:00",
+      demo_counts: { likeCount: 244, favoriteCount: 121, playCount: 2986 },
+      demo_comments: []
+    },
+    {
+      id: "demo-mi-3",
+      title: "前端性能优化 Checklist（2026）",
+      summary: "覆盖首屏渲染、资源加载、交互响应和监控告警，附落地优先级建议。",
+      video_url: "https://www.youtube.com/watch?v=3QhU9jd03a0",
+      cover_url: "",
+      category: "技术教程",
+      duration_text: "06:42",
+      tags: ["前端性能", "Web Vitals", "工程化"],
+      author_id: null,
+      author_name: "Ivy · 前端",
+      created_at: "2026-03-05T12:02:00+08:00",
+      demo_counts: { likeCount: 418, favoriteCount: 236, playCount: 5520 },
+      demo_comments: [
+        { id: "demo-mi-3-c1", text: "请问这套清单有公开模板吗？", author_name: "Aiden", created_at: "2026-03-05T12:20:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-mi-4",
+      title: "设计系统改版复盘：少颜色策略",
+      summary: "展示如何用主色 + 强调色 + 灰阶完成多模块统一，并保持可读性。",
+      video_url: "https://www.youtube.com/watch?v=9No-FiEInLA",
+      cover_url: "",
+      category: "综合推荐",
+      duration_text: "05:17",
+      tags: ["设计系统", "视觉统一", "UI"],
+      author_id: null,
+      author_name: "Luna · 设计",
+      created_at: "2026-03-05T14:40:00+08:00",
+      demo_counts: { likeCount: 271, favoriteCount: 164, playCount: 3368 },
+      demo_comments: []
+    },
+    {
+      id: "demo-mi-5",
+      title: "一小时搭建 Supabase 社区后端",
+      summary: "从表结构、RLS 到前端接入的最短路径，适合中小团队快速验证想法。",
+      video_url: "https://www.youtube.com/watch?v=3sQJrY6y4kY",
+      cover_url: "",
+      category: "开源项目",
+      duration_text: "11:09",
+      tags: ["Supabase", "后端", "快速验证"],
+      author_id: null,
+      author_name: "Kite · 全栈",
+      created_at: "2026-03-05T16:08:00+08:00",
+      demo_counts: { likeCount: 389, favoriteCount: 221, playCount: 6021 },
+      demo_comments: [
+        { id: "demo-mi-5-c1", text: "这个对独立开发者太友好了。", author_name: "Ryan", created_at: "2026-03-05T16:31:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-mi-6",
+      title: "产品发布会：社区 2026 路线图",
+      summary: "公开分享互动体系、推荐策略和创作者激励计划。",
+      video_url: "https://www.youtube.com/watch?v=5MgBikgcWnY",
+      cover_url: "",
+      category: "综合推荐",
+      duration_text: "09:36",
+      tags: ["路线图", "社区产品", "创作者"],
+      author_id: null,
+      author_name: "Ari · 社区团队",
+      created_at: "2026-03-05T19:22:00+08:00",
+      demo_counts: { likeCount: 452, favoriteCount: 274, playCount: 6890 },
+      demo_comments: []
+    }
+  ];
 
   function setStatus(text, kind) {
     if (!statusEl) return;
@@ -211,6 +309,100 @@
     return state.countsMap.get(videoId) || { likeCount: 0, favoriteCount: 0, playCount: 0 };
   }
 
+  function isDemoVideoId(videoId) {
+    return String(videoId || "").indexOf("demo-") === 0;
+  }
+
+  function getAvatarText(name) {
+    const value = String(name || "").trim();
+    if (!value) return "匿";
+    return value.slice(0, 1).toUpperCase();
+  }
+
+  function renderGridSkeleton(count) {
+    if (!gridEl) return;
+    const total = Math.max(3, Number(count || 6));
+    const cards = [];
+    for (let index = 0; index < total; index += 1) {
+      cards.push(
+        "<article class='video-card skeleton-card'>" +
+          "<div class='skeleton-media'></div>" +
+          "<div class='skeleton-head'>" +
+            "<span class='skeleton-avatar'></span>" +
+            "<div class='skeleton-meta'>" +
+              "<div class='skeleton-line w-42'></div>" +
+              "<div class='skeleton-line w-25'></div>" +
+            "</div>" +
+          "</div>" +
+          "<div class='skeleton-line w-90'></div>" +
+          "<div class='skeleton-line w-68'></div>" +
+          "<div class='skeleton-actions'>" +
+            "<span class='skeleton-chip'></span>" +
+            "<span class='skeleton-chip'></span>" +
+            "<span class='skeleton-chip'></span>" +
+          "</div>" +
+        "</article>"
+      );
+    }
+    gridEl.innerHTML = cards.join("");
+  }
+
+  function renderGridFailure(message) {
+    if (!gridEl) return;
+    gridEl.innerHTML =
+      "<article class='video-card empty-state-card'>" +
+        "<strong>加载失败</strong>" +
+        "<p class='body-text'>" + (message || "网络暂时不稳定，请点击重试加载。") + "</p>" +
+        "<div class='tag-list'><span class='tag'>#可重试</span><span class='tag'>#稍后再试</span></div>" +
+      "</article>";
+  }
+
+  function applyDemoVideos() {
+    state.videos = DEMO_VIDEOS.map(function (item) {
+      return {
+        id: item.id,
+        title: item.title,
+        summary: item.summary,
+        video_url: item.video_url,
+        cover_url: item.cover_url,
+        category: item.category,
+        duration_text: item.duration_text,
+        tags: item.tags || [],
+        author_id: item.author_id,
+        author_name: item.author_name,
+        created_at: item.created_at,
+        demo: true
+      };
+    });
+
+    state.actionSet = new Set();
+    state.countsMap = new Map();
+    state.commentsMap = new Map();
+    state.playedSet = new Set();
+
+    state.videos.forEach(function (video) {
+      const source = DEMO_VIDEOS.find(function (item) {
+        return item.id === video.id;
+      });
+      state.countsMap.set(video.id, {
+        likeCount: Number(source?.demo_counts?.likeCount || 0),
+        favoriteCount: Number(source?.demo_counts?.favoriteCount || 0),
+        playCount: Number(source?.demo_counts?.playCount || 0)
+      });
+
+      const comments = (source?.demo_comments || []).map(function (comment) {
+        return {
+          id: comment.id,
+          video_id: video.id,
+          text: comment.text,
+          author_name: comment.author_name,
+          created_at: comment.created_at
+        };
+      });
+      state.commentsMap.set(video.id, comments);
+    });
+  }
+
   async function loadViewer() {
     await core.applyNavState();
     state.context = await core.getSessionContext();
@@ -256,6 +448,7 @@
 
     if (!opts.silent) {
       setStatus("正在加载公开视频...", "");
+      renderGridSkeleton(6);
     }
     setRetryVisible(false);
 
@@ -275,11 +468,8 @@
       state.countsMap = new Map();
       state.commentsMap = new Map();
       renderTags();
-      renderGrid();
+      renderGridFailure("网络较慢，视频流加载超时。你可以立即点击重试。");
       renderPlayer();
-      if (gridEl) {
-        gridEl.innerHTML = "<div class='empty'>加载超时，请点击“重试加载”按钮。</div>";
-      }
       setStatus("加载超时，网络较慢，请重试", "err");
       setRetryVisible(true);
       return;
@@ -298,7 +488,7 @@
         setStatus("加载视频失败：" + result.error.message, "err");
       }
       renderTags();
-      renderGrid();
+      renderGridFailure("服务暂时不可用，请稍后重试。");
       renderPlayer();
       setRetryVisible(true);
       return;
@@ -306,6 +496,20 @@
 
     state.tableReady = true;
     state.videos = result.data || [];
+
+    if (!state.videos.length) {
+      applyDemoVideos();
+      state.currentVideoId = state.videos[0]?.id || null;
+      state.flashVideoId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderTags();
+      renderGrid();
+      renderPlayer();
+      setStatus("当前暂无真实视频，先为你展示 6 条高质量示例内容", "");
+      return;
+    }
+
     if (!state.currentVideoId || !getVideoById(state.currentVideoId)) {
       state.currentVideoId = state.videos[0]?.id || null;
     }
@@ -537,27 +741,42 @@
       card.classList.toggle("active", state.currentVideoId === video.id);
       const counts = getCounts(video.id);
       const comments = state.commentsMap.get(video.id) || [];
+      const authorName = video.author_name || "匿名创作者";
 
       const coverNode = card.querySelector(".video-cover");
       if (coverNode) renderCover(coverNode, video);
+
+      const avatarEl = card.querySelector(".author-avatar");
+      if (avatarEl) avatarEl.textContent = getAvatarText(authorName);
+      const authorEl = card.querySelector(".author-name");
+      if (authorEl) authorEl.textContent = authorName;
+
       card.querySelector(".title").textContent = video.title || "未命名视频";
       const categoryNode = card.querySelector(".category");
       if (categoryNode) categoryNode.textContent = video.category || "综合推荐";
       card.querySelector(".summary").textContent = video.summary || "作者暂未填写简介";
-      card.querySelector(".meta").textContent =
-        (video.author_name || "匿名创作者") +
-        " · " +
-        formatTime(video.created_at);
+      card.querySelector(".meta").textContent = formatTime(video.created_at);
 
       const tagWrap = card.querySelector(".tag-list");
       if (tagWrap) {
         tagWrap.innerHTML = "";
-        (video.tags || []).forEach(function (tag) {
+        const tags = (video.tags && video.tags.length ? video.tags : [video.category || "综合推荐"]).slice(0, 4);
+        tags.forEach(function (tag) {
           const tagNode = document.createElement("span");
           tagNode.className = "tag";
           tagNode.textContent = tag;
           tagWrap.appendChild(tagNode);
         });
+      }
+
+      const statsEl = card.querySelector(".card-stats");
+      if (statsEl) {
+        statsEl.textContent =
+          "▶ " + Number(counts.playCount || 0) +
+          " · 👍 " + Number(counts.likeCount || 0) +
+          " · ⭐ " + Number(counts.favoriteCount || 0) +
+          " · 💬 " + comments.length +
+          (video.demo ? " · 示例" : "");
       }
 
       const likeBtn = card.querySelector(".like-btn");
@@ -568,7 +787,8 @@
 
       likeBtn.querySelector("span").textContent = String(Number(counts.likeCount || 0));
       favBtn.querySelector("span").textContent = String(Number(counts.favoriteCount || 0));
-      commentBtn.textContent = "💬 评论 " + comments.length;
+      const commentCountNode = commentBtn.querySelector("span");
+      if (commentCountNode) commentCountNode.textContent = String(comments.length);
       likeBtn.classList.toggle("on", state.actionSet.has(video.id + ":like"));
       favBtn.classList.toggle("on", state.actionSet.has(video.id + ":favorite"));
 
@@ -764,6 +984,13 @@
     if (state.playedSet.has(videoId)) return;
 
     const counts = getCounts(videoId);
+    if (isDemoVideoId(videoId)) {
+      counts.playCount += 1;
+      state.countsMap.set(videoId, counts);
+      state.playedSet.add(videoId);
+      return;
+    }
+
     if (state.user) {
       const insertRes = await (state.context?.client || core.localClient)
         .from("mi_video_views")
@@ -803,6 +1030,11 @@
     counts[countKey] = Math.max(0, Number(counts[countKey] || 0) + (existed ? -1 : 1));
     state.countsMap.set(video.id, counts);
     refreshViews();
+
+    if (isDemoVideoId(video.id)) {
+      setStatus(actionText + "（示例预览）", "ok");
+      return;
+    }
 
     if (existed) {
       const deleteRes = await client
@@ -906,6 +1138,22 @@
     if (!text) {
       setStatus("评论内容不能为空", "err");
       return false;
+    }
+
+    if (isDemoVideoId(video.id)) {
+      const demoComments = state.commentsMap.get(video.id) || [];
+      demoComments.unshift({
+        id: "demo-local-" + Date.now(),
+        video_id: video.id,
+        text: text,
+        author_name: state.displayName || "已登录用户",
+        created_at: new Date().toISOString()
+      });
+      state.commentsMap.set(video.id, demoComments);
+      commentInput.value = "";
+      setStatus("评论成功（示例预览）", "ok");
+      refreshViews();
+      return true;
     }
 
     const insertRes = await state.context.client

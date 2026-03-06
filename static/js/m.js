@@ -44,6 +44,83 @@
   const retryBtn = document.getElementById("mRetryBtn");
 
   const LOAD_TIMEOUT_MS = 8000;
+  const DEMO_POSTS = [
+    {
+      id: "demo-m-1",
+      content: "刚把客服知识库接入 RAG，平均响应时间从 14s 降到 4.8s。今天准备优化意图识别。#AI产品 #RAG",
+      media_url: "",
+      author_id: null,
+      author_name: "Lena · 产品经理",
+      created_at: "2026-03-05T09:18:00+08:00",
+      tags: ["#AI产品", "#RAG", "#效率优化"],
+      demo_reaction: { likeCount: 236, repostCount: 41 },
+      demo_comments: [
+        { id: "demo-m-1-c1", text: "这个提升很实在，能分享下评估指标吗？", author_name: "Jason", created_at: "2026-03-05T09:42:00+08:00" },
+        { id: "demo-m-1-c2", text: "建议加上失败兜底策略，线上会更稳。", author_name: "Sora", created_at: "2026-03-05T10:03:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-m-2",
+      content: "今天把新用户引导改成 1 屏 1 动作后，注册转化提升 19%。下一步做 A/B 看留存。#增长实验 #转化",
+      media_url: "",
+      author_id: null,
+      author_name: "Yuki · 增长",
+      created_at: "2026-03-05T11:08:00+08:00",
+      tags: ["#增长实验", "#转化", "#A/B测试"],
+      demo_reaction: { likeCount: 182, repostCount: 27 },
+      demo_comments: [
+        { id: "demo-m-2-c1", text: "有对照组细节吗？我也在做类似改版。", author_name: "Mina", created_at: "2026-03-05T11:18:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-m-3",
+      content: "开源组件库发布 v2.1：首屏加载减少 32%，暗色模式对比度问题修复完毕。#前端工程 #开源",
+      media_url: "",
+      author_id: null,
+      author_name: "Kai · 前端",
+      created_at: "2026-03-05T13:32:00+08:00",
+      tags: ["#前端工程", "#开源", "#性能"],
+      demo_reaction: { likeCount: 320, repostCount: 65 },
+      demo_comments: [
+        { id: "demo-m-3-c1", text: "v2 动效很克制，视觉节奏舒服。", author_name: "Nora", created_at: "2026-03-05T13:45:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-m-4",
+      content: "把 CI 改成并行流水线后，主分支发布从 22 分钟降到 9 分钟，团队幸福感+1。#DevOps #工程效率",
+      media_url: "",
+      author_id: null,
+      author_name: "Ethan · 工程效能",
+      created_at: "2026-03-05T15:11:00+08:00",
+      tags: ["#DevOps", "#工程效率", "#持续交付"],
+      demo_reaction: { likeCount: 147, repostCount: 18 },
+      demo_comments: []
+    },
+    {
+      id: "demo-m-5",
+      content: "把社区内容审核改成“风险分级 + 人工复核”，误杀率从 6.2% 降到 1.4%。#社区治理 #内容安全",
+      media_url: "",
+      author_id: null,
+      author_name: "Iris · 运营",
+      created_at: "2026-03-05T17:26:00+08:00",
+      tags: ["#社区治理", "#内容安全", "#运营"],
+      demo_reaction: { likeCount: 205, repostCount: 32 },
+      demo_comments: [
+        { id: "demo-m-5-c1", text: "这个策略很适合早期社区。", author_name: "Leo", created_at: "2026-03-05T17:38:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-m-6",
+      content: "周报：本周新增 1.2k 注册，内容消费时长提升 24%，下一周重点做推荐模型冷启动。#数据周报 #推荐系统",
+      media_url: "",
+      author_id: null,
+      author_name: "Mo · 数据分析",
+      created_at: "2026-03-05T20:10:00+08:00",
+      tags: ["#数据周报", "#推荐系统", "#产品迭代"],
+      demo_reaction: { likeCount: 173, repostCount: 21 },
+      demo_comments: []
+    }
+  ];
 
   function setStatus(text, kind) {
     if (!statusEl) return;
@@ -162,6 +239,106 @@
     if (post.author_name) return post.author_name;
     if (!post.author_id) return "匿名用户";
     return "用户 " + post.author_id.slice(0, 8);
+  }
+
+  function isDemoPostId(postId) {
+    return String(postId || "").indexOf("demo-") === 0;
+  }
+
+  function getAvatarText(name) {
+    const value = String(name || "").trim();
+    if (!value) return "匿";
+    return value.slice(0, 1).toUpperCase();
+  }
+
+  function getPostTags(post) {
+    if (Array.isArray(post.tags) && post.tags.length) {
+      return post.tags.slice(0, 4);
+    }
+    const topics = extractTopics(post.content || "");
+    if (topics.length) {
+      return topics.slice(0, 4).map(function (topic) {
+        return "#" + topic;
+      });
+    }
+    return ["#社区动态"];
+  }
+
+  function renderFeedSkeleton(count) {
+    if (!feedEl) return;
+    const total = Math.max(3, Number(count || 6));
+    const cards = [];
+    for (let index = 0; index < total; index += 1) {
+      cards.push(
+        "<article class='post skeleton-card'>" +
+          "<div class='skeleton-head'>" +
+            "<span class='skeleton-avatar'></span>" +
+            "<div class='skeleton-meta'>" +
+              "<div class='skeleton-line w-40'></div>" +
+              "<div class='skeleton-line w-25'></div>" +
+            "</div>" +
+          "</div>" +
+          "<div class='skeleton-line w-95'></div>" +
+          "<div class='skeleton-line w-88'></div>" +
+          "<div class='skeleton-line w-72'></div>" +
+          "<div class='skeleton-actions'>" +
+            "<span class='skeleton-chip'></span>" +
+            "<span class='skeleton-chip'></span>" +
+            "<span class='skeleton-chip'></span>" +
+          "</div>" +
+        "</article>"
+      );
+    }
+    feedEl.innerHTML = cards.join("");
+  }
+
+  function renderFeedFailure(message) {
+    if (!feedEl) return;
+    feedEl.innerHTML =
+      "<article class='post empty-state-card'>" +
+        "<strong>加载失败</strong>" +
+        "<p class='body-text'>" + (message || "网络暂时不稳定，请点击重试加载。") + "</p>" +
+        "<div class='tag-list'><span class='tag'>#可重试</span><span class='tag'>#网络波动</span></div>" +
+      "</article>";
+  }
+
+  function applyDemoPosts() {
+    state.posts = DEMO_POSTS.map(function (item) {
+      return {
+        id: item.id,
+        content: item.content,
+        media_url: item.media_url,
+        author_id: item.author_id,
+        author_name: item.author_name,
+        created_at: item.created_at,
+        tags: item.tags || [],
+        demo: true
+      };
+    });
+
+    state.reactions = new Map();
+    state.comments = new Map();
+    state.posts.forEach(function (post) {
+      const source = DEMO_POSTS.find(function (item) {
+        return item.id === post.id;
+      });
+      state.reactions.set(post.id, {
+        likeCount: Number(source?.demo_reaction?.likeCount || 0),
+        repostCount: Number(source?.demo_reaction?.repostCount || 0),
+        userLiked: false,
+        userReposted: false
+      });
+      const comments = (source?.demo_comments || []).map(function (comment) {
+        return {
+          id: comment.id,
+          post_id: post.id,
+          text: comment.text,
+          author_name: comment.author_name,
+          created_at: comment.created_at
+        };
+      });
+      state.comments.set(post.id, comments);
+    });
   }
 
   function getPostById(postId) {
@@ -287,6 +464,7 @@
 
     if (!opts.silent) {
       setStatus("正在加载公开动态...", "");
+      renderFeedSkeleton(6);
     }
     setRetryVisible(false);
 
@@ -304,7 +482,7 @@
       state.posts = [];
       state.reactions = new Map();
       state.comments = new Map();
-      feedEl.innerHTML = "<div class='empty'>加载超时，请点击“重试加载”按钮。</div>";
+      renderFeedFailure("网络较慢，内容加载超时。你可以立即点击重试。");
       setStatus("加载超时，网络较慢，请重试", "err");
       setRetryVisible(true);
       return;
@@ -322,7 +500,7 @@
         setStatus("加载动态失败：" + postsRes.error.message, "err");
       }
       renderTopics();
-      renderFeed();
+      renderFeedFailure("服务暂时不可用，请稍后重试。");
       if (state.activeDetailPostId) renderDetail();
       setRetryVisible(true);
       return;
@@ -330,6 +508,19 @@
 
     state.tableReady = true;
     state.posts = postsRes.data || [];
+
+    if (!state.posts.length) {
+      applyDemoPosts();
+      state.flashPostId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderTopics();
+      renderFeed();
+      if (state.activeDetailPostId) renderDetail();
+      setStatus("当前暂无真实动态，先为你展示 6 条高质量示例内容", "");
+      return;
+    }
+
     let partialDataIssue = false;
     try {
       await withTimeout(loadMetaData(client), LOAD_TIMEOUT_MS);
@@ -552,7 +743,11 @@
     if (detailAuthor) detailAuthor.textContent = authorLabel(post);
 
     if (detailMeta) {
-      const authorId = post.author_id ? ("作者ID: " + post.author_id.slice(0, 8) + "...") : "作者ID: 未知";
+      const authorId = post.demo
+        ? "示例内容"
+        : post.author_id
+          ? ("作者ID: " + post.author_id.slice(0, 8) + "...")
+          : "作者ID: 未知";
       detailMeta.textContent = formatTime(post.created_at) + " · " + authorId;
     }
 
@@ -632,11 +827,35 @@
       const comments = state.comments.get(post.id) || [];
       const fullText = post.content || "";
       const previewText = fullText.length > 180 ? fullText.slice(0, 180).trim() + "..." : fullText;
+      const authorName = authorLabel(post);
 
-      card.querySelector(".title").textContent = authorLabel(post);
+      const avatarEl = card.querySelector(".author-avatar");
+      if (avatarEl) avatarEl.textContent = getAvatarText(authorName);
+      const authorEl = card.querySelector(".author-name");
+      if (authorEl) authorEl.textContent = authorName;
       card.querySelector(".meta").textContent = formatTime(post.created_at);
       card.querySelector(".body-text").textContent = previewText;
       renderMedia(card.querySelector(".media-preview"), post.media_url || "");
+
+      const tagWrap = card.querySelector(".post-tags");
+      if (tagWrap) {
+        tagWrap.innerHTML = "";
+        getPostTags(post).forEach(function (tagText) {
+          const tagNode = document.createElement("span");
+          tagNode.className = "tag";
+          tagNode.textContent = tagText;
+          tagWrap.appendChild(tagNode);
+        });
+      }
+
+      const statsEl = card.querySelector(".card-stats");
+      if (statsEl) {
+        statsEl.textContent =
+          "👍 " + Number(reaction.likeCount || 0) +
+          " · 🔁 " + Number(reaction.repostCount || 0) +
+          " · 💬 " + comments.length +
+          (post.demo ? " · 示例" : "");
+      }
 
       const likeBtn = card.querySelector(".like-btn");
       const repostBtn = card.querySelector(".repost-btn");
@@ -705,6 +924,10 @@
 
   async function toggleReaction(postId, reactionType) {
     if (!canWrite(reactionType === "like" ? "点赞" : "转发")) return;
+    if (isDemoPostId(postId)) {
+      setStatus("示例内容仅供浏览，登录后发布真实内容即可参与互动", "");
+      return;
+    }
 
     const client = state.context.client;
     const reaction = state.reactions.get(postId) || {
@@ -815,6 +1038,10 @@
 
   async function submitComment(postId, rawText) {
     if (!canWrite("评论")) return false;
+    if (isDemoPostId(postId)) {
+      setStatus("示例内容仅供浏览，发布真实动态后可评论互动", "");
+      return false;
+    }
     const text = String(rawText || "").trim();
     if (!text) {
       setStatus("评论内容不能为空", "err");

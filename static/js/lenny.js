@@ -54,6 +54,124 @@
   const searchEl = document.getElementById("lennySearch");
 
   const LOAD_TIMEOUT_MS = 8000;
+  const DEMO_ARTICLES = [
+    {
+      id: "demo-lenny-1",
+      title: "构建 AI 社区门户的架构决策记录",
+      summary: "拆解账号系统、公开流、发布流分离与回流闭环的关键方案，适合团队复盘。",
+      content:
+        "本文记录了从单页面演进到三社区架构的核心决策：\n\n" +
+        "1) 登录与发布链路解耦，降低入口复杂度。\n" +
+        "2) 公开流优先可见性，发布流强调效率。\n" +
+        "3) 互动操作改为本地即时反馈，失败回滚。\n\n" +
+        "这套方案在小团队场景中，能较快达到稳定的用户体验。",
+      article_type: "analysis",
+      tags: ["架构", "社区产品", "工程实践"],
+      author_id: null,
+      author_name: "Rina · 架构",
+      created_at: "2026-03-05T09:00:00+08:00",
+      demo_counts: { likeCount: 268, bookmarkCount: 190, readCount: 4890 },
+      demo_comments: [
+        { id: "demo-lenny-1-c1", text: "这篇 ADR 很适合团队同步。", author_name: "Neil", created_at: "2026-03-05T09:24:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-lenny-2",
+      title: "前端骨架屏设计指南：从假加载到真实占位",
+      summary: "给出社区场景骨架屏的结构、节奏和失败兜底设计，避免“像没做完”的体验。",
+      content:
+        "骨架屏不是灰块堆砌，而是内容结构预演。\n\n" +
+        "建议实践：\n" +
+        "- 与真实卡片同布局\n" +
+        "- 1~1.2s 轻量 shimmer\n" +
+        "- 超时时立即露出重试按钮\n" +
+        "- 空态给出示例内容，避免空白\n",
+      article_type: "tutorial",
+      tags: ["骨架屏", "UX", "前端"],
+      author_id: null,
+      author_name: "Seth · 前端",
+      created_at: "2026-03-05T10:36:00+08:00",
+      demo_counts: { likeCount: 315, bookmarkCount: 227, readCount: 6122 },
+      demo_comments: []
+    },
+    {
+      id: "demo-lenny-3",
+      title: "如何定义社区信任信号（头像、时间、标签、互动）",
+      summary: "从信息可信度和阅读停留角度解释内容卡片的最小信任要素。",
+      content:
+        "信任信号的本质是降低判断成本。\n\n" +
+        "推荐字段：\n" +
+        "- 作者头像 + 昵称\n" +
+        "- 发布时间（可追溯）\n" +
+        "- 标签（上下文）\n" +
+        "- 互动计数（社会证明）\n",
+      article_type: "analysis",
+      tags: ["信任设计", "信息架构", "社区"],
+      author_id: null,
+      author_name: "Mori · 研究",
+      created_at: "2026-03-05T12:12:00+08:00",
+      demo_counts: { likeCount: 284, bookmarkCount: 173, readCount: 5330 },
+      demo_comments: [
+        { id: "demo-lenny-3-c1", text: "这个清单可以直接做设计评审标准。", author_name: "Pia", created_at: "2026-03-05T12:25:00+08:00" }
+      ]
+    },
+    {
+      id: "demo-lenny-4",
+      title: "Supabase 社区表设计与 RLS 模板",
+      summary: "给出动态、视频、文章和互动表的最小可用结构，并附访问策略建议。",
+      content:
+        "最小模型建议分四层：\n" +
+        "1) 主体内容表\n" +
+        "2) 互动表（点赞/收藏/评论）\n" +
+        "3) 关系表（关注）\n" +
+        "4) 通知表\n\n" +
+        "每层都应设置最小权限原则。",
+      article_type: "tutorial",
+      tags: ["Supabase", "RLS", "数据库"],
+      author_id: null,
+      author_name: "Aven · 后端",
+      created_at: "2026-03-05T14:08:00+08:00",
+      demo_counts: { likeCount: 358, bookmarkCount: 241, readCount: 7014 },
+      demo_comments: []
+    },
+    {
+      id: "demo-lenny-5",
+      title: "从 0 到 1 设计统一 UI Token 系统",
+      summary: "颜色、圆角、阴影、字号、间距一次收敛，解决多页面“气质割裂”问题。",
+      content:
+        "一套可落地 token 通常包含：\n" +
+        "- 色彩：主色 / 强调色 / 灰阶\n" +
+        "- 空间：16/24/32 三级\n" +
+        "- 字体：标题/正文/辅助三档\n" +
+        "- 控件：按钮、卡片、输入框统一状态\n",
+      article_type: "blog",
+      tags: ["Design Token", "UI", "前端规范"],
+      author_id: null,
+      author_name: "Lio · 设计工程",
+      created_at: "2026-03-05T16:18:00+08:00",
+      demo_counts: { likeCount: 301, bookmarkCount: 205, readCount: 5682 },
+      demo_comments: []
+    },
+    {
+      id: "demo-lenny-6",
+      title: "社区推荐冷启动：规则与模型混合策略",
+      summary: "给出新社区冷启动期的可行推荐方案，兼顾内容质量和分发公平性。",
+      content:
+        "冷启动建议采用“两段式”：\n" +
+        "- 第一段：规则兜底（新鲜度、质量分、基础多样性）\n" +
+        "- 第二段：行为反馈驱动模型迭代\n\n" +
+        "先稳定体验，再提升精准度。",
+      article_type: "analysis",
+      tags: ["推荐系统", "冷启动", "数据策略"],
+      author_id: null,
+      author_name: "Theo · 算法",
+      created_at: "2026-03-05T19:05:00+08:00",
+      demo_counts: { likeCount: 279, bookmarkCount: 184, readCount: 5196 },
+      demo_comments: [
+        { id: "demo-lenny-6-c1", text: "希望后续能补一个离线评估案例。", author_name: "Vic", created_at: "2026-03-05T19:22:00+08:00" }
+      ]
+    }
+  ];
 
   function setStatus(text, kind) {
     if (!statusEl) return;
@@ -211,6 +329,98 @@
     return state.countsMap.get(articleId) || { likeCount: 0, bookmarkCount: 0, readCount: 0 };
   }
 
+  function isDemoArticleId(articleId) {
+    return String(articleId || "").indexOf("demo-") === 0;
+  }
+
+  function getAvatarText(name) {
+    const value = String(name || "").trim();
+    if (!value) return "匿";
+    return value.slice(0, 1).toUpperCase();
+  }
+
+  function renderListSkeleton(count) {
+    if (!listEl) return;
+    const total = Math.max(3, Number(count || 6));
+    const cards = [];
+    for (let index = 0; index < total; index += 1) {
+      cards.push(
+        "<article class='article-card skeleton-card'>" +
+          "<div class='skeleton-head'>" +
+            "<span class='skeleton-avatar'></span>" +
+            "<div class='skeleton-meta'>" +
+              "<div class='skeleton-line w-42'></div>" +
+              "<div class='skeleton-line w-25'></div>" +
+            "</div>" +
+          "</div>" +
+          "<div class='skeleton-line w-86'></div>" +
+          "<div class='skeleton-line w-93'></div>" +
+          "<div class='skeleton-line w-70'></div>" +
+          "<div class='skeleton-actions'>" +
+            "<span class='skeleton-chip'></span>" +
+            "<span class='skeleton-chip'></span>" +
+            "<span class='skeleton-chip'></span>" +
+          "</div>" +
+        "</article>"
+      );
+    }
+    listEl.innerHTML = cards.join("");
+  }
+
+  function renderListFailure(message) {
+    if (!listEl) return;
+    listEl.innerHTML =
+      "<article class='article-card empty-state-card'>" +
+        "<strong>加载失败</strong>" +
+        "<p class='body-text'>" + (message || "网络暂时不稳定，请点击重试加载。") + "</p>" +
+        "<div class='tag-list'><span class='tag'>#可重试</span><span class='tag'>#网络波动</span></div>" +
+      "</article>";
+  }
+
+  function applyDemoArticles() {
+    state.articles = DEMO_ARTICLES.map(function (item) {
+      return {
+        id: item.id,
+        title: item.title,
+        summary: item.summary,
+        content: item.content,
+        article_type: item.article_type,
+        tags: item.tags || [],
+        author_id: item.author_id,
+        author_name: item.author_name,
+        created_at: item.created_at,
+        demo: true
+      };
+    });
+
+    state.actionSet = new Set();
+    state.countsMap = new Map();
+    state.commentsMap = new Map();
+    state.openedSet = new Set();
+
+    state.articles.forEach(function (article) {
+      const source = DEMO_ARTICLES.find(function (item) {
+        return item.id === article.id;
+      });
+      state.countsMap.set(article.id, {
+        likeCount: Number(source?.demo_counts?.likeCount || 0),
+        bookmarkCount: Number(source?.demo_counts?.bookmarkCount || 0),
+        readCount: Number(source?.demo_counts?.readCount || 0)
+      });
+
+      const comments = (source?.demo_comments || []).map(function (comment) {
+        return {
+          id: comment.id,
+          article_id: article.id,
+          text: comment.text,
+          author_name: comment.author_name,
+          created_at: comment.created_at
+        };
+      });
+      state.commentsMap.set(article.id, comments);
+    });
+  }
+
   async function loadViewer() {
     await core.applyNavState();
     state.context = await core.getSessionContext();
@@ -256,6 +466,7 @@
 
     if (!opts.silent) {
       setStatus("正在加载公开文章...", "");
+      renderListSkeleton(6);
     }
     setRetryVisible(false);
 
@@ -275,11 +486,8 @@
       state.countsMap = new Map();
       state.commentsMap = new Map();
       renderTags();
-      renderList();
+      renderListFailure("网络较慢，文章流加载超时。你可以立即点击重试。");
       renderViewer();
-      if (listEl) {
-        listEl.innerHTML = "<div class='empty'>加载超时，请点击“重试加载”按钮。</div>";
-      }
       setStatus("加载超时，网络较慢，请重试", "err");
       setRetryVisible(true);
       return;
@@ -298,7 +506,7 @@
         setStatus("加载文章失败：" + result.error.message, "err");
       }
       renderTags();
-      renderList();
+      renderListFailure("服务暂时不可用，请稍后重试。");
       renderViewer();
       setRetryVisible(true);
       return;
@@ -306,6 +514,19 @@
 
     state.tableReady = true;
     state.articles = result.data || [];
+
+    if (!state.articles.length) {
+      applyDemoArticles();
+      state.currentArticleId = state.articles[0]?.id || null;
+      state.flashArticleId = null;
+      state.flashExpireAt = 0;
+      state.flashRetryCount = 0;
+      renderTags();
+      renderList();
+      renderViewer();
+      setStatus("当前暂无真实文章，先为你展示 6 篇高质量示例内容", "");
+      return;
+    }
 
     if (!state.currentArticleId || !getArticleById(state.currentArticleId)) {
       state.currentArticleId = state.articles[0]?.id || null;
@@ -539,20 +760,26 @@
       }
       card.classList.toggle("active", article.id === state.currentArticleId);
       const counts = getCounts(article.id);
+      const authorName = article.author_name || "匿名作者";
+
+      const avatarEl = card.querySelector(".author-avatar");
+      if (avatarEl) avatarEl.textContent = getAvatarText(authorName);
+      const authorEl = card.querySelector(".author-name");
+      if (authorEl) authorEl.textContent = authorName;
 
       card.querySelector(".title").textContent = article.title || "未命名文章";
       const typeNode = card.querySelector(".type");
       if (typeNode) typeNode.textContent = TYPE_LABEL[article.article_type] || article.article_type || "技术博客";
       card.querySelector(".summary").textContent = article.summary || "作者未填写摘要";
-      card.querySelector(".meta").textContent =
-        (article.author_name || "匿名作者") +
-        " · " +
-        formatTime(article.created_at);
+      card.querySelector(".meta").textContent = formatTime(article.created_at);
 
       const tagWrap = card.querySelector(".tag-list");
       if (tagWrap) {
         tagWrap.innerHTML = "";
-        (article.tags || []).forEach(function (tag) {
+        const tags = (article.tags && article.tags.length
+          ? article.tags
+          : [TYPE_LABEL[article.article_type] || article.article_type || "技术博客"]).slice(0, 4);
+        tags.forEach(function (tag) {
           const tagNode = document.createElement("span");
           tagNode.className = "tag";
           tagNode.textContent = tag;
@@ -561,6 +788,16 @@
       }
 
       const comments = state.commentsMap.get(article.id) || [];
+      const statsEl = card.querySelector(".card-stats");
+      if (statsEl) {
+        statsEl.textContent =
+          "👁 " + Number(counts.readCount || 0) +
+          " · 👍 " + Number(counts.likeCount || 0) +
+          " · 🔖 " + Number(counts.bookmarkCount || 0) +
+          " · 💬 " + comments.length +
+          (article.demo ? " · 示例" : "");
+      }
+
       const likeBtn = card.querySelector(".like-btn");
       const bookmarkBtn = card.querySelector(".bookmark-btn");
       const commentBtn = card.querySelector(".comment-btn");
@@ -568,7 +805,8 @@
 
       likeBtn.querySelector("span").textContent = String(Number(counts.likeCount || 0));
       bookmarkBtn.querySelector("span").textContent = String(Number(counts.bookmarkCount || 0));
-      commentBtn.textContent = "💬 评论 " + comments.length;
+      const commentCountNode = commentBtn.querySelector("span");
+      if (commentCountNode) commentCountNode.textContent = String(comments.length);
       likeBtn.classList.toggle("on", state.actionSet.has(article.id + ":like"));
       bookmarkBtn.classList.toggle("on", state.actionSet.has(article.id + ":bookmark"));
 
@@ -698,6 +936,13 @@
     if (state.openedSet.has(articleId)) return;
 
     const counts = getCounts(articleId);
+    if (isDemoArticleId(articleId)) {
+      counts.readCount += 1;
+      state.countsMap.set(articleId, counts);
+      state.openedSet.add(articleId);
+      return;
+    }
+
     if (state.user) {
       const insertRes = await (state.context?.client || core.localClient)
         .from("lenny_article_reads")
@@ -737,6 +982,11 @@
     counts[countKey] = Math.max(0, Number(counts[countKey] || 0) + (existed ? -1 : 1));
     state.countsMap.set(article.id, counts);
     refreshViews();
+
+    if (isDemoArticleId(article.id)) {
+      setStatus(actionText + "（示例预览）", "ok");
+      return;
+    }
 
     if (existed) {
       const deleteRes = await client
@@ -840,6 +1090,22 @@
     if (!text) {
       setStatus("评论内容不能为空", "err");
       return false;
+    }
+
+    if (isDemoArticleId(article.id)) {
+      const demoComments = state.commentsMap.get(article.id) || [];
+      demoComments.unshift({
+        id: "demo-local-" + Date.now(),
+        article_id: article.id,
+        text: text,
+        author_name: state.displayName || "已登录用户",
+        created_at: new Date().toISOString()
+      });
+      state.commentsMap.set(article.id, demoComments);
+      commentInput.value = "";
+      setStatus("评论成功（示例预览）", "ok");
+      refreshViews();
+      return true;
     }
 
     const insertRes = await state.context.client

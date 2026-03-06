@@ -10,247 +10,284 @@
 <meta name="description" content="M、Mi、Lenny 三个社区的一站式入口：社交发布、视频内容、技术社区。">
 <style>
   :root {
-    --bg: #f7fafc;
-    --text: #18243a;
-    --muted: #5f728f;
-    --line: #dce6f3;
-    --surface: #ffffff;
-    --m: #1d9bf0;
-    --mi: #fb7299;
-    --lenny: #2da44e;
+    --bg: #0f1419;
+    --surface: #161b22;
+    --surface-soft: #121922;
+    --line: rgba(83, 100, 113, 0.34);
+    --text: #e7e9ea;
+    --muted: #536471;
+    --primary: #1d9bf0;
+    --accent: #f91880;
+    --radius: 12px;
+    --space-16: 16px;
+    --space-24: 24px;
+    --space-32: 32px;
+    --title-size: 20px;
+    --body-size: 16px;
+    --meta-size: 13px;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.26);
+    --transition: 150ms ease;
   }
+
   * { box-sizing: border-box; }
+
   body {
     margin: 0;
-    font-family: "Sora", "PingFang SC", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
     color: var(--text);
     background:
-      radial-gradient(980px 520px at 10% -10%, rgba(29, 155, 240, 0.18), transparent 63%),
-      radial-gradient(980px 520px at 90% -10%, rgba(251, 114, 153, 0.16), transparent 63%),
-      radial-gradient(1100px 540px at 50% 120%, rgba(45, 164, 78, 0.14), transparent 68%),
+      radial-gradient(980px 460px at 100% -20%, rgba(29, 155, 240, 0.12), transparent 62%),
       var(--bg);
-    min-height: 100vh;
+    font-size: var(--body-size);
+    line-height: 1.6;
   }
-  .container { width: min(1160px, 93%); margin: 18px auto 42px; }
-  .top {
+
+  .shell {
+    width: min(680px, calc(100% - 32px));
+    margin: var(--space-24) auto var(--space-32);
+    display: grid;
+    gap: var(--space-24);
+  }
+
+  .top,
+  .hero,
+  .preview,
+  .foot,
+  .preview-card {
     border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.86);
-    backdrop-filter: blur(8px);
-    border-radius: 16px;
-    padding: 14px 16px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .top,
+  .hero,
+  .preview,
+  .foot {
+    padding: var(--space-24);
+  }
+
+  .top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: var(--space-16);
     position: sticky;
     top: 12px;
-    z-index: 20;
+    z-index: 10;
   }
+
   .brand {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: 0.02em;
+    font-size: var(--title-size);
+    line-height: 1.3;
+    font-weight: 700;
+    letter-spacing: 0.01em;
   }
-  .nav {
+
+  .top-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-  }
-  .nav a {
-    text-decoration: none;
-    color: #30486f;
-    border: 1px solid #d2dff2;
-    background: #fff;
-    border-radius: 999px;
-    min-height: 34px;
-    padding: 0 12px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-  }
-  .nav .entry {
-    border: none;
-    color: #fff;
-  }
-  .nav .m { background: linear-gradient(100deg, #2ea7f4, #1d9bf0); }
-  .nav .mi { background: linear-gradient(100deg, #ff8db1, #fb7299); }
-  .nav .lenny { background: linear-gradient(100deg, #42bf63, #2da44e); }
-
-  .hero {
-    margin-top: 14px;
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(247,250,255,0.88));
-    padding: 28px;
-    box-shadow: 0 18px 42px rgba(87, 112, 149, 0.14);
-  }
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border-radius: 999px;
-    border: 1px solid #dbe5f2;
-    background: #fff;
-    color: #4c5f7f;
-    padding: 6px 11px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .hero h1 {
-    margin: 12px 0 10px;
-    font-size: clamp(34px, 5vw, 56px);
-    line-height: 1.08;
-    letter-spacing: -0.02em;
-  }
-  .hero h1 span {
-    background: linear-gradient(100deg, #1d9bf0, #fb7299, #2da44e);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .hero p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 17px;
-    line-height: 1.8;
-    max-width: 900px;
-  }
-
-  .portal-grid {
-    margin-top: 16px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-  .portal {
-    border-radius: 20px;
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid var(--line);
-    background: #fff;
-    padding: 16px;
-    box-shadow: 0 14px 28px rgba(97, 118, 151, 0.1);
-    transition: transform .18s ease, box-shadow .18s ease;
-    display: grid;
     gap: 10px;
   }
-  .portal:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 34px rgba(97, 118, 151, 0.14);
+
+  .mini-link,
+  .cta {
+    transition:
+      background-color var(--transition),
+      border-color var(--transition),
+      color var(--transition);
   }
-  .portal .head {
-    display: flex;
+
+  .mini-link {
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface-soft);
+    color: var(--muted);
+    text-decoration: none;
+    font-size: var(--meta-size);
+    font-weight: 600;
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
+  }
+
+  .mini-link:hover {
+    color: var(--text);
+    background: rgba(231, 233, 234, 0.08);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(249, 24, 128, 0.5);
+    background: rgba(249, 24, 128, 0.12);
+    color: #ffd0e8;
+    font-size: var(--meta-size);
+    font-weight: 600;
+  }
+
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    font-size: var(--title-size);
+    line-height: 1.3;
+    font-weight: 700;
+  }
+
+  .hero h1 {
+    margin-top: var(--space-16);
+  }
+
+  .hero p,
+  .foot,
+  .preview-card .meta {
+    color: var(--muted);
+    font-size: var(--meta-size);
+    line-height: 1.6;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .hero p {
+    margin-top: var(--space-16);
+  }
+
+  .cta {
+    margin-top: var(--space-24);
+    min-height: 44px;
+    border-radius: 999px;
+    border: 1px solid var(--primary);
+    background: var(--primary);
+    color: #ffffff;
+    text-decoration: none;
+    font-size: var(--body-size);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+  }
+
+  .cta:hover {
+    background: #188cd8;
+  }
+
+  .minor-links {
+    margin-top: var(--space-16);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .preview {
+    display: grid;
+    gap: var(--space-16);
+  }
+
+  .preview-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-16);
+  }
+
+  .preview-card {
+    padding: var(--space-16);
+    display: grid;
     gap: 8px;
   }
-  .portal .logo {
-    font-size: 26px;
-    font-weight: 800;
+
+  .preview-card h3 {
+    font-size: var(--body-size);
   }
-  .portal .type {
-    font-size: 11px;
-    border-radius: 999px;
-    padding: 4px 9px;
-    font-weight: 700;
-    border: 1px solid #d6e0ef;
-    color: #4f607f;
-    background: #f7faff;
+
+  .preview-card .line {
+    font-size: var(--body-size);
+    line-height: 1.6;
+    color: var(--text);
   }
-  .portal h3 {
-    margin: 0;
-    font-size: 22px;
-  }
-  .portal p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.75;
-  }
-  .portal ul {
-    margin: 0;
-    padding-left: 18px;
-    color: #516687;
-    font-size: 13px;
-    line-height: 1.8;
-  }
-  .portal.m { border-color: rgba(29,155,240,.28); background: linear-gradient(155deg, rgba(29,155,240,.1), #fff 38%); }
-  .portal.mi { border-color: rgba(251,114,153,.28); background: linear-gradient(155deg, rgba(251,114,153,.1), #fff 38%); }
-  .portal.lenny { border-color: rgba(45,164,78,.28); background: linear-gradient(155deg, rgba(45,164,78,.1), #fff 38%); }
 
   .foot {
-    margin-top: 16px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: #fff;
-    padding: 14px;
-    color: #61738f;
-    font-size: 13px;
+    text-align: center;
   }
 
-  @media (max-width: 980px) {
-    .portal-grid { grid-template-columns: 1fr; }
+  @media (max-width: 640px) {
+    .shell {
+      width: calc(100% - 24px);
+      margin: var(--space-16) auto var(--space-24);
+      gap: var(--space-16);
+    }
+
+    .top,
+    .hero,
+    .preview,
+    .foot {
+      padding: var(--space-16);
+    }
+
+    .top {
+      position: static;
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>
 </head>
 <body>
-<main class="container">
+<main class="shell">
   <header class="top">
     <div class="brand">xiaoma.cyou</div>
-    <nav class="nav">
-      <a class="entry m" href="/m.html">M</a>
-      <a class="entry mi" href="/mi.html">Mi</a>
-      <a class="entry lenny" href="/lenny.html">Lenny</a>
-      <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
-      <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
-      <a href="/auth.html" id="loginNav">账号入口</a>
-      <a href="#" id="logoutNav" style="display:none">退出账号</a>
+    <nav class="top-links">
+      <a class="mini-link" href="/m.html">M</a>
+      <a class="mini-link" href="/mi.html">Mi</a>
+      <a class="mini-link" href="/lenny.html">Lenny</a>
+      <a class="mini-link" href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+      <a class="mini-link" href="/admin.html" id="adminNav" style="display:none">控制台</a>
+      <a class="mini-link" href="/auth.html" id="loginNav">账号入口</a>
+      <a class="mini-link" href="#" id="logoutNav" style="display:none">退出账号</a>
     </nav>
   </header>
 
   <section class="hero">
-    <span class="eyebrow">Integrated Community Hub</span>
-    <h1>一个网站，<span>三种创作宇宙</span></h1>
-    <p>欢迎来到 xiaoma.cyou。这里把实时社交、视频社区、技术创作统一在一个账号体系里：你可以在 M 发动态，在 Mi 发视频，在 Lenny 写教程与分析文章。</p>
-
-    <div class="portal-grid">
-      <a class="portal m" href="/m.html">
-        <div class="head"><div class="logo">M</div><span class="type">Micro Social</span></div>
-        <h3>像推特一样快速发布</h3>
-        <p>短内容优先，时间流刷新，适合即时观点、动态更新与社区互动。</p>
-        <ul>
-          <li>发布动态、图片链接、热门话题</li>
-          <li>点赞、评论、转发、关注作者</li>
-          <li>适合“边学边分享”的即时输出</li>
-        </ul>
-      </a>
-
-      <a class="portal mi" href="/mi.html">
-        <div class="head"><div class="logo">Mi</div><span class="type">Video Community</span></div>
-        <h3>像 B 站一样看与发视频</h3>
-        <p>视频卡片流 + 分类发现，支持封面、简介与链接发布，形成内容频道。</p>
-        <ul>
-          <li>上传视频信息、分类和封面</li>
-          <li>播放、点赞、收藏、快速浏览</li>
-          <li>适合教程视频和创作展示</li>
-        </ul>
-      </a>
-
-      <a class="portal lenny" href="/lenny.html">
-        <div class="head"><div class="logo">Lenny</div><span class="type">Tech Community</span></div>
-        <h3>像 GitHub 社区一样沉淀技术</h3>
-        <p>面向教程、复盘、分析文章的技术阵地，鼓励高质量长期内容。</p>
-        <ul>
-          <li>发布教程、分析、实战笔记</li>
-          <li>标签分类、文章互动、收藏管理</li>
-          <li>适合建立个人技术影响力</li>
-        </ul>
-      </a>
+    <span class="badge">Community Hub</span>
+    <h1>一个账号，立即开始发布并连接 M、Mi、Lenny。</h1>
+    <p>少一步选择，多一步行动：3 秒内看见真实内容，1 步完成登录和发布。</p>
+    <a class="cta" href="/auth.html?next=/m-publish.html">立即登录并开始发布</a>
+    <div class="minor-links">
+      <a class="mini-link" href="/m.html">先浏览 M</a>
+      <a class="mini-link" href="/mi.html">先浏览 Mi</a>
+      <a class="mini-link" href="/lenny.html">先浏览 Lenny</a>
+      <a class="mini-link" href="/community.html">社区导航页</a>
     </div>
   </section>
 
-  <section class="foot">建议先完成账号登录，再进入对应模块发布内容，这样可获得完整互动与个人资料联动体验。</section>
+  <section class="preview">
+    <h2>第一屏示例内容</h2>
+    <div class="preview-grid">
+      <article class="preview-card">
+        <h3>M · 实时动态</h3>
+        <div class="line">Lena：RAG 响应从 14s 降到 4.8s，正在优化意图识别。</div>
+        <div class="meta">2 分钟前 · 👍 236 · 🔁 41 · #AI产品 #RAG</div>
+      </article>
+      <article class="preview-card">
+        <h3>Mi · 视频更新</h3>
+        <div class="line">Mira：3 分钟看懂 RAG 工作流，适合产品和工程协作。</div>
+        <div class="meta">15 分钟前 · ▶ 4120 · ⭐ 188 · #LLM #检索增强</div>
+      </article>
+      <article class="preview-card">
+        <h3>Lenny · 技术文章</h3>
+        <div class="line">Rina：社区门户架构决策记录，含发布回流与互动策略。</div>
+        <div class="meta">31 分钟前 · 👁 4890 · 🔖 190 · #架构 #社区产品</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="foot">默认展示示例内容是为了保证首屏可用性；登录后你会看到真实社区流并可立即发布。</section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/app-core.js"></script>
