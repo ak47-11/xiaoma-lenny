@@ -8,13 +8,14 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/hub.css" />
+  <link rel="stylesheet" href="/css/community-system.css" />
 </head>
-<body>
+<body class="hub-page page-mi">
   <main class="hub-shell">
     <header class="hub-top">
       <div class="hub-brand">
-        <strong>Mi</strong>
-        <span>视频社区 · 类 B 站体验</span>
+        <strong>Mi / Motion</strong>
+        <span>视频社区 · bilibili 风格节奏</span>
       </div>
       <nav class="hub-nav">
         <a class="pill m" href="/m.html">M</a>
@@ -29,38 +30,47 @@
     </header>
 
     <section class="hub-layout">
-      <aside class="panel">
-        <h3>社区功能</h3>
+      <aside class="panel panel-left">
+        <h3>Mi 社区导航</h3>
         <div id="miSideMenu" class="side-menu">
-          <button data-action="home" class="active">Home</button>
-          <button data-action="explore">Explore</button>
-          <button data-action="notifications">Notifications</button>
-          <button data-action="follow">Follow</button>
-          <button data-action="chat">Chat</button>
-          <button data-action="more">More</button>
-          <button data-action="setting">Setting</button>
+          <button data-action="home" class="active">首页</button>
+          <button data-action="explore">发现</button>
+          <button data-action="notifications">消息</button>
+          <button data-action="follow">关注</button>
+          <button data-action="chat">弹幕聊</button>
+          <button data-action="more">分区</button>
+          <button data-action="setting">偏好</button>
         </div>
         <div class="side-panel">
-          <strong id="miSidePanelTitle">Home</strong>
-          <div id="miSidePanelBody" class="side-panel-body">这是公开视频广场，浏览全部用户上传作品。</div>
+          <strong id="miSidePanelTitle">首页</strong>
+          <div id="miSidePanelBody" class="side-panel-body">这里是公开视频广场，按热度与时效自动混排。</div>
         </div>
         <h4 style="margin-top:14px;">频道分区</h4>
         <ul class="list-text">
           <li>综合推荐</li>
           <li>技术教程</li>
-          <li>开源项目</li>
+          <li>创作实验室</li>
           <li>实战复盘</li>
         </ul>
         <h4 style="margin-top:14px;">热门标签</h4>
         <div id="miTags" class="tag-list"></div>
       </aside>
 
-      <section class="panel">
-        <h2>公开视频社区</h2>
+      <section class="panel panel-main">
+        <div class="scene-intro scene-intro-mi">
+          <p class="scene-eyebrow">VIDEO KNOWLEDGE NETWORK</p>
+          <h2>Mi 公开视频社区</h2>
+          <p class="scene-copy">强调内容可看性与互动亲和力，快速在教程、项目、复盘之间切换学习路径。</p>
+          <div class="scene-metrics">
+            <span>双列流</span>
+            <span>播放器优先</span>
+            <span>高互动标签</span>
+          </div>
+        </div>
         <p id="userHint" class="muted" style="margin:0 0 8px;">游客可浏览视频流，登录后可立即发布并互动。</p>
-        <div class="hint">这里展示所有用户公开视频作品。发布与管理请进入个人发布页，公开社区和个人页分开。</div>
+        <div class="hint">这里展示所有用户公开视频作品。发布与管理在个人发布页完成，公开浏览与创作管理分离。</div>
         <div class="actions" style="margin-top:10px;">
-          <a class="action-btn" href="/mi-publish.html">进入个人发布页</a>
+          <a class="action-btn" href="/mi-publish.html">进入创作台</a>
           <a href="/profile.html">个人中心</a>
           <a href="/openclaw.html">AI 对话界面</a>
         </div>
@@ -89,15 +99,15 @@
         <div id="miGrid" class="video-grid"></div>
       </section>
 
-      <aside class="panel">
-        <h3>视频说明</h3>
-        <div class="hint">Mi 支持视频链接发布、播放、点赞、收藏和评论，适合课程、项目演示与创作分享。</div>
-        <h4 style="margin-top:14px;">创作建议</h4>
+      <aside class="panel panel-right">
+        <h3>创作指南</h3>
+        <div class="hint">Mi 支持视频链接发布、播放、点赞、收藏和评论，适合课程拆解、项目演示与创作分享。</div>
+        <h4 style="margin-top:14px;">提升完播建议</h4>
         <ul class="list-text">
-          <li>标题明确描述核心收益</li>
-          <li>简介补充章节与重点时间点</li>
-          <li>封面尽量突出主题关键词</li>
-          <li>使用标签可提升内容发现率</li>
+          <li>标题先写结果收益</li>
+          <li>开头 10 秒给出看点</li>
+          <li>封面突出单一主概念</li>
+          <li>标签控制在 3-5 个以内</li>
         </ul>
       </aside>
     </section>

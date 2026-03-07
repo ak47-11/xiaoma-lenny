@@ -8,13 +8,14 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/hub.css" />
+  <link rel="stylesheet" href="/css/community-system.css" />
 </head>
-<body>
+<body class="hub-page page-lenny">
   <main class="hub-shell">
     <header class="hub-top">
       <div class="hub-brand">
-        <strong>Lenny</strong>
-        <span>技术社区 · 类 GitHub 风格沉淀</span>
+        <strong>Lenny / Forge</strong>
+        <span>技术社区 · GitHub 风格沉淀</span>
       </div>
       <nav class="hub-nav">
         <a class="pill m" href="/m.html">M</a>
@@ -29,38 +30,47 @@
     </header>
 
     <section class="hub-layout">
-      <aside class="panel">
-        <h3>社区功能</h3>
+      <aside class="panel panel-left">
+        <h3>Lenny 导航</h3>
         <div id="lennySideMenu" class="side-menu">
-          <button data-action="home" class="active">Home</button>
-          <button data-action="explore">Explore</button>
-          <button data-action="notifications">Notifications</button>
-          <button data-action="follow">Follow</button>
-          <button data-action="chat">Chat</button>
-          <button data-action="more">More</button>
-          <button data-action="setting">Setting</button>
+          <button data-action="home" class="active">Overview</button>
+          <button data-action="explore">Trending</button>
+          <button data-action="notifications">Inbox</button>
+          <button data-action="follow">Following</button>
+          <button data-action="chat">Discussions</button>
+          <button data-action="more">Resources</button>
+          <button data-action="setting">Settings</button>
         </div>
         <div class="side-panel">
-          <strong id="lennySidePanelTitle">Home</strong>
-          <div id="lennySidePanelBody" class="side-panel-body">这是公开技术内容流，可阅读所有用户发布的文章。</div>
+          <strong id="lennySidePanelTitle">Overview</strong>
+          <div id="lennySidePanelBody" class="side-panel-body">这是公开技术内容流，强调可读性、可检索性与长期沉淀。</div>
         </div>
         <h4 style="margin-top:14px;">内容分区</h4>
         <ul class="list-text">
-          <li>技术博客</li>
-          <li>学习教程</li>
-          <li>分析文章</li>
-          <li>项目复盘</li>
+          <li>Architecture Notes</li>
+          <li>Engineering Tutorials</li>
+          <li>Deep Analysis</li>
+          <li>Project Retrospective</li>
         </ul>
         <h4 style="margin-top:14px;">热门标签</h4>
         <div id="lennyTags" class="tag-list"></div>
       </aside>
 
-      <section class="panel">
-        <h2>公开技术社区</h2>
+      <section class="panel panel-main">
+        <div class="scene-intro scene-intro-lenny">
+          <p class="scene-eyebrow">ENGINEERING KNOWLEDGE BASE</p>
+          <h2>Lenny 开发者社区</h2>
+          <p class="scene-copy">聚焦工程经验沉淀与知识复用，把技术讨论组织成可追溯、可复盘的结构化内容。</p>
+          <div class="scene-metrics">
+            <span>文档优先</span>
+            <span>阅读友好</span>
+            <span>状态清晰</span>
+          </div>
+        </div>
         <p id="userHint" class="muted" style="margin:0 0 8px;">游客可阅读技术内容，登录后可立即发布并互动。</p>
-        <div class="hint">这里是公开技术内容流，所有访客都可以阅读全部用户文章。发布与个人管理请进入独立发布页。</div>
+        <div class="hint">这里是公开技术内容流，所有访客都可阅读全部用户文章。发布与管理请前往独立发布页。</div>
         <div class="actions" style="margin-top:10px;">
-          <a class="action-btn" href="/lenny-publish.html">进入个人发布页</a>
+          <a class="action-btn" href="/lenny-publish.html">进入创作台</a>
           <a href="/profile.html">个人中心</a>
           <a href="/openclaw.html">AI 对话界面</a>
         </div>
@@ -83,8 +93,8 @@
         <div id="lennyList" class="article-list" style="margin-top:10px;"></div>
       </section>
 
-      <aside class="panel">
-        <h3>文章阅读区</h3>
+      <aside class="panel panel-right">
+        <h3>Reader Workspace</h3>
         <div id="lennyViewer" class="article-view">
           <h4 id="lennyViewerTitle" style="margin:0 0 8px;">请选择一篇文章</h4>
           <div id="lennyViewerMeta" class="meta"></div>

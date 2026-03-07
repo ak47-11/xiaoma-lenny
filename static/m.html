@@ -8,13 +8,14 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/hub.css" />
+  <link rel="stylesheet" href="/css/community-system.css" />
 </head>
-<body>
+<body class="hub-page page-m">
   <main class="hub-shell">
     <header class="hub-top">
       <div class="hub-brand">
-        <strong>M</strong>
-        <span>实时社交发布 · 类推特体验</span>
+        <strong>M / Pulse</strong>
+        <span>实时社交发布 · X 风格节奏</span>
       </div>
       <nav class="hub-nav">
         <a class="pill m is-current" href="/m.html">M</a>
@@ -29,38 +30,47 @@
     </header>
 
     <section class="hub-layout">
-      <aside class="panel">
-        <h3>社区功能</h3>
+      <aside class="panel panel-left">
+        <h3>M 社区导航</h3>
         <div id="mSideMenu" class="side-menu">
-          <button data-action="home" class="active">Home</button>
-          <button data-action="explore">Explore</button>
-          <button data-action="notifications">Notifications</button>
-          <button data-action="follow">Follow</button>
-          <button data-action="chat">Chat</button>
-          <button data-action="more">More</button>
-          <button data-action="setting">Setting</button>
+          <button data-action="home" class="active">For You</button>
+          <button data-action="explore">Discover</button>
+          <button data-action="notifications">Alerts</button>
+          <button data-action="follow">Following</button>
+          <button data-action="chat">Live Chat</button>
+          <button data-action="more">Toolkit</button>
+          <button data-action="setting">Preferences</button>
         </div>
         <div class="side-panel">
-          <strong id="mSidePanelTitle">Home</strong>
-          <div id="mSidePanelBody" class="side-panel-body">这是公开时间线，向下滚动可查看所有用户动态。</div>
+          <strong id="mSidePanelTitle">For You</strong>
+          <div id="mSidePanelBody" class="side-panel-body">这是公开时间线，聚焦实时观点与高互动内容。</div>
         </div>
-        <h4 style="margin-top:14px;">频道导航</h4>
+        <h4 style="margin-top:14px;">流式分栏</h4>
         <ul class="list-text">
-          <li>推荐动态</li>
-          <li>关注动态</li>
-          <li>技术热议</li>
-          <li>活动公告</li>
+          <li>For You 推荐流</li>
+          <li>Following 关注流</li>
+          <li>X-Lab 技术热议</li>
+          <li>Signal 公告与活动</li>
         </ul>
-        <h4 style="margin-top:14px;">热门话题</h4>
+        <h4 style="margin-top:14px;">Trending Topics</h4>
         <div id="mTopics" class="tag-list"></div>
       </aside>
 
-      <section class="panel">
-        <h2>公开社区广场</h2>
+      <section class="panel panel-main">
+        <div class="scene-intro scene-intro-m">
+          <p class="scene-eyebrow">REAL-TIME SOCIAL LAYER</p>
+          <h2>M 时间线</h2>
+          <p class="scene-copy">以观点密度和互动速度为核心，让公开讨论更快、更清晰、更有信号价值。</p>
+          <div class="scene-metrics">
+            <span>公开流</span>
+            <span>即时互动</span>
+            <span>话题扩散</span>
+          </div>
+        </div>
         <p id="userHint" class="muted" style="margin:0 0 8px;">游客可浏览公开动态，登录后可立即发布并互动。</p>
-        <div class="hint">这里是公开动态流，任何访客都可以浏览全部用户内容。发布内容请进入个人发布页。</div>
+        <div class="hint">这里是公开动态流，任何访客都可浏览内容。发布内容请进入个人发布页。</div>
         <div class="actions" style="margin-top:10px;">
-          <a class="action-btn" href="/m-publish.html">进入个人发布页</a>
+          <a class="action-btn" href="/m-publish.html">进入创作台</a>
           <a href="/profile.html">个人中心</a>
           <a href="/openclaw.html">AI 对话界面</a>
         </div>
@@ -72,15 +82,15 @@
         <div id="mFeed" class="feed-list" style="margin-top:10px;"></div>
       </section>
 
-      <aside class="panel">
-        <h3>动态说明</h3>
-        <div class="hint">M 提供快速发布与互动能力：点赞、评论、转发，适合日常即时交流。</div>
-        <h4 style="margin-top:14px;">建议</h4>
+      <aside class="panel panel-right">
+        <h3>Signal Brief</h3>
+        <div class="hint">M 强调高频表达与即时反馈：点赞、评论、转发都以“轻动作、快响应”为设计原则。</div>
+        <h4 style="margin-top:14px;">高效发布建议</h4>
         <ul class="list-text">
-          <li>优先写清观点，提升互动率</li>
-          <li>尽量用短句，阅读体验更好</li>
-          <li>配图可显著提升曝光</li>
-          <li>登录后可点赞、评论与转发</li>
+          <li>先给结论，再补证据</li>
+          <li>保持短句与单观点结构</li>
+          <li>一条内容只服务一个话题</li>
+          <li>稳定输出比偶发爆款更关键</li>
         </ul>
       </aside>
     </section>
