@@ -826,7 +826,12 @@
       const likeBtn = card.querySelector(".like-btn");
       const bookmarkBtn = card.querySelector(".bookmark-btn");
       const commentBtn = card.querySelector(".comment-btn");
+      const actionMore = card.querySelector(".action-more");
       const followBtn = card.querySelector(".follow-btn");
+
+      function closeActionMore() {
+        if (actionMore) actionMore.removeAttribute("open");
+      }
 
       likeBtn.querySelector("span").textContent = String(Number(counts.likeCount || 0));
       bookmarkBtn.querySelector("span").textContent = String(Number(counts.bookmarkCount || 0));
@@ -836,18 +841,22 @@
       bookmarkBtn.classList.toggle("on", state.actionSet.has(article.id + ":bookmark"));
 
       card.querySelector(".read-btn").addEventListener("click", async function () {
+        closeActionMore();
         await openArticle(article.id, true);
       });
 
       likeBtn.addEventListener("click", async function () {
+        closeActionMore();
         await toggleAction(article, "like");
       });
 
       bookmarkBtn.addEventListener("click", async function () {
+        closeActionMore();
         await toggleAction(article, "bookmark");
       });
 
       commentBtn.addEventListener("click", async function () {
+        closeActionMore();
         await openArticle(article.id, false);
         commentInput?.focus();
       });
@@ -1519,6 +1528,13 @@
       retryBtn.addEventListener("click", function () {
         setRetryBusy(true);
         loadArticles();
+      });
+    }
+    const quickTopBtn = document.querySelector(".quick-top-btn");
+    if (quickTopBtn) {
+      quickTopBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
     }
     bindPublisher();

@@ -808,7 +808,12 @@
       const favBtn = card.querySelector(".fav-btn");
       const playBtn = card.querySelector(".play-btn");
       const commentBtn = card.querySelector(".comment-btn");
+      const actionMore = card.querySelector(".action-more");
       const followBtn = card.querySelector(".follow-btn");
+
+      function closeActionMore() {
+        if (actionMore) actionMore.removeAttribute("open");
+      }
 
       likeBtn.querySelector("span").textContent = String(Number(counts.likeCount || 0));
       favBtn.querySelector("span").textContent = String(Number(counts.favoriteCount || 0));
@@ -818,18 +823,22 @@
       favBtn.classList.toggle("on", state.actionSet.has(video.id + ":favorite"));
 
       playBtn.addEventListener("click", async function () {
+        closeActionMore();
         await openVideo(video.id, true);
       });
 
       likeBtn.addEventListener("click", async function () {
+        closeActionMore();
         await toggleAction(video, "like");
       });
 
       favBtn.addEventListener("click", async function () {
+        closeActionMore();
         await toggleAction(video, "favorite");
       });
 
       commentBtn.addEventListener("click", async function () {
+        closeActionMore();
         await openVideo(video.id, false);
         commentInput?.focus();
       });
@@ -1554,6 +1563,13 @@
       retryBtn.addEventListener("click", function () {
         setRetryBusy(true);
         loadVideos();
+      });
+    }
+    const quickTopBtn = document.querySelector(".quick-top-btn");
+    if (quickTopBtn) {
+      quickTopBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
     }
     bindUploader();

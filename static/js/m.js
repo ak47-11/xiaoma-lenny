@@ -886,11 +886,16 @@
       const repostBtn = card.querySelector(".repost-btn");
       const commentBtn = card.querySelector(".comment-btn");
       const viewBtn = card.querySelector(".view-btn");
+      const actionMore = card.querySelector(".action-more");
       const followBtn = card.querySelector(".follow-btn");
       const commentWrap = card.querySelector(".comment-wrap");
       const commentList = card.querySelector(".comment-list");
       const commentForm = card.querySelector(".comment-form");
       const commentInput = commentForm.querySelector("input");
+
+      function closeActionMore() {
+        if (actionMore) actionMore.removeAttribute("open");
+      }
 
       likeBtn.querySelector("span").textContent = String(reaction.likeCount);
       repostBtn.querySelector("span").textContent = String(reaction.repostCount);
@@ -920,19 +925,23 @@
       if (viewBtn) {
         viewBtn.textContent = fullText.length > 180 ? "查看全部" : "查看详情";
         viewBtn.addEventListener("click", function () {
+          closeActionMore();
           openDetail(post.id);
         });
       }
 
       likeBtn.addEventListener("click", async function () {
+        closeActionMore();
         await toggleReaction(post.id, "like");
       });
 
       repostBtn.addEventListener("click", async function () {
+        closeActionMore();
         await toggleReaction(post.id, "repost");
       });
 
       commentBtn.addEventListener("click", function () {
+        closeActionMore();
         commentWrap.classList.toggle("hidden");
         if (!commentWrap.classList.contains("hidden")) commentInput.focus();
       });
@@ -1470,6 +1479,13 @@
       retryBtn.addEventListener("click", function () {
         setRetryBusy(true);
         loadPosts();
+      });
+    }
+    const quickTopBtn = document.querySelector(".quick-top-btn");
+    if (quickTopBtn) {
+      quickTopBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
     }
     bindComposer();
