@@ -7,7 +7,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="description" content="M、Mi、Lenny 三个社区的一站式入口：社交发布、视频内容、技术社区。">
+<meta name="description" content="M、Mi、Lenny 三个社区与 OpenClaw AI 助手的一站式入口。">
 <style>
   :root {
     --bg: #f7fafc;
@@ -76,6 +76,7 @@
   .nav .m { background: linear-gradient(100deg, #2ea7f4, #1d9bf0); }
   .nav .mi { background: linear-gradient(100deg, #ff8db1, #fb7299); }
   .nav .lenny { background: linear-gradient(100deg, #42bf63, #2da44e); }
+  .nav .ai { background: linear-gradient(100deg, #1570d8, #0d47a1); }
 
   .hero {
     margin-top: 14px;
@@ -115,6 +116,59 @@
     font-size: 17px;
     line-height: 1.8;
     max-width: 900px;
+  }
+
+  .hero-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hero-actions a {
+    text-decoration: none;
+    border-radius: 999px;
+    min-height: 38px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid #cfdcf0;
+    color: #2d466b;
+    background: #ffffff;
+  }
+
+  .hero-actions .ai-primary {
+    border: none;
+    color: #ffffff;
+    background: linear-gradient(100deg, #1570d8, #0d47a1);
+    box-shadow: 0 14px 30px rgba(13, 71, 161, 0.28);
+  }
+
+  .hero-actions .ai-primary:hover {
+    transform: translateY(-1px);
+  }
+
+  .ai-banner {
+    margin-top: 14px;
+    border: 1px solid rgba(13, 71, 161, 0.2);
+    border-radius: 16px;
+    background: linear-gradient(130deg, rgba(21, 112, 216, 0.12), rgba(13, 71, 161, 0.08));
+    padding: 14px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .ai-banner strong {
+    font-size: 15px;
+    color: #13396b;
+  }
+
+  .ai-banner span {
+    color: #4f6486;
+    font-size: 13px;
+    line-height: 1.7;
   }
 
   .portal-grid {
@@ -202,6 +256,7 @@
       <a class="entry m" href="/m.html">M</a>
       <a class="entry mi" href="/mi.html">Mi</a>
       <a class="entry lenny" href="/lenny.html">Lenny</a>
+      <a class="entry ai" href="/openclaw.html">AI 对话</a>
       <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
       <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
       <a href="/auth.html" id="loginNav">账号入口</a>
@@ -213,6 +268,16 @@
     <span class="eyebrow">Integrated Community Hub</span>
     <h1>一个网站，<span>三种创作宇宙</span></h1>
     <p>欢迎来到 xiaoma.cyou。这里把实时社交、视频社区、技术创作统一在一个账号体系里：你可以在 M 发动态，在 Mi 发视频，在 Lenny 写教程与分析文章。</p>
+
+    <div class="hero-actions">
+      <a class="ai-primary" href="/openclaw.html">进入 OpenClaw 新界面</a>
+      <a href="/auth.html?next=/openclaw.html">登录后继续对话</a>
+    </div>
+
+    <div class="ai-banner">
+      <strong>OpenClaw 已接入主页入口</strong>
+      <span>点击即可进入独立 AI 对话界面，支持模型/Token 配置与多轮上下文，体验参考 ChatGPT。</span>
+    </div>
 
     <div class="portal-grid">
       <a class="portal m" href="/m.html">

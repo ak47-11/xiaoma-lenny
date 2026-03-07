@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenClaw 对话 | xiaoma.cyou</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #161b22;
+      --panel-soft: #121922;
+      --line: rgba(83, 100, 113, 0.35);
+      --text: #e7e9ea;
+      --muted: #93a7bb;
+      --primary: #1d9bf0;
+      --radius: 14px;
+      --shadow: 0 12px 34px rgba(0, 0, 0, 0.3);
+      --transition: 150ms ease;
+      --sidebar-width: 272px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 500px at 100% -20%, rgba(29, 155, 240, 0.13), transparent 62%),
+        radial-gradient(1000px 460px at -10% 120%, rgba(29, 155, 240, 0.06), transparent 66%),
+        var(--bg);
+    }
+
+    .chat-shell {
+      width: min(1280px, calc(100% - 24px));
+      margin: 12px auto;
+      min-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .sidebar,
+    .main {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto auto auto auto auto 1fr;
+      gap: 10px;
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+    }
+
+    .brand strong {
+      font-size: 18px;
+      line-height: 1.3;
+      letter-spacing: 0.02em;
+    }
+
+    .brand span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .btn,
+    .thread-item,
+    .composer button,
+    .composer textarea {
+      transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        color var(--transition),
+        box-shadow var(--transition);
+    }
+
+    .btn {
+      min-height: 38px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 0 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: #188cd8;
+    }
+
+    .btn:hover {
+      background: rgba(231, 233, 234, 0.08);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-soft);
+      padding: 8px 10px;
+    }
+
+    .thread-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      overflow: auto;
+    }
+
+    .thread-item {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-soft);
+      color: var(--text);
+      text-align: left;
+      padding: 8px 10px;
+      display: grid;
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .thread-item strong {
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .thread-item span {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .thread-item.active {
+      border-color: rgba(29, 155, 240, 0.7);
+      background: rgba(29, 155, 240, 0.14);
+      box-shadow: 0 0 0 1px rgba(29, 155, 240, 0.25);
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+    }
+
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(18, 25, 34, 0.82);
+      backdrop-filter: blur(7px);
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.3;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .topbar p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .chat-feed {
+      overflow: auto;
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      background:
+        linear-gradient(180deg, rgba(15, 20, 25, 0.82), rgba(15, 20, 25, 0.9));
+    }
+
+    .msg {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel-soft);
+      padding: 12px 14px;
+      max-width: min(860px, 100%);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+      justify-self: start;
+      display: grid;
+      gap: 6px;
+    }
+
+    .msg.user {
+      justify-self: end;
+      border-color: rgba(29, 155, 240, 0.7);
+      background: rgba(29, 155, 240, 0.16);
+    }
+
+    .msg.error {
+      border-color: rgba(249, 24, 128, 0.58);
+      background: rgba(249, 24, 128, 0.12);
+    }
+
+    .msg-head {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .msg-body {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text);
+    }
+
+    .welcome {
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      background: rgba(18, 25, 34, 0.82);
+      padding: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .composer {
+      border-top: 1px solid var(--line);
+      padding: 12px 16px;
+      background: rgba(18, 25, 34, 0.9);
+      display: grid;
+      gap: 10px;
+    }
+
+    .composer textarea {
+      width: 100%;
+      min-height: 88px;
+      max-height: 200px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-soft);
+      color: var(--text);
+      padding: 10px 12px;
+      font: inherit;
+      line-height: 1.7;
+      outline: none;
+    }
+
+    .composer textarea:focus {
+      border-color: rgba(29, 155, 240, 0.68);
+      box-shadow: 0 0 0 1px rgba(29, 155, 240, 0.25);
+    }
+
+    .composer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .composer-tip {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .chat-shell {
+        width: calc(100% - 16px);
+        margin: 8px auto;
+        min-height: calc(100vh - 16px);
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        grid-template-rows: auto auto auto auto;
+      }
+
+      .thread-list {
+        max-height: 180px;
+      }
+
+      .chat-feed {
+        padding: 14px;
+      }
+
+      .composer {
+        padding: 10px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="chat-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <strong>OpenClaw Chat</strong>
+        <span>本地算力 · 站点代理</span>
+      </div>
+      <button id="newChatBtn" class="btn primary" type="button">+ 新对话</button>
+      <button id="configBtn" class="btn" type="button">接口设置</button>
+      <a class="btn" href="/">返回门户</a>
+      <div id="modelHint" class="hint">模型：openclaw-agent · 未配置鉴权</div>
+      <ul id="threadList" class="thread-list"></ul>
+    </aside>
+
+    <section class="main">
+      <header class="topbar">
+        <div>
+          <h1>OpenClaw 新界面</h1>
+          <p>界面参考 ChatGPT：左侧会话、右侧多轮对话、底部输入框。</p>
+        </div>
+        <button id="clearChatBtn" class="btn" type="button">清空当前对话</button>
+      </header>
+
+      <div id="chatFeed" class="chat-feed"></div>
+
+      <form id="composerForm" class="composer">
+        <textarea id="promptInput" maxlength="5000" placeholder="输入你的问题，Enter 发送，Shift + Enter 换行。"></textarea>
+        <div class="composer-row">
+          <span class="composer-tip">提示：首次使用先点“接口设置”填模型和 Bridge Token。</span>
+          <button id="sendBtn" class="btn primary" type="submit">发送</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/js/openclaw-chat.js"></script>
+</body>
+</html>

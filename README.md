@@ -18,12 +18,29 @@
 cloudflared tunnel login
 ```
 
-创建并运行隧道（示例把本机 `11434` 暴露到公网子域）：
+创建并运行命名隧道（示例把本机 `11434` 暴露到公网子域）：
 
 ```bash
 cloudflared tunnel create xiaoma-openclaw
 cloudflared tunnel route dns xiaoma-openclaw ai.your-domain.com
-cloudflared tunnel run xiaoma-openclaw --url http://127.0.0.1:11434
+```
+
+然后在 `~/.cloudflared/config.yml` 配置 ingress：
+
+```yaml
+tunnel: <TUNNEL_ID>
+credentials-file: C:\Users\<you>\.cloudflared\<TUNNEL_ID>.json
+
+ingress:
+  - hostname: ai.your-domain.com
+    service: http://127.0.0.1:11434
+  - service: http_status:404
+```
+
+最后启动：
+
+```bash
+cloudflared tunnel run xiaoma-openclaw
 ```
 
 如果你的 OpenClaw 是 OpenAI 兼容接口，最终 API 端点通常类似：
@@ -40,16 +57,16 @@ cloudflared tunnel run xiaoma-openclaw --url http://127.0.0.1:11434
 - `OPENCLAW_BRIDGE_TOKEN`：前端按钮调用时的二次鉴权口令（必填）
 - `OPENCLAW_TIMEOUT_MS`：可选，默认 `25000`
 
-### 4) 前端按钮使用
+### 4) 前端入口使用
 
-`M / Mi / Lenny` 页面已内置 `OpenClaw 接口按钮`。
+首页已提供 `OpenClaw 新界面` 入口，点击后进入 `/openclaw.html` 独立对话页（参考 ChatGPT）。
 
 首次使用点击 `接口设置`，填写：
 
-- 模型名（默认 `openclaw`）
+- 模型名（默认 `openclaw-agent`）
 - Bridge Token（与你环境变量 `OPENCLAW_BRIDGE_TOKEN` 一致）
 
-然后输入问题并点击按钮即可调用本地 OpenClaw。
+然后输入问题并发送即可调用本地 OpenClaw。
 
 ### 5) 安全注意
 
