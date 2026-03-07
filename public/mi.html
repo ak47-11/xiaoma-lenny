@@ -64,6 +64,16 @@
           <a href="/profile.html">个人中心</a>
         </div>
 
+        <div class="openclaw-widget" data-context="你是 Mi 视频社区创作助手，擅长标题优化、脚本大纲和转化引导文案。">
+          <div class="openclaw-row">
+            <input class="openclaw-input" maxlength="300" placeholder="输入问题：比如“给这个视频标题写3个更吸引人的版本”" />
+            <button type="button" class="openclaw-send">OpenClaw 接口按钮</button>
+            <button type="button" class="openclaw-config">接口设置</button>
+          </div>
+          <div class="openclaw-model-hint"></div>
+          <pre class="openclaw-output">已接入本地 OpenClaw。输入问题后点击接口按钮即可调用。</pre>
+        </div>
+
         <div id="miStatus" class="status">正在准备公开视频流...</div>
         <div class="actions" style="margin-top:8px;">
           <button id="miRetryBtn" type="button" class="retry-btn hidden">重试加载</button>
@@ -130,6 +140,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/app-core.js"></script>
+  <script src="/js/openclaw-widget.js"></script>
   <script src="/js/mi.js"></script>
 </body>
 </html>
