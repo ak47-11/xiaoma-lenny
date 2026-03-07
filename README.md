@@ -73,3 +73,30 @@ cloudflared tunnel run xiaoma-openclaw
 - 不要把 `OPENCLAW_API_KEY` 和 `OPENCLAW_BRIDGE_TOKEN` 写进前端代码。
 - 仅在需要时开启本机 OpenClaw 与 cloudflared，关机/休眠时服务不可用属正常。
 - 定期更新本机系统、OpenClaw 和 cloudflared 版本。
+
+### 6) 解决“重启后接口失效”（自动拉起）
+
+仓库内已提供自动自愈脚本：
+
+- `scripts/openclaw-autostart.ps1`：检查并拉起本机 bridge + cloudflared
+- `scripts/register-openclaw-autostart.ps1`：注册 Windows 登录自动任务
+
+首次执行一次注册（推荐）：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\register-openclaw-autostart.ps1 -RunNow
+```
+
+如果系统策略不允许创建计划任务，脚本会自动回退到用户 `Startup` 文件夹启动器（同样可在重启后自动拉起）。
+
+查看当前链路状态：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\openclaw-autostart.ps1 -Status
+```
+
+如果要移除自动任务：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\register-openclaw-autostart.ps1 -Unregister
+```

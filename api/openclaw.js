@@ -74,6 +74,29 @@ function pickAnswer(payload) {
   return "";
 }
 
+function looksLikeHtml(input) {
+  const text = String(input || "").trim().toLowerCase();
+  return text.startsWith("<!doctype html") || text.startsWith("<html");
+}
+
+function pickUpstreamError(upstreamRes, upstreamData, upstreamText) {
+  const dataError =
+    upstreamData?.error?.message ||
+    upstreamData?.message ||
+    "";
+  if (dataError) return String(dataError);
+
+  if (looksLikeHtml(upstreamText)) {
+    if (Number(upstreamRes?.status) === 530) {
+      return "OpenClaw 隧道不可用，请检查本机 bridge 与 cloudflared 是否运行";
+    }
+    return "OpenClaw 上游返回异常页面，请检查隧道与本机服务";
+  }
+
+  const plain = String(upstreamText || "").trim();
+  return plain ? plain.slice(0, 320) : "upstream request failed";
+}
+
 module.exports = async function handler(req, res) {
   withCors(res);
 
@@ -158,11 +181,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (!upstreamRes.ok) {
-      const reason =
-        upstreamData?.error?.message ||
-        upstreamData?.message ||
-        upstreamText.slice(0, 320) ||
-        "upstream request failed";
+      const reason = pickUpstreamError(upstreamRes, upstreamData, upstreamText);
       res.status(upstreamRes.status).json({ ok: false, error: reason });
       return;
     }
