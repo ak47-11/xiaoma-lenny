@@ -132,13 +132,23 @@
       <div class="tag-list"></div>
       <div class="meta card-stats"></div>
       <div class="actions">
-        <button class="play-btn">▶ 播放</button>
-        <button class="like-btn">👍 <span>0</span></button>
-        <button class="fav-btn">⭐ <span>0</span></button>
-        <button class="comment-btn">💬 评论 <span>0</span></button>
+        <button class="play-btn action-btn">▶ 播放</button>
+        <details class="action-more">
+          <summary class="more-btn">更多操作</summary>
+          <div class="action-more-menu">
+            <button class="like-btn">👍 <span>0</span></button>
+            <button class="fav-btn">⭐ <span>0</span></button>
+            <button class="comment-btn">💬 评论 <span>0</span></button>
+          </div>
+        </details>
       </div>
     </article>
   </template>
+
+  <div class="mobile-quickbar">
+    <a class="action-btn" href="/mi-publish.html">发布视频</a>
+    <a class="button button--secondary" href="#">回到顶部</a>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/app-core.js"></script>

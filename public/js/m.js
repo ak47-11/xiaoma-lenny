@@ -138,6 +138,17 @@
     retryBtn.classList.toggle("hidden", !visible);
   }
 
+  function setRetryBusy(loading) {
+    if (!retryBtn) return;
+    retryBtn.disabled = !!loading;
+    retryBtn.classList.toggle("is-loading", !!loading);
+    if (loading) {
+      retryBtn.setAttribute("aria-busy", "true");
+    } else {
+      retryBtn.removeAttribute("aria-busy");
+    }
+  }
+
   function showToast(text) {
     const node = document.createElement("div");
     node.className = "flash-toast";
@@ -299,7 +310,15 @@
         "<strong>加载失败</strong>" +
         "<p class='body-text'>" + (message || "网络暂时不稳定，请点击重试加载。") + "</p>" +
         "<div class='tag-list'><span class='tag'>#可重试</span><span class='tag'>#网络波动</span></div>" +
+        "<div class='failure-actions'><button type='button' class='retry-btn inline-retry'>立即重试</button><a class='button button--secondary' href='/'>返回门户</a></div>" +
       "</article>";
+
+    const inlineRetry = feedEl.querySelector(".inline-retry");
+    if (inlineRetry) {
+      inlineRetry.addEventListener("click", function () {
+        loadPosts();
+      });
+    }
   }
 
   function applyDemoPosts() {
@@ -461,9 +480,10 @@
   async function loadPosts(options) {
     const opts = options || {};
     const client = state.context?.client || core.localClient;
+    setRetryBusy(true);
 
     if (!opts.silent) {
-      setStatus("正在加载公开动态...", "");
+      setStatus("正在加载公开动态内容与互动信息...", "info");
       renderFeedSkeleton(6);
     }
     setRetryVisible(false);
@@ -483,8 +503,9 @@
       state.reactions = new Map();
       state.comments = new Map();
       renderFeedFailure("网络较慢，内容加载超时。你可以立即点击重试。");
-      setStatus("加载超时，网络较慢，请重试", "err");
+      setStatus("加载超时：请点击“重试加载”，或先返回门户稍后再试", "err");
       setRetryVisible(true);
+      setRetryBusy(false);
       return;
     }
 
@@ -503,6 +524,7 @@
       renderFeedFailure("服务暂时不可用，请稍后重试。");
       if (state.activeDetailPostId) renderDetail();
       setRetryVisible(true);
+      setRetryBusy(false);
       return;
     }
 
@@ -518,6 +540,7 @@
       renderFeed();
       if (state.activeDetailPostId) renderDetail();
       setStatus("当前暂无真实动态，先为你展示 6 条高质量示例内容", "");
+      setRetryBusy(false);
       return;
     }
 
@@ -537,10 +560,12 @@
     if (!state.posts.length) {
       setStatus("公开广场还没有动态，去个人发布页发第一条吧", "");
     } else if (partialDataIssue) {
-      setStatus("已加载 " + state.posts.length + " 条动态，互动数据加载较慢，可点击重试", "err");
+      setStatus("已加载 " + state.posts.length + " 条动态，部分互动数据较慢，可点击重试补全", "warn");
     } else {
       setStatus("已加载 " + state.posts.length + " 条动态", "ok");
     }
+
+    setRetryBusy(false);
 
     if (state.flashPostId && !state.posts.some(function (post) { return post.id === state.flashPostId; })) {
       if (state.flashRetryCount < 3) {
@@ -1443,6 +1468,7 @@
     bindDetailModal();
     if (retryBtn) {
       retryBtn.addEventListener("click", function () {
+        setRetryBusy(true);
         loadPosts();
       });
     }

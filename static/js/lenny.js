@@ -189,6 +189,17 @@
     retryBtn.classList.toggle("hidden", !visible);
   }
 
+  function setRetryBusy(loading) {
+    if (!retryBtn) return;
+    retryBtn.disabled = !!loading;
+    retryBtn.classList.toggle("is-loading", !!loading);
+    if (loading) {
+      retryBtn.setAttribute("aria-busy", "true");
+    } else {
+      retryBtn.removeAttribute("aria-busy");
+    }
+  }
+
   function showToast(text) {
     const node = document.createElement("div");
     node.className = "flash-toast";
@@ -374,7 +385,15 @@
         "<strong>加载失败</strong>" +
         "<p class='body-text'>" + (message || "网络暂时不稳定，请点击重试加载。") + "</p>" +
         "<div class='tag-list'><span class='tag'>#可重试</span><span class='tag'>#网络波动</span></div>" +
+        "<div class='failure-actions'><button type='button' class='retry-btn inline-retry'>立即重试</button><a class='button button--secondary' href='/'>返回门户</a></div>" +
       "</article>";
+
+    const inlineRetry = listEl.querySelector(".inline-retry");
+    if (inlineRetry) {
+      inlineRetry.addEventListener("click", function () {
+        loadArticles();
+      });
+    }
   }
 
   function applyDemoArticles() {
@@ -463,9 +482,10 @@
   async function loadArticles(options) {
     const opts = options || {};
     const client = state.context?.client || core.localClient;
+    setRetryBusy(true);
 
     if (!opts.silent) {
-      setStatus("正在加载公开文章...", "");
+      setStatus("正在加载公开文章与互动信息...", "info");
       renderListSkeleton(6);
     }
     setRetryVisible(false);
@@ -488,8 +508,9 @@
       renderTags();
       renderListFailure("网络较慢，文章流加载超时。你可以立即点击重试。");
       renderViewer();
-      setStatus("加载超时，网络较慢，请重试", "err");
+      setStatus("加载超时：请点击“重试加载”，或先返回门户稍后再试", "err");
       setRetryVisible(true);
+      setRetryBusy(false);
       return;
     }
 
@@ -509,6 +530,7 @@
       renderListFailure("服务暂时不可用，请稍后重试。");
       renderViewer();
       setRetryVisible(true);
+      setRetryBusy(false);
       return;
     }
 
@@ -525,6 +547,7 @@
       renderList();
       renderViewer();
       setStatus("当前暂无真实文章，先为你展示 6 篇高质量示例内容", "");
+      setRetryBusy(false);
       return;
     }
 
@@ -547,10 +570,12 @@
     if (!state.articles.length) {
       setStatus("公开技术社区还没有文章，去个人发布页写第一篇吧", "");
     } else if (partialDataIssue) {
-      setStatus("已加载 " + state.articles.length + " 篇文章，互动数据加载较慢，可点击重试", "err");
+      setStatus("已加载 " + state.articles.length + " 篇文章，部分互动数据较慢，可点击重试补全", "warn");
     } else {
       setStatus("已加载 " + state.articles.length + " 篇文章", "ok");
     }
+
+    setRetryBusy(false);
 
     if (state.flashArticleId && !state.articles.some(function (article) { return article.id === state.flashArticleId; })) {
       if (state.flashRetryCount < 3) {
@@ -1492,6 +1517,7 @@
     bindSideMenu();
     if (retryBtn) {
       retryBtn.addEventListener("click", function () {
+        setRetryBusy(true);
         loadArticles();
       });
     }
