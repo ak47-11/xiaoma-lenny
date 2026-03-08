@@ -56,6 +56,27 @@ function normalizeContent(content) {
   return "";
 }
 
+const MAX_HISTORY_MESSAGES = 12;
+const MAX_MESSAGE_CHARS = 3200;
+
+function sanitizeMessages(input) {
+  if (!Array.isArray(input)) return [];
+
+  return input
+    .map(function (item) {
+      if (!item || typeof item !== "object") return null;
+      const role = String(item.role || "").trim().toLowerCase();
+      if (role !== "user" && role !== "assistant" && role !== "system") return null;
+
+      const content = normalizeContent(item.content).trim().slice(0, MAX_MESSAGE_CHARS);
+      if (!content) return null;
+
+      return { role, content };
+    })
+    .filter(Boolean)
+    .slice(-MAX_HISTORY_MESSAGES);
+}
+
 function pickAnswer(payload) {
   if (!payload || typeof payload !== "object") return "";
 
@@ -77,6 +98,12 @@ function pickAnswer(payload) {
 function looksLikeHtml(input) {
   const text = String(input || "").trim().toLowerCase();
   return text.startsWith("<!doctype html") || text.startsWith("<html");
+}
+
+function pickPlainTextAnswer(upstreamText) {
+  if (looksLikeHtml(upstreamText)) return "";
+  const plain = String(upstreamText || "").trim();
+  return plain ? plain.slice(0, 12000) : "";
 }
 
 function pickUpstreamError(upstreamRes, upstreamData, upstreamText) {
@@ -129,23 +156,38 @@ module.exports = async function handler(req, res) {
   const prompt = String(body.prompt || "").trim();
   const context = String(body.context || "").trim();
   const model = String(body.model || config.model || "openclaw").trim();
+  const incomingMessages = sanitizeMessages(body.messages);
 
-  if (!prompt) {
-    res.status(400).json({ ok: false, error: "prompt is required" });
+  if (!prompt && !incomingMessages.length) {
+    res.status(400).json({ ok: false, error: "prompt or messages is required" });
     return;
   }
 
   const messages = [];
-  if (context) {
+  const hasSystemRole = incomingMessages.some(function (item) {
+    return item.role === "system";
+  });
+  if (context && !hasSystemRole) {
     messages.push({
       role: "system",
       content: context.slice(0, 2000)
     });
   }
-  messages.push({
-    role: "user",
-    content: prompt.slice(0, 6000)
-  });
+
+  if (incomingMessages.length) {
+    messages.push.apply(messages, incomingMessages);
+  }
+
+  if (prompt) {
+    const normalizedPrompt = prompt.slice(0, 6000);
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== "user" || last.content !== normalizedPrompt) {
+      messages.push({
+        role: "user",
+        content: normalizedPrompt
+      });
+    }
+  }
 
   const controller = new AbortController();
   const timer = setTimeout(function () {
@@ -186,7 +228,7 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const answer = pickAnswer(upstreamData);
+    const answer = pickAnswer(upstreamData) || pickPlainTextAnswer(upstreamText);
     if (!answer) {
       res.status(502).json({ ok: false, error: "upstream response has no text" });
       return;
