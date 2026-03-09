@@ -2818,6 +2818,34 @@ samp {
   margin-top: var(--space-3);
 }
 
+.auth-page .field input {
+  border-color: color-mix(in srgb, var(--color-border-default) 90%, var(--color-primary-soft));
+  background: color-mix(in srgb, var(--color-bg-elevated) 88%, #ffffff);
+  transition:
+    border-color var(--motion-duration-base) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-base) var(--motion-ease-standard),
+    background-color var(--motion-duration-base) var(--motion-ease-standard),
+    transform var(--motion-duration-base) var(--motion-ease-standard);
+}
+
+.auth-page .field input::placeholder {
+  color: color-mix(in srgb, var(--color-text-tertiary) 82%, transparent);
+}
+
+.auth-page .field input:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-bg-elevated) 82%, #ffffff);
+}
+
+.auth-page .field input:focus-visible {
+  border-color: color-mix(in srgb, var(--color-primary) 58%, var(--color-border-default));
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--color-primary-soft) 66%, transparent),
+    0 12px 24px color-mix(in srgb, var(--color-primary) 12%, transparent);
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
 .auth-page .actions {
   margin-top: var(--space-4);
   display: grid;
@@ -2848,11 +2876,40 @@ samp {
   font-family: inherit;
   transition:
     color var(--motion-duration-base) var(--motion-ease-standard),
-    text-decoration-color var(--motion-duration-base) var(--motion-ease-standard);
+    text-decoration-color var(--motion-duration-base) var(--motion-ease-standard),
+    transform var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 .auth-page .link-btn:hover {
   color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.auth-page .tab,
+.auth-page .btn {
+  transition:
+    transform var(--motion-duration-base) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-base) var(--motion-ease-standard),
+    background-color var(--motion-duration-base) var(--motion-ease-standard),
+    border-color var(--motion-duration-base) var(--motion-ease-standard),
+    color var(--motion-duration-base) var(--motion-ease-standard);
+}
+
+.auth-page .tab:hover {
+  transform: translateY(-1px);
+}
+
+.auth-page .tab:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.auth-page .actions .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+}
+
+.auth-page .actions .btn:active {
+  transform: translateY(0) scale(0.99);
 }
 
 .auth-page .link-btn.is-active {
@@ -4211,6 +4268,17 @@ body.app-page.auth-page[data-apple-variant="b"] .field input {
   background: #ffffff;
 }
 
+body.app-page.auth-page[data-apple-variant="b"] .field input:hover {
+  border-color: rgba(29, 29, 31, 0.18);
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .field input:focus-visible {
+  border-color: rgba(0, 102, 204, 0.62);
+  box-shadow:
+    0 0 0 4px rgba(0, 102, 204, 0.16),
+    0 16px 30px rgba(0, 102, 204, 0.14);
+}
+
 body.app-page.auth-page[data-apple-variant="b"] .status {
   border-color: rgba(29, 29, 31, 0.1);
   background: rgba(255, 255, 255, 0.88);
@@ -4242,6 +4310,14 @@ body.app-page.auth-page[data-apple-variant="b"] .link-btn.is-active {
   text-decoration-color: rgba(0, 102, 204, 0.75);
 }
 
+body.app-page.auth-page[data-apple-variant="b"] .actions .btn:hover {
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .actions .btn.primary:hover {
+  box-shadow: 0 16px 30px rgba(0, 102, 204, 0.24);
+}
+
 body.app-page.auth-page[data-apple-variant="b"] .panel[data-auth-mode="register"] {
   border-color: rgba(0, 102, 204, 0.22);
   box-shadow:
@@ -4266,6 +4342,16 @@ body.app-page.auth-page[data-apple-variant="b"] .panel[data-auth-mode="reset"] .
   border-color: rgba(204, 127, 15, 0.34);
   background: rgba(204, 127, 15, 0.11);
   color: #9f5f00;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-page .field input,
+  .auth-page .tab,
+  .auth-page .btn,
+  .auth-page .link-btn {
+    transition: none;
+    transform: none;
+  }
 }
 
 body.app-page[data-apple-variant="b"] .home-page .home-shell {
