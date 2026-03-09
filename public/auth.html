@@ -4,355 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>登录 | xiaoma.cyou</title>
-  <style>
-    :root {
-      --bg: #0f1419;
-      --surface: #161b22;
-      --surface-soft: #121922;
-      --line: rgba(83, 100, 113, 0.34);
-      --text: #e7e9ea;
-      --muted: #536471;
-      --primary: #1d9bf0;
-      --accent: #f91880;
-      --radius: 12px;
-      --space-16: 16px;
-      --space-24: 24px;
-      --space-32: 32px;
-      --title-size: 20px;
-      --body-size: 16px;
-      --meta-size: 13px;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.26);
-      --transition: 150ms ease;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(980px 460px at 100% -20%, rgba(29, 155, 240, 0.12), transparent 62%),
-        var(--bg);
-      font-size: var(--body-size);
-      line-height: 1.6;
-    }
-
-    .shell {
-      width: min(680px, calc(100% - 32px));
-      margin: var(--space-24) auto var(--space-32);
-      display: grid;
-      gap: var(--space-24);
-    }
-
-    .hero,
-    .panel,
-    .session-bar,
-    .status {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
-      box-shadow: var(--shadow);
-    }
-
-    .hero,
-    .panel {
-      padding: var(--space-24);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 0 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(249, 24, 128, 0.48);
-      background: rgba(249, 24, 128, 0.12);
-      color: #ffcce6;
-      font-size: var(--meta-size);
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-
-    h1,
-    h2 {
-      margin: 0;
-      font-size: var(--title-size);
-      line-height: 1.3;
-      font-weight: 700;
-    }
-
-    h1 {
-      margin-top: var(--space-16);
-    }
-
-    .sub {
-      margin: 0;
-      color: var(--muted);
-      font-size: var(--meta-size);
-      line-height: 1.6;
-      font-weight: 500;
-    }
-
-    .hero-actions {
-      margin-top: var(--space-24);
-      display: flex;
-      gap: var(--space-16);
-    }
-
-    .btn,
-    .mini-btn,
-    .status-link,
-    .tab,
-    .field input {
-      transition:
-        background-color var(--transition),
-        border-color var(--transition),
-        color var(--transition),
-        box-shadow var(--transition);
-    }
-
-    .btn,
-    .mini-btn,
-    .status-link {
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      min-height: 36px;
-      padding: 0 14px;
-      font-size: var(--meta-size);
-      font-weight: 600;
-      background: var(--surface-soft);
-      color: var(--text);
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-family: inherit;
-    }
-
-    .btn {
-      width: 100%;
-    }
-
-    .btn:hover,
-    .mini-btn:hover,
-    .status-link:hover,
-    .tab:hover {
-      background: rgba(231, 233, 234, 0.08);
-    }
-
-    .btn.primary {
-      border-color: var(--primary);
-      background: var(--primary);
-      color: #ffffff;
-    }
-
-    .btn.primary:hover {
-      background: #188cd8;
-    }
-
-    .btn.secondary {
-      border-style: solid;
-    }
-
-    .btn:disabled,
-    .mini-btn:disabled {
-      opacity: 0.62;
-      cursor: not-allowed;
-    }
-
-    .panel {
-      display: grid;
-      gap: var(--space-16);
-    }
-
-    .session-bar {
-      display: none;
-      padding: var(--space-16);
-      background: var(--surface-soft);
-    }
-
-    .session-text {
-      font-size: var(--meta-size);
-      line-height: 1.6;
-      color: var(--muted);
-    }
-
-    .session-actions {
-      margin-top: var(--space-16);
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-16);
-    }
-
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 4px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--surface-soft);
-    }
-
-    .tab {
-      border: 1px solid transparent;
-      border-radius: 999px;
-      min-height: 36px;
-      padding: 0 12px;
-      background: transparent;
-      color: var(--muted);
-      font-size: var(--meta-size);
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .tab.active {
-      border-color: var(--line);
-      background: var(--surface);
-      color: var(--text);
-    }
-
-    .form-panel {
-      display: none;
-    }
-
-    .form-panel.active {
-      display: block;
-    }
-
-    .field {
-      margin-top: var(--space-16);
-    }
-
-    .field label {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--muted);
-      font-size: var(--meta-size);
-      line-height: 1.6;
-      font-weight: 500;
-    }
-
-    .field input {
-      width: 100%;
-      min-height: 44px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface-soft);
-      padding: 0 14px;
-      color: var(--text);
-      font: inherit;
-      outline: none;
-    }
-
-    .field input::placeholder {
-      color: var(--muted);
-      opacity: 0.9;
-    }
-
-    .field input:focus {
-      border-color: rgba(29, 155, 240, 0.66);
-      box-shadow: 0 0 0 1px rgba(29, 155, 240, 0.2);
-    }
-
-    .actions {
-      margin-top: var(--space-16);
-      display: grid;
-      gap: var(--space-16);
-    }
-
-    .minor-links {
-      margin-top: var(--space-16);
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-16);
-    }
-
-    .link-btn {
-      border: none;
-      padding: 0;
-      background: transparent;
-      color: var(--primary);
-      font-size: var(--meta-size);
-      line-height: 1.6;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      font-family: inherit;
-    }
-
-    .inline-row {
-      margin-top: var(--space-16);
-      color: var(--muted);
-      font-size: var(--meta-size);
-      line-height: 1.6;
-      font-weight: 500;
-    }
-
-    .status {
-      min-height: 44px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: var(--muted);
-      font-size: var(--meta-size);
-      line-height: 1.6;
-      font-weight: 500;
-      background: var(--surface-soft);
-    }
-
-    .status.ok {
-      color: #d7ecff;
-      border-color: rgba(29, 155, 240, 0.66);
-      background: rgba(29, 155, 240, 0.14);
-    }
-
-    .status.err {
-      color: #ffd5e8;
-      border-color: rgba(249, 24, 128, 0.58);
-      background: rgba(249, 24, 128, 0.14);
-    }
-
-    .status-action {
-      display: none;
-      justify-content: center;
-    }
-
-    .minimal-hidden {
-      display: none !important;
-    }
-
-    @media (max-width: 640px) {
-      .shell {
-        width: calc(100% - 24px);
-        margin: var(--space-16) auto var(--space-24);
-      }
-
-      .hero,
-      .panel {
-        padding: var(--space-16);
-      }
-
-      .tabs {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/app.css" />
 </head>
 <body class="app-page auth-page">
   <main class="shell">
     <section class="hero">
       <span class="badge">Xiaoma ID</span>
-      <h1>登录后继续你的社区发布与互动。</h1>
-      <p class="sub">密码登录为主路径，验证码保留为次级入口。</p>
+      <h1>登录后继续发布与互动。</h1>
+      <p class="sub">主路径：邮箱 + 密码。验证码作为备用入口。</p>
       <div class="hero-actions">
         <a class="btn primary" href="/community.html">先浏览社区</a>
       </div>
@@ -360,13 +22,13 @@
 
     <section class="panel">
       <h2>登录 xiaoma.cyou</h2>
-      <p class="sub">输入邮箱和密码后点击主按钮即可继续。</p>
+      <p class="sub">输入账号信息后即可继续。</p>
 
       <div id="sessionBar" class="session-bar"></div>
 
       <div class="tabs">
         <button class="tab active" data-tab="password" type="button">密码登录</button>
-        <button class="tab" data-tab="otp" type="button">验证码（次级）</button>
+        <button class="tab" data-tab="otp" type="button">验证码（备用）</button>
       </div>
 
       <div id="panel-password" class="form-panel active">
@@ -420,16 +82,17 @@
           <button class="btn primary" id="verifyOtpBtn" type="button">验证并登录</button>
         </div>
         <div class="inline-row">
-          <span>收不到邮件？检查垃圾箱，或 60 秒后重发。</span>
+          <span>收不到邮件可检查垃圾箱，60 秒后可重发。</span>
         </div>
       </div>
 
-      <div id="status" class="status">请输入邮箱和密码</div>
+      <div id="status" class="status">等待登录操作</div>
       <div id="statusAction" class="status-action"></div>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/design-variants.js"></script>
   <script src="/js/auth-plus.js" data-supabase-url="https://vtplvtwbkyydxmcxgctn.supabase.co" data-supabase-anon-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU"></script>
 </body>
 </html>

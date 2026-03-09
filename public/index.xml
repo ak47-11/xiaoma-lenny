@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>xiaoma.cyou</title>
-    <link>http://localhost:1313/</link>
+    <link>https://xiaoma.cyou/</link>
     <description>Recent content on xiaoma.cyou</description>
     <generator>Hugo -- 0.157.0</generator>
     <language>zh-cn</language>
     <lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://xiaoma.cyou/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>免责声明</title>
-      <link>http://localhost:1313/disclaimer/</link>
+      <link>https://xiaoma.cyou/disclaimer/</link>
       <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/disclaimer/</guid>
+      <guid>https://xiaoma.cyou/disclaimer/</guid>
       <description>&lt;h1 id=&#34;免责声明&#34;&gt;免责声明&lt;/h1&gt;
 &lt;p&gt;欢迎访问本网站（xiaoma.cyou）。为明确各方权利义务，请您在使用本网站前仔细阅读本声明。您继续访问或使用本网站，即视为已阅读、理解并同意本声明全部内容。&lt;/p&gt;
 &lt;h2 id=&#34;1-内容性质&#34;&gt;1. 内容性质&lt;/h2&gt;
@@ -40,9 +40,9 @@
     </item>
     <item>
       <title>关于我</title>
-      <link>http://localhost:1313/about/</link>
+      <link>https://xiaoma.cyou/about/</link>
       <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/about/</guid>
+      <guid>https://xiaoma.cyou/about/</guid>
       <description>&lt;p&gt;你好，我是小马。
 我专注做三件事：&lt;/p&gt;
 &lt;ol&gt;
@@ -54,9 +54,9 @@
     </item>
     <item>
       <title>注册与登录</title>
-      <link>http://localhost:1313/auth/</link>
+      <link>https://xiaoma.cyou/auth/</link>
       <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/auth/</guid>
+      <guid>https://xiaoma.cyou/auth/</guid>
       <description>账号密码登录 | 验证码登录</description>
     </item>
   </channel>

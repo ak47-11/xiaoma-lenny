@@ -7,72 +7,29 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<style>
-:root{
---bg:#f8fafc;
---text:#223149;
---muted:#647592;
---line:#dfe6f2;
---card:#ffffff;
---brand:#86c7ff;
---brand2:#7ae4d0;
-}
-*{box-sizing:border-box}
-body{
-margin:0;
-font-family:"Nunito","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
-color:var(--text);
-background:
-radial-gradient(1000px 500px at 10% -20%, rgba(134,199,255,.32), transparent 62%),
-radial-gradient(1000px 500px at 100% -10%, rgba(122,228,208,.26), transparent 62%),
-var(--bg);
-}
-.container{width:min(980px,92%);margin:20px auto 42px}
-.top{
-display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
-border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:#fff;
-box-shadow:0 8px 20px rgba(110,126,164,.10)
-}
-.brand{font-weight:900;letter-spacing:.3px}
-.actions a{
-display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border-radius:999px;
-border:1px solid var(--line);text-decoration:none;color:#526488;font-size:13px;font-weight:700;margin-left:8px;background:#fff;
-}
-.actions .primary{background:linear-gradient(100deg,var(--brand),var(--brand2));border:none;color:#223650}
-.paper{
-margin-top:14px;border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--card);
-box-shadow:0 12px 30px rgba(108,121,156,.12)
-}
-.content{line-height:1.9;font-size:16px;color:#2c3b56}
-.content h1,.content h2,.content h3{line-height:1.35;color:#1f2d46}
-.content h1{font-size:34px;margin-top:0}
-.content h2{font-size:24px;margin-top:24px}
-.content p{margin:12px 0}
-.content ul,.content ol{padding-left:22px}
-.content hr{border:none;border-top:1px solid #e6ecf6;margin:20px 0}
-.content code{background:#f4f7fc;padding:2px 6px;border-radius:6px}
-.content pre{background:#101826;color:#ecf2ff;padding:14px;border-radius:10px;overflow:auto}
-@media (max-width:900px){.paper{padding:18px}}
-</style>
+<link rel="stylesheet" href="/css/app.css" />
 </head>
-<body>
-<div class="container">
+<body class="app-page doc-page">
+<main class="shell">
   <header class="top">
     <div class="brand">xiaoma.cyou</div>
-    <nav class="actions">
+    <nav class="nav">
+      <a href="/">首页</a>
       <a href="/community.html">社区入口</a>
       <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
       <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
-      <a href="/auth.html" id="loginNav" class="primary">账号入口</a>
+      <a href="/auth.html" id="loginNav">账号入口</a>
       <a href="#" id="logoutNav" style="display:none">退出账号</a>
     </nav>
   </header>
 
-  <article class="paper">
-    <div class="content">{{ .Content }}</div>
+  <article class="article-view doc-article">
+    <h1>{{ .Title }}</h1>
+    <div class="doc-content">{{ .Content }}</div>
   </article>
-</div>
+</main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/session-gate.js"></script>
+<script src="/js/design-variants.js"></script>
 </body>
 </html>

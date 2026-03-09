@@ -250,7 +250,7 @@
       setAuthFormVisible(true);
     });
 
-    setStatus("检测到登录状态，可直接继续访问", "ok");
+    setStatus("已登录，可直接继续", "ok");
     setAuthFormVisible(false);
   }
 
@@ -372,10 +372,10 @@
     renderOtpButtonState();
     setStatus(
       otpPurpose === "register"
-        ? "注册验证码已发送，请输入验证码完成注册"
+        ? "注册验证码已发送，请输入验证码继续"
         : otpPurpose === "reset"
           ? "找回验证码已发送，请输入验证码并设置新密码"
-          : "登录验证码已发送，请查收邮箱并输入验证码",
+          : "登录验证码已发送，请输入验证码",
       "ok"
     );
     otpCodeEl.focus();
@@ -390,7 +390,7 @@
       document.getElementById("panel-" + activeTab).classList.add("active");
       if (activeTab !== "password") setRegisterMode(false);
       if (activeTab !== "otp") setResetMode(false);
-      setStatus(activeTab === "password" ? "请输入邮箱和密码" : "请输入邮箱并获取验证码");
+      setStatus(activeTab === "password" ? "等待密码登录" : "等待验证码操作");
     });
   });
 
@@ -423,7 +423,7 @@
   registerBtn.addEventListener("click", async function () {
     if (!registerMode) {
       setRegisterMode(true);
-      setStatus("请先填写确认密码，再次点击“发送注册验证码”继续", "");
+      setStatus("已切换注册，请填写确认密码后继续", "");
       if (passwordConfirmEl) passwordConfirmEl.focus();
       return;
     }
@@ -451,7 +451,7 @@
   forgotBtn.addEventListener("click", async function () {
     if (resetMode) {
       setResetMode(false);
-      setStatus("已取消找回密码", "");
+      setStatus("已取消找回", "");
       return;
     }
 
@@ -460,7 +460,7 @@
     setResetMode(true);
     switchToOtpTab();
     otpIdentityEl.value = (emailEl.value || "").trim();
-    setStatus("请输入邮箱或用户名，发送验证码后输入新密码完成重置", "");
+    setStatus("请输入邮箱或用户名并发送验证码", "");
   });
 
   sendOtpBtn.addEventListener("click", async function () {

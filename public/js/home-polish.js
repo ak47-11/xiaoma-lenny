@@ -26,14 +26,14 @@
       },
       mi: {
         title: "推荐你先进入 Mi 社区",
-        copy: "如果你正在做教程讲解、作品展示或项目演示视频，Mi 会更适合你建立持续曝光。",
+        copy: "如果你正在做教程讲解、作品展示或项目演示视频，Mi 更适合你建立持续曝光。",
         linkHref: "/mi.html",
         linkText: "进入 Mi 开始发视频",
         jumpLabel: "Mi"
       },
       lenny: {
         title: "推荐你先进入 Lenny 社区",
-        copy: "如果你想沉淀可复用的教程和技术复盘，Lenny 更适合打造长期个人影响力。",
+        copy: "如果你想沉淀可复用的教程和技术复盘，Lenny 更适合打造长期影响力。",
         linkHref: "/lenny.html",
         linkText: "进入 Lenny 开始写作",
         jumpLabel: "Lenny"

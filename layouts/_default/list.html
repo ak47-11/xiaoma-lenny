@@ -7,24 +7,36 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<style>
-:root{--bg:#f8fafc;--text:#223149;--muted:#647592;--line:#dfe6f2;--card:#fff}
-body{max-width:980px;margin:32px auto;padding:0 16px;font-family:"Nunito","PingFang SC","Microsoft YaHei",system-ui;background:var(--bg);color:var(--text)}
-h1{margin:0 0 14px}
-.item{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:12px 0;background:var(--card);box-shadow:0 10px 22px rgba(113,127,162,.10)}
-a{color:#3d67a7;text-decoration:none}
-small{color:var(--muted)}
-.back{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line);text-decoration:none;color:#526488;font-size:13px;font-weight:700;background:#fff}
-</style>
+<link rel="stylesheet" href="/css/app.css" />
 </head>
-<body>
-<h1>{{ .Title }}</h1>
-{{ range .Pages }}
-<div class="item">
-<h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-<small>{{ .Date.Format "2006-01-02" }}</small>
-</div>
-{{ end }}
-<p><a class="back" href="/">返回站点</a></p>
+<body class="app-page doc-page">
+<main class="shell">
+  <header class="top">
+    <div class="brand">xiaoma.cyou</div>
+    <nav class="nav">
+      <a href="/">首页</a>
+      <a href="/community.html">社区入口</a>
+      <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+      <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
+      <a href="/auth.html" id="loginNav">账号入口</a>
+      <a href="#" id="logoutNav" style="display:none">退出账号</a>
+    </nav>
+  </header>
+
+  <section class="section doc-list-wrap">
+    <h1>{{ .Title }}</h1>
+    <div class="doc-list">
+      {{ range .Pages }}
+      <article class="card doc-list-item">
+        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <small>{{ .Date.Format "2006-01-02" }}</small>
+      </article>
+      {{ end }}
+    </div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/session-gate.js"></script>
+<script src="/js/design-variants.js"></script>
 </body>
 </html>
