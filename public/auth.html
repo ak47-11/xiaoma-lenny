@@ -11,18 +11,34 @@
 </head>
 <body class="app-page auth-page">
   <main class="shell">
-    <section class="hero">
+    <section class="hero" data-reveal="up">
       <span class="badge">Xiaoma ID</span>
-      <h1>登录后继续发布与互动。</h1>
-      <p class="sub">主路径：邮箱 + 密码。验证码作为备用入口。</p>
+      <h1>登录后，继续你的创作流程。</h1>
+      <p class="sub">一个账号连接 M、Mi、Lenny 与 OpenClaw。保持表达连续，也让内容沉淀更稳定。</p>
+
+      <div class="feature-list">
+        <div class="feature"><span class="feature-dot"></span><span>统一账号体系，跨场景无缝切换</span></div>
+        <div class="feature"><span class="feature-dot"></span><span>支持密码登录与验证码备用路径</span></div>
+        <div class="feature"><span class="feature-dot"></span><span>登录后可直接进入发布与管理</span></div>
+      </div>
+
+      <div class="auth-hero-kpis" aria-label="登录页能力亮点">
+        <article><strong>3</strong><span>内容场景</span></article>
+        <article><strong>1</strong><span>统一身份</span></article>
+        <article><strong>24h</strong><span>随时创作</span></article>
+      </div>
+
       <div class="hero-actions">
         <a class="btn primary" href="/community.html">先浏览社区</a>
+        <a class="btn" href="/">返回首页</a>
       </div>
     </section>
 
-    <section class="panel">
-      <h2>登录 xiaoma.cyou</h2>
-      <p class="sub">输入账号信息后即可继续。</p>
+    <section class="panel" data-reveal="up">
+      <div class="auth-panel-head">
+        <h2>登录 xiaoma.cyou</h2>
+        <p class="sub">输入账号信息后即可继续。</p>
+      </div>
 
       <div id="sessionBar" class="session-bar"></div>
 
@@ -30,6 +46,8 @@
         <button class="tab active" data-tab="password" type="button">密码登录</button>
         <button class="tab" data-tab="otp" type="button">验证码（备用）</button>
       </div>
+
+      <div class="divider">secure sign in</div>
 
       <div id="panel-password" class="form-panel active">
         <div class="field">
@@ -88,6 +106,7 @@
 
       <div id="status" class="status">等待登录操作</div>
       <div id="statusAction" class="status-action"></div>
+      <p class="auth-legal">继续即表示你同意平台服务条款与隐私政策。</p>
     </section>
   </main>
 
