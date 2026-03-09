@@ -247,6 +247,32 @@
     touchThread(thread);
   }
 
+  function buildConversationMessages(thread, prompt) {
+    const history = Array.isArray(thread?.messages) ? thread.messages : [];
+    const normalized = history
+      .filter(function (item) {
+        return item && typeof item.content === "string" && (item.role === "user" || item.role === "assistant");
+      })
+      .map(function (item) {
+        return {
+          role: item.role,
+          content: String(item.content || "").trim()
+        };
+      })
+      .filter(function (item) {
+        return !!item.content;
+      })
+      .slice(-12);
+
+    const nextPrompt = String(prompt || "").trim();
+    const last = normalized[normalized.length - 1];
+    if (nextPrompt && (!last || last.role !== "user" || last.content !== nextPrompt)) {
+      normalized.push({ role: "user", content: nextPrompt });
+    }
+
+    return normalized.slice(-12);
+  }
+
   async function sendPrompt() {
     if (state.sending) return;
 
@@ -258,6 +284,9 @@
       return;
     }
 
+    const threadBeforeSend = getActiveThread();
+    const conversation = buildConversationMessages(threadBeforeSend, prompt);
+
     state.sending = true;
     sendBtnEl.disabled = true;
     promptInputEl.value = "";
@@ -266,8 +295,8 @@
     pushMessage("user", prompt);
     pushMessage("assistant", "OpenClaw 正在思考中...");
 
-    const thread = getActiveThread();
-    const pending = thread?.messages?.[thread.messages.length - 1];
+    const activeThread = getActiveThread();
+    const pending = activeThread?.messages?.[activeThread.messages.length - 1];
 
     try {
       const response = await fetch(API_PATH, {
@@ -279,7 +308,8 @@
         body: JSON.stringify({
           prompt: prompt,
           model: state.model,
-          context: "你是 xiaoma.cyou 的 AI 助手，请用简洁清晰、可执行的中文回复。"
+          context: "你是 xiaoma.cyou 的 AI 助手，请用简洁清晰、可执行的中文回复。",
+          messages: conversation
         })
       });
 
@@ -302,8 +332,8 @@
         pending.createdAt = Date.now();
       }
     } finally {
-      if (thread) {
-        touchThread(thread);
+      if (activeThread) {
+        touchThread(activeThread);
       }
       saveState();
       renderAll();

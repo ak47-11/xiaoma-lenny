@@ -1,31 +1,63 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>xiaoma.cyou</title><link>https://xiaoma.cyou/</link><description>Recent content on xiaoma.cyou</description><generator>Hugo -- 0.157.0</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xiaoma.cyou/index.xml" rel="self" type="application/rss+xml"/><item><title>免责声明</title><link>https://xiaoma.cyou/disclaimer/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xiaoma.cyou/disclaimer/</guid><description>&lt;h1 id="免责声明"&gt;免责声明&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>xiaoma.cyou</title>
+    <link>https://xiaoma.cyou/</link>
+    <description>Recent content on xiaoma.cyou</description>
+    <generator>Hugo -- 0.157.0</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://xiaoma.cyou/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>免责声明</title>
+      <link>https://xiaoma.cyou/disclaimer/</link>
+      <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://xiaoma.cyou/disclaimer/</guid>
+      <description>&lt;h1 id=&#34;免责声明&#34;&gt;免责声明&lt;/h1&gt;
 &lt;p&gt;欢迎访问本网站（xiaoma.cyou）。为明确各方权利义务，请您在使用本网站前仔细阅读本声明。您继续访问或使用本网站，即视为已阅读、理解并同意本声明全部内容。&lt;/p&gt;
-&lt;h2 id="1-内容性质"&gt;1. 内容性质&lt;/h2&gt;
+&lt;h2 id=&#34;1-内容性质&#34;&gt;1. 内容性质&lt;/h2&gt;
 &lt;p&gt;本网站所发布的全部内容（包括但不限于文章、观点、教程、工具说明、示例代码、资源链接等）仅供一般信息参考与学习交流，不构成任何形式的法律、财务、税务、医疗、投资或其他专业建议。&lt;/p&gt;
-&lt;h2 id="2-准确性与完整性"&gt;2. 准确性与完整性&lt;/h2&gt;
+&lt;h2 id=&#34;2-准确性与完整性&#34;&gt;2. 准确性与完整性&lt;/h2&gt;
 &lt;p&gt;网站运营者将尽合理努力保证信息的及时性与准确性，但不对内容的完整性、准确性、适用性、持续可用性作任何明示或默示保证。因信息更新滞后、第三方变更、技术故障等导致的偏差，本网站不承担责任。&lt;/p&gt;
-&lt;h2 id="3-使用风险"&gt;3. 使用风险&lt;/h2&gt;
+&lt;h2 id=&#34;3-使用风险&#34;&gt;3. 使用风险&lt;/h2&gt;
 &lt;p&gt;您应基于自身情况独立判断并自行承担使用本网站内容所产生的全部风险。因依赖本网站信息而产生的任何直接或间接损失（包括但不限于数据损失、交易损失、机会损失、经营损失等），网站运营者不承担赔偿责任。&lt;/p&gt;
-&lt;h2 id="4-第三方链接与服务"&gt;4. 第三方链接与服务&lt;/h2&gt;
+&lt;h2 id=&#34;4-第三方链接与服务&#34;&gt;4. 第三方链接与服务&lt;/h2&gt;
 &lt;p&gt;本网站可能包含指向第三方网站、平台或服务的链接。该等链接仅为方便用户提供，不代表网站运营者对其内容、服务或安全性进行背书或保证。您访问第三方服务时，应遵守其自身条款并自行承担风险。&lt;/p&gt;
-&lt;h2 id="5-知识产权"&gt;5. 知识产权&lt;/h2&gt;
+&lt;h2 id=&#34;5-知识产权&#34;&gt;5. 知识产权&lt;/h2&gt;
 &lt;p&gt;除另有声明外，本网站内容的著作权及相关权利归网站运营者或合法权利人所有。未经书面许可，任何单位或个人不得擅自复制、传播、改编、汇编、镜像或用于商业用途。&lt;/p&gt;
-&lt;h2 id="6-用户行为"&gt;6. 用户行为&lt;/h2&gt;
+&lt;h2 id=&#34;6-用户行为&#34;&gt;6. 用户行为&lt;/h2&gt;
 &lt;p&gt;用户在使用本网站过程中应遵守适用法律法规，不得利用本网站从事违法违规活动。因用户行为引发的法律责任由用户自行承担；如因此给网站运营者造成损失，网站运营者有权依法追偿。&lt;/p&gt;
-&lt;h2 id="7-隐私与数据"&gt;7. 隐私与数据&lt;/h2&gt;
+&lt;h2 id=&#34;7-隐私与数据&#34;&gt;7. 隐私与数据&lt;/h2&gt;
 &lt;p&gt;本网站可能为统计分析、性能优化与安全目的收集必要的技术数据（如访问日志、设备信息、Cookie 等）。如有单独隐私政策，以隐私政策为准；若两者不一致，以隐私政策中关于数据处理的条款优先。&lt;/p&gt;
-&lt;h2 id="8-免责范围限制"&gt;8. 免责范围限制&lt;/h2&gt;
+&lt;h2 id=&#34;8-免责范围限制&#34;&gt;8. 免责范围限制&lt;/h2&gt;
 &lt;p&gt;在适用法律允许的最大范围内，网站运营者对任何间接性、附带性、惩罚性或后果性损害不承担责任。若法律另有强制规定，以法律规定为准。&lt;/p&gt;
-&lt;h2 id="9-声明更新"&gt;9. 声明更新&lt;/h2&gt;
+&lt;h2 id=&#34;9-声明更新&#34;&gt;9. 声明更新&lt;/h2&gt;
 &lt;p&gt;网站运营者有权根据法律法规、监管要求或运营需要不时更新本声明。更新后的内容一经发布即生效。建议您定期查阅本页面。&lt;/p&gt;
-&lt;h2 id="10-适用法律与争议解决"&gt;10. 适用法律与争议解决&lt;/h2&gt;
+&lt;h2 id=&#34;10-适用法律与争议解决&#34;&gt;10. 适用法律与争议解决&lt;/h2&gt;
 &lt;p&gt;本声明的订立、执行与解释适用中华人民共和国法律（不含冲突规范）。因使用本网站产生的争议，双方应先友好协商；协商不成的，提交网站运营者所在地有管辖权的人民法院处理。&lt;/p&gt;
 &lt;hr&gt;
-&lt;p&gt;如您对本声明有疑问，请通过网站提供的联系方式与我们联系。&lt;/p&gt;</description></item><item><title>关于我</title><link>https://xiaoma.cyou/about/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xiaoma.cyou/about/</guid><description>&lt;p&gt;你好，我是小马。
+&lt;p&gt;如您对本声明有疑问，请通过网站提供的联系方式与我们联系。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>关于我</title>
+      <link>https://xiaoma.cyou/about/</link>
+      <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://xiaoma.cyou/about/</guid>
+      <description>&lt;p&gt;你好，我是小马。
 我专注做三件事：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;AI 自动化落地&lt;/li&gt;
 &lt;li&gt;效率工具实战&lt;/li&gt;
 &lt;li&gt;个人品牌与变现&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;如果你想合作，可以邮件联系：3102850054@qq.com&lt;/p&gt;</description></item><item><title>注册与登录</title><link>https://xiaoma.cyou/auth/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xiaoma.cyou/auth/</guid><description>账号密码登录 | 验证码登录</description></item></channel></rss>
+&lt;p&gt;如果你想合作，可以邮件联系：3102850054@qq.com&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>注册与登录</title>
+      <link>https://xiaoma.cyou/auth/</link>
+      <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://xiaoma.cyou/auth/</guid>
+      <description>账号密码登录 | 验证码登录</description>
+    </item>
+  </channel>
+</rss>

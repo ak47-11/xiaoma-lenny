@@ -1432,7 +1432,7 @@
 
       [
         { href: "/mi-publish.html", label: "前往 Mi 个人发布页" },
-        { href: "/community.html", label: "返回社区入口" },
+        { href: "/", label: "返回社区入口" },
         { href: "/profile.html", label: "打开个人中心" },
         { href: "/m.html", label: "切换到 M" },
         { href: "/lenny.html", label: "切换到 Lenny" }

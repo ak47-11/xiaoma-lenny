@@ -1313,7 +1313,7 @@
 
       [
         { href: "/m-publish.html", label: "前往 M 个人发布页" },
-        { href: "/community.html", label: "返回社区入口" },
+        { href: "/", label: "返回社区入口" },
         { href: "/profile.html", label: "打开个人中心" },
         { href: "/mi.html", label: "切换到 Mi" },
         { href: "/lenny.html", label: "切换到 Lenny" }

@@ -77,8 +77,8 @@
     const url = new URL(window.location.href);
     const next = url.searchParams.get("next");
     if (!next || !next.startsWith("/")) return "/";
-    if (next === "/community" || next === "/community/") return "/community.html";
-    if (next.startsWith("/community.html")) return "/community.html";
+    if (next === "/community" || next === "/community/") return "/";
+    if (next.startsWith("/community.html")) return "/";
     return next;
   }
 
@@ -143,7 +143,7 @@
   }
 
   function renderOtpButtonState() {
-    if (!resendOtpBtn) return;
+    if (!sendOtpBtn || !resendOtpBtn) return;
     const left = getCooldownLeft(getCurrentOtpIdentity());
     const disabled = left > 0;
     sendOtpBtn.disabled = disabled;
@@ -235,7 +235,7 @@
       window.location.href = "/profile.html";
     });
     document.getElementById("goCommunityBtn").addEventListener("click", function () {
-      window.location.href = "/community.html";
+      window.location.href = "/";
     });
     if (isAdmin) {
       document.getElementById("goAdminBtn").addEventListener("click", function () {

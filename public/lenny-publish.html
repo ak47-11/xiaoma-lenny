@@ -7,9 +7,9 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="/css/hub.css" />
+  <link rel="stylesheet" href="/css/app.css" />
 </head>
-<body class="accent-lenny">
+<body class="app-page hub-page page-lenny">
   <main class="hub-shell">
     <header class="hub-top">
       <div class="hub-brand">
@@ -17,10 +17,10 @@
         <span>个人页面 · 发布与管理我的技术文章</span>
       </div>
       <nav class="hub-nav">
-        <a class="pill lenny" href="/lenny.html">Lenny 公共社区</a>
+        <a class="pill lenny is-current" href="/lenny.html">Lenny 公共社区</a>
         <a class="pill m" href="/m.html">M</a>
         <a class="pill mi" href="/mi.html">Mi</a>
-        <a href="/community.html">社区入口</a>
+        <a href="/">社区入口</a>
         <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
         <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
         <a href="/auth.html" id="loginNav">账号入口</a>
@@ -29,7 +29,7 @@
     </header>
 
     <section class="hub-layout">
-      <aside class="panel">
+      <aside class="panel panel-left">
         <h3>页面说明</h3>
         <div class="hint">这是 Lenny 的个人发布页。公开阅读区与个人管理区分开，便于内容管理与展示。</div>
         <div class="actions" style="margin-top:10px;">
@@ -37,7 +37,7 @@
         </div>
       </aside>
 
-      <section class="panel">
+      <section class="panel panel-main">
         <h2>发布技术文章</h2>
         <p id="userHint" class="muted" style="margin:0 0 8px;">正在验证登录状态...</p>
         <form id="lennyPublisher">
@@ -76,7 +76,7 @@
         <div id="lennyMineList" class="article-list"></div>
       </section>
 
-      <aside class="panel">
+      <aside class="panel panel-right">
         <h3>写作建议</h3>
         <ul class="list-text">
           <li>标题清晰说明问题与价值</li>
