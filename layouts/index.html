@@ -1,255 +1,20 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>xiaoma.cyou | M · Mi · Lenny</title>
+<title>xiaoma.cyou | 一站式创作社区</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="description" content="Xiaoma community hub for M, Mi, Lenny and OpenClaw.">
-<style>
-  :root {
-    --bg: #f7fafc;
-    --text: #18243a;
-    --muted: #5f728f;
-    --line: #dce6f3;
-    --surface: #ffffff;
-    --m: #1d9bf0;
-    --mi: #fb7299;
-    --lenny: #2da44e;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: "Sora", "PingFang SC", "Microsoft YaHei", sans-serif;
-    color: var(--text);
-    background:
-      radial-gradient(980px 520px at 10% -10%, rgba(29, 155, 240, 0.18), transparent 63%),
-      radial-gradient(980px 520px at 90% -10%, rgba(251, 114, 153, 0.16), transparent 63%),
-      radial-gradient(1100px 540px at 50% 120%, rgba(45, 164, 78, 0.14), transparent 68%),
-      var(--bg);
-    min-height: 100vh;
-  }
-  .container { width: min(1160px, 93%); margin: 18px auto 42px; }
-  .top {
-    border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.86);
-    backdrop-filter: blur(8px);
-    border-radius: 16px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    position: sticky;
-    top: 12px;
-    z-index: 20;
-  }
-  .brand {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-  }
-  .nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .nav a {
-    text-decoration: none;
-    color: #30486f;
-    border: 1px solid #d2dff2;
-    background: #fff;
-    border-radius: 999px;
-    min-height: 34px;
-    padding: 0 12px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-  }
-  .nav .entry {
-    border: none;
-    color: #fff;
-  }
-  .nav .m { background: linear-gradient(100deg, #2ea7f4, #1d9bf0); }
-  .nav .mi { background: linear-gradient(100deg, #ff8db1, #fb7299); }
-  .nav .lenny { background: linear-gradient(100deg, #42bf63, #2da44e); }
-  .nav .ai { background: linear-gradient(100deg, #1570d8, #0d47a1); }
-
-  .hero {
-    margin-top: 14px;
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(247,250,255,0.88));
-    padding: 28px;
-    box-shadow: 0 18px 42px rgba(87, 112, 149, 0.14);
-  }
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border-radius: 999px;
-    border: 1px solid #dbe5f2;
-    background: #fff;
-    color: #4c5f7f;
-    padding: 6px 11px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .hero h1 {
-    margin: 12px 0 10px;
-    font-size: clamp(34px, 5vw, 56px);
-    line-height: 1.08;
-    letter-spacing: -0.02em;
-  }
-  .hero h1 span {
-    background: linear-gradient(100deg, #1d9bf0, #fb7299, #2da44e);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .hero p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 17px;
-    line-height: 1.8;
-    max-width: 900px;
-  }
-
-  .hero-actions {
-    margin-top: 14px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .hero-actions a {
-    text-decoration: none;
-    border-radius: 999px;
-    min-height: 38px;
-    padding: 0 14px;
-    display: inline-flex;
-    align-items: center;
-    font-size: 13px;
-    font-weight: 700;
-    border: 1px solid #cfdcf0;
-    color: #2d466b;
-    background: #ffffff;
-  }
-
-  .hero-actions .ai-primary {
-    border: none;
-    color: #ffffff;
-    background: linear-gradient(100deg, #1570d8, #0d47a1);
-    box-shadow: 0 14px 30px rgba(13, 71, 161, 0.28);
-  }
-
-  .ai-banner {
-    margin-top: 14px;
-    border: 1px solid rgba(13, 71, 161, 0.2);
-    border-radius: 16px;
-    background: linear-gradient(130deg, rgba(21, 112, 216, 0.12), rgba(13, 71, 161, 0.08));
-    padding: 14px;
-    display: grid;
-    gap: 8px;
-  }
-
-  .ai-banner strong {
-    font-size: 15px;
-    color: #13396b;
-  }
-
-  .ai-banner span {
-    color: #4f6486;
-    font-size: 13px;
-    line-height: 1.7;
-  }
-
-  .portal-grid {
-    margin-top: 16px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-  .portal {
-    border-radius: 20px;
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid var(--line);
-    background: #fff;
-    padding: 16px;
-    box-shadow: 0 14px 28px rgba(97, 118, 151, 0.1);
-    transition: transform .18s ease, box-shadow .18s ease;
-    display: grid;
-    gap: 10px;
-  }
-  .portal:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 34px rgba(97, 118, 151, 0.14);
-  }
-  .portal .head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .portal .logo {
-    font-size: 26px;
-    font-weight: 800;
-  }
-  .portal .type {
-    font-size: 11px;
-    border-radius: 999px;
-    padding: 4px 9px;
-    font-weight: 700;
-    border: 1px solid #d6e0ef;
-    color: #4f607f;
-    background: #f7faff;
-  }
-  .portal h3 {
-    margin: 0;
-    font-size: 22px;
-  }
-  .portal p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.75;
-  }
-  .portal ul {
-    margin: 0;
-    padding-left: 18px;
-    color: #516687;
-    font-size: 13px;
-    line-height: 1.8;
-  }
-  .portal.m { border-color: rgba(29,155,240,.28); background: linear-gradient(155deg, rgba(29,155,240,.1), #fff 38%); }
-  .portal.mi { border-color: rgba(251,114,153,.28); background: linear-gradient(155deg, rgba(251,114,153,.1), #fff 38%); }
-  .portal.lenny { border-color: rgba(45,164,78,.28); background: linear-gradient(155deg, rgba(45,164,78,.1), #fff 38%); }
-
-  .foot {
-    margin-top: 16px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: #fff;
-    padding: 14px;
-    color: #61738f;
-    font-size: 13px;
-  }
-
-  @media (max-width: 980px) {
-    .portal-grid { grid-template-columns: 1fr; }
-  }
-</style>
+<meta name="description" content="Xiaoma 一站式创作社区：M、Mi、Lenny 与 OpenClaw 整合在统一账号体系里。">
 <link rel="stylesheet" href="/css/app.css" />
 </head>
 <body class="app-page home-page">
-<main class="container">
+<main class="container home-shell">
   <header class="top" data-reveal="down">
     <div class="brand">xiaoma.cyou</div>
-    <nav class="nav">
+    <nav class="nav" aria-label="站点主导航">
       <a class="entry m" href="/m.html">M</a>
       <a class="entry mi" href="/mi.html">Mi</a>
       <a class="entry lenny" href="/lenny.html">Lenny</a>
@@ -261,78 +26,253 @@
     </nav>
   </header>
 
-  <section class="hero" data-reveal="up">
-    <span class="eyebrow">Integrated Community Hub</span>
-    <h1>一个账号，连接<span>三种创作社区</span></h1>
-    <p>在同一站点里完成实时表达、视频分享与技术沉淀，用更少路径完成从内容发布到互动增长的全流程。</p>
+  <section class="hero home-hero-grid" data-reveal="up">
+    <div class="hero-main">
+      <span class="eyebrow">Creator OS · 2026</span>
+      <h1>把灵感变成持续产出，<span>一个账号完成发布、互动与沉淀</span></h1>
+      <p>无论你偏好短内容、视频表达还是技术长文，都能在同一个系统完成创作闭环。先浏览体验，再登录发布，减少认知负担与平台切换成本。</p>
 
-    <div class="hero-actions">
-      <a class="ai-primary" href="/openclaw.html">进入 OpenClaw 新界面</a>
-      <a href="/auth.html?next=/openclaw.html">登录后继续对话</a>
-    </div>
-
-    <div class="ai-banner" data-reveal="up">
-      <strong>OpenClaw 已接入主页入口</strong>
-      <span>点击即可进入独立 AI 对话界面，支持模型和 Token 配置以及多轮上下文，体验接近 ChatGPT。</span>
-    </div>
-
-    <div class="hero-playground" data-reveal="up">
-      <div class="playground-head">
-        <strong>流光捕手 Mini Game</strong>
-        <span>15 秒挑战：点击移动光点，测试你的反应速度。</span>
+      <div class="hero-actions">
+        <a class="ai-primary" href="/openclaw.html">立即开始：用 AI 打磨首条内容</a>
+        <a href="/auth.html?next=/m-publish.html">登录并发布第一条</a>
+        <a class="cta-soft" href="/m.html">先逛社区，再决定注册</a>
       </div>
-      <div class="playground-stage" data-flow-catch aria-label="流光捕手游戏区域">
-        <canvas class="playground-canvas" aria-hidden="true"></canvas>
-        <button class="playground-start" type="button" data-flow-start>开始 15 秒挑战</button>
-        <div class="playground-hud">
-          <span>得分 <b data-flow-score>0</b></span>
-          <span>最高 <b data-flow-best>0</b></span>
-          <span>剩余 <b data-flow-time>15</b>s</span>
-        </div>
+
+      <div class="hero-points">
+        <span>统一账号体系</span>
+        <span>游客可先体验</span>
+        <span>创作后自动沉淀</span>
+        <span>支持公开内容检索</span>
+      </div>
+
+      <div class="metric-grid" data-reveal="up">
+        <article class="metric-card">
+          <strong data-count-target="3">3</strong>
+          <span>内容社区模块：M / Mi / Lenny</span>
+        </article>
+        <article class="metric-card">
+          <strong data-count-target="1">1</strong>
+          <span>统一身份与账号状态管理</span>
+        </article>
+        <article class="metric-card">
+          <strong>∞</strong>
+          <span>长期内容资产持续累积</span>
+        </article>
       </div>
     </div>
 
-    <div class="portal-grid" data-reveal="up">
-      <a class="portal m" href="/m.html" data-tilt-card>
+    <aside class="hero-side">
+      <article class="launch-card" data-reveal="up">
+        <strong>新用户 3 分钟上手</strong>
+        <ol class="launch-list">
+          <li>浏览 M / Mi / Lenny，找到适合你的表达场景</li>
+          <li>登录账号并完成第一条发布</li>
+          <li>用 OpenClaw 优化标题、结构和表达</li>
+        </ol>
+        <a class="ai-primary" href="/auth.html?next=/m-publish.html">开始我的第一条内容</a>
+      </article>
+      <article class="signal-card" data-reveal="up">
+        <strong>为什么用户愿意持续使用？</strong>
+        <ul>
+          <li>不用多平台切换，一次登录全站通用</li>
+          <li>每次发布都能变成可复用的内容资产</li>
+          <li>AI 辅助降低写作与表达的启动门槛</li>
+        </ul>
+      </article>
+    </aside>
+  </section>
+
+  <section class="section trust-strip" data-reveal="up">
+    <div class="trust-item">
+      <b>M</b>
+      <span>碎片观点、动态更新、即时互动</span>
+    </div>
+    <div class="trust-item">
+      <b>Mi</b>
+      <span>视频内容发布、分类发现、快速分发</span>
+    </div>
+    <div class="trust-item">
+      <b>Lenny</b>
+      <span>技术长文、教程复盘、知识沉淀</span>
+    </div>
+    <div class="trust-item">
+      <b>OpenClaw</b>
+      <span>AI 对话辅助创作与内容优化</span>
+    </div>
+  </section>
+
+  <section class="section" data-reveal="up">
+    <div class="section-head">
+      <h2>你能在这里完成的核心动作</h2>
+      <p>按当下主流内容产品思路：降低上手门槛、强调反馈闭环、强化内容资产沉淀。</p>
+    </div>
+    <div class="value-grid">
+      <article class="value-card">
+        <h3>多场景分发</h3>
+        <p>同一个账号直达图文、视频与技术社区，减少跨站同步成本。</p>
+      </article>
+      <article class="value-card">
+        <h3>AI 协同创作</h3>
+        <p>在 OpenClaw 中快速打磨标题、提纲和正文表达，提高产出效率。</p>
+      </article>
+      <article class="value-card">
+        <h3>持续增长反馈</h3>
+        <p>通过点赞、评论、收藏与转发，持续验证内容方向与用户偏好。</p>
+      </article>
+      <article class="value-card">
+        <h3>统一身份安全</h3>
+        <p>账号状态统一管理，减少重复登录与权限割裂带来的体验损耗。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section creator-fit" data-reveal="up">
+    <div class="section-head">
+      <h2>告诉我们你是哪类创作者</h2>
+      <p>点击下面类型，系统会自动推荐最合适的内容入口，并高亮对应社区。</p>
+    </div>
+    <div class="creator-switch" role="tablist" aria-label="创作类型切换">
+      <button class="creator-chip is-active" type="button" role="tab" aria-selected="true" data-creator-chip="m">短内容创作者</button>
+      <button class="creator-chip" type="button" role="tab" aria-selected="false" data-creator-chip="mi">视频创作者</button>
+      <button class="creator-chip" type="button" role="tab" aria-selected="false" data-creator-chip="lenny">技术写作者</button>
+    </div>
+    <article class="creator-spotlight" data-creator-spotlight>
+      <h3 data-creator-title>推荐你先进入 M 社区</h3>
+      <p data-creator-copy>如果你希望快速表达观点、跟进热点并获得即时反馈，M 是最轻量的起步方式。</p>
+      <div class="creator-actions">
+        <a class="ai-primary" data-creator-link href="/m.html">进入 M 立即开始</a>
+        <a data-creator-jump href="#portal-m">查看对应入口详情</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="portal-section" data-reveal="up">
+    <div class="section-head">
+      <h2>按你的内容类型，选择一个入口开写</h2>
+      <p>每个入口都是完整社区，不同表达方式对应不同增长路径。</p>
+    </div>
+    <div class="portal-grid">
+      <a class="portal m is-focused" id="portal-m" data-portal="m" href="/m.html" data-tilt-card>
         <div class="head"><div class="logo">M</div><span class="type">Micro Social</span></div>
-        <h3>像推特一样快速发布</h3>
-        <p>短内容优先，时间流刷新，适合即时观点、动态更新与社区互动。</p>
+        <h3>像推特一样快速发布观点</h3>
+        <p>短内容优先，适合热点反应、学习记录与日常动态更新。</p>
         <ul>
-          <li>发布动态、图片链接、热门话题</li>
-          <li>点赞、评论、转发、关注作者</li>
-          <li>适合边学边分享的即时输出</li>
+          <li>动态、图片链接、话题标签快速发布</li>
+          <li>点赞评论转发，形成即时讨论场</li>
+          <li>适合边学边分享的连续输出节奏</li>
         </ul>
+        <span class="portal-cta">进入 M 社区 →</span>
       </a>
 
-      <a class="portal mi" href="/mi.html" data-tilt-card>
+      <a class="portal mi" id="portal-mi" data-portal="mi" href="/mi.html" data-tilt-card>
         <div class="head"><div class="logo">Mi</div><span class="type">Video Community</span></div>
-        <h3>像 B 站一样看与发视频</h3>
-        <p>视频卡片流与分类发现，支持封面、简介与链接发布，形成内容频道。</p>
+        <h3>像 B 站一样发布和发现视频</h3>
+        <p>视频卡片流+分类浏览，面向教程、演示和创作展示内容。</p>
         <ul>
-          <li>上传视频信息、分类和封面</li>
-          <li>播放、点赞、收藏、快速浏览</li>
-          <li>适合教程视频和创作展示</li>
+          <li>封面、简介、分类信息结构化发布</li>
+          <li>播放点赞收藏，提升内容曝光效率</li>
+          <li>适合教程拆解与作品展示场景</li>
         </ul>
+        <span class="portal-cta">进入 Mi 社区 →</span>
       </a>
 
-      <a class="portal lenny" href="/lenny.html" data-tilt-card>
+      <a class="portal lenny" id="portal-lenny" data-portal="lenny" href="/lenny.html" data-tilt-card>
         <div class="head"><div class="logo">Lenny</div><span class="type">Tech Community</span></div>
-        <h3>像 GitHub 社区一样沉淀技术</h3>
-        <p>面向教程、复盘、分析文章的技术阵地，鼓励高质量长期内容。</p>
+        <h3>像 GitHub 社区一样沉淀技术内容</h3>
+        <p>围绕教程、复盘、分析长文建立你的长期技术影响力。</p>
         <ul>
-          <li>发布教程、分析、实战笔记</li>
-          <li>标签分类、文章互动、收藏管理</li>
-          <li>适合建立个人技术影响力</li>
+          <li>发布教程、分析与实战经验总结</li>
+          <li>标签分类、互动收藏、结构化沉淀</li>
+          <li>适合打造可复用知识资产体系</li>
         </ul>
+        <span class="portal-cta">进入 Lenny 社区 →</span>
       </a>
     </div>
   </section>
 
-  <section class="foot">建议先完成账号登录，再进入对应模块发布内容，这样可获得完整互动与个人资料联动体验。</section>
+  <section class="hero-playground" data-reveal="up">
+    <div class="playground-head">
+      <strong>流光捕手 Mini Game</strong>
+      <span>15 秒挑战：点击移动光点，测试你的反应速度。</span>
+    </div>
+    <div class="playground-stage" data-flow-catch aria-label="流光捕手游戏区域">
+      <canvas class="playground-canvas" aria-hidden="true"></canvas>
+      <button class="playground-start" type="button" data-flow-start>开始 15 秒挑战</button>
+      <div class="playground-hud">
+        <span>得分 <b data-flow-score>0</b></span>
+        <span>最高 <b data-flow-best>0</b></span>
+        <span>剩余 <b data-flow-time>15</b>s</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section onboarding" data-reveal="up">
+    <div class="section-head">
+      <h2>新用户从这里开始</h2>
+      <p>按照这条路径走，通常 3 分钟内就能完成首次内容发布。</p>
+    </div>
+    <div class="steps">
+      <article class="step">
+        <b>STEP 1</b>
+        <strong>先体验，不注册</strong>
+        <p>先看公开内容流，确认平台节奏与内容氛围是否适合你。</p>
+        <a href="/m.html">去看 M 社区</a>
+      </article>
+      <article class="step">
+        <b>STEP 2</b>
+        <strong>登录并发布第一条内容</strong>
+        <p>选择 M / Mi / Lenny 中最适合你的场景，完成首次创作上线。</p>
+        <a href="/auth.html?next=/m-publish.html">登录并开始发布</a>
+      </article>
+      <article class="step">
+        <b>STEP 3</b>
+        <strong>用 AI 放大你的产出效率</strong>
+        <p>用 OpenClaw 打磨标题、结构和表达，提升完稿率与内容质量。</p>
+        <a href="/openclaw.html">进入 OpenClaw</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="section quote-section" data-reveal="up">
+    <div class="section-head">
+      <h2>创作者最常反馈的三点价值</h2>
+      <p>我们把用户真正关心的效率、曝光和沉淀放在同一个产品流程里。</p>
+    </div>
+    <div class="quote-grid">
+      <article class="quote-card">
+        <p>“以前我要开三四个页面才能完成一次内容分发，现在一套流程就够了。”</p>
+        <span>效率提升 · 减少切换成本</span>
+      </article>
+      <article class="quote-card">
+        <p>“短内容先试水，表现好的再沉淀成长文，路径非常顺手。”</p>
+        <span>增长闭环 · 表达到沉淀</span>
+      </article>
+      <article class="quote-card">
+        <p>“OpenClaw 对标题和结构优化很实用，能明显降低‘写不出来’的门槛。”</p>
+        <span>AI 协同 · 提升完稿速度</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="cta-band" data-reveal="up">
+    <div>
+      <strong>准备好发布你的下一条内容了吗？</strong>
+      <p>现在就从任意一个入口开始：先体验，再登录，再持续输出。</p>
+    </div>
+    <div class="cta-band-actions">
+      <a class="ai-primary" href="/auth.html?next=/m-publish.html">开始发布</a>
+      <a href="/openclaw.html">先用 AI 生成思路</a>
+    </div>
+  </section>
+
+  <section class="foot">
+    推荐路径：先浏览 -> 再登录 -> 完成首条发布。你可以随时在个人资料页管理身份与内容；如遇账号问题，可从登录页进入恢复流程。管理员功能仍仅对管理员角色开放。
+  </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/app-core.js"></script>
 <script src="/js/home-playground.js"></script>
+<script src="/js/home-polish.js"></script>
 <script>
   window.XiaomaCore?.applyNavState();
 </script>

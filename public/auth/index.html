@@ -1,13 +1,470 @@
-<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>注册与登录 | xiaoma.cyou</title><style>@import "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap";:root{--bg:#f5f7fb;--surface:#ffffff;--surface-soft:#f7f9fc;--text:#0f1419;--muted:#5f6b7a;--line:#dde3ec;--line-strong:#bdc8d8;--x-blue:#1d9bf0;--tesla-red:#e82127;--ok:#0b8a5a;--err:#bf1d18}*{box-sizing:border-box;margin:0;padding:0}body{min-height:100vh;font-family:ibm plex sans,pingfang sc,microsoft yahei,sans-serif;color:var(--text);background:radial-gradient(1200px 500px at -10% 10%,rgba(29,155,240,.11),transparent 70%),radial-gradient(800px 360px at 110% 90%,rgba(232,33,39,9%),transparent 70%),linear-gradient(180deg,#f8fafd 0%,#eef2f7 100%);display:grid;place-items:center;padding:24px}.shell{width:min(1040px,100%);min-height:min(700px,calc(100vh - 48px));background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.9);border-radius:28px;box-shadow:0 28px 90px rgba(31,52,87,.18);backdrop-filter:blur(10px);display:grid;grid-template-columns:1fr 420px;overflow:hidden;animation:rise .6s ease}.hero{position:relative;padding:52px;background:linear-gradient(160deg,rgba(255,255,255,.95),rgba(246,250,255,.86)),repeating-linear-gradient(120deg,rgba(26,41,61,3%) 0 2px,transparent 2px 14px);border-right:1px solid rgba(188,201,220,.42);display:flex;flex-direction:column;justify-content:space-between;gap:26px}.brand-tag{width:fit-content;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.9)}.hero h1{margin-top:18px;font-family:sora,ibm plex sans,sans-serif;font-size:clamp(30px,4.5vw,42px);line-height:1.12;letter-spacing:-.02em}.hero h1 strong{color:var(--x-blue)}.hero h1 span{color:var(--tesla-red)}.hero p{margin-top:16px;max-width:480px;color:var(--muted);font-size:16px;line-height:1.72}.feature-list{display:grid;gap:12px;max-width:420px}.feature{display:flex;align-items:center;gap:10px;font-size:14px;color:#2f3f54}.feature-dot{width:8px;height:8px;border-radius:999px;background:linear-gradient(160deg,var(--x-blue),var(--tesla-red))}.panel{background:var(--surface);padding:38px 30px 28px;display:flex;flex-direction:column;justify-content:center;gap:14px}.panel h2{font-family:sora,ibm plex sans,sans-serif;font-size:26px;margin-bottom:2px}.sub{font-size:14px;color:var(--muted);margin-bottom:10px}.btn{width:100%;border:1px solid var(--line);background:#fff;border-radius:999px;min-height:46px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease}.btn:hover{transform:translateY(-1px);border-color:var(--line-strong)}.btn:disabled{opacity:.65;cursor:not-allowed;transform:none}.btn.primary{border:none;background:#0f1419;color:#fff}.btn.primary:hover{background:#1c2733}.btn.secondary{border-color:#cfd8e4;background:#f9fbfd}.divider{display:flex;align-items:center;gap:10px;color:#7a8798;font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:6px 0}.divider::before,.divider::after{content:"";flex:1;border-top:1px solid var(--line)}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px;background:var(--surface-soft);border:1px solid var(--line);border-radius:999px}.tab{border:none;border-radius:999px;background:0 0;min-height:36px;font-size:13px;font-weight:600;color:#6c7a8c;cursor:pointer}.tab.active{color:var(--text);background:#fff;box-shadow:0 8px 16px rgba(24,39,61,9%)}.form-panel{display:none;margin-top:4px}.form-panel.active{display:block;animation:fade .2s ease}.field{margin-top:10px}.field label{display:block;font-size:12px;color:#5f6c7d;margin-bottom:6px;font-weight:500}.field input{width:100%;min-height:44px;border-radius:12px;border:1px solid #ccd6e3;background:#fff;padding:0 14px;font-size:14px;color:var(--text);outline:none;transition:border-color .16s ease,box-shadow .16s ease}.field input::placeholder{color:#9aa7b8}.field input:focus{border-color:var(--x-blue);box-shadow:0 0 0 3px rgba(29,155,240,.17)}.inline-row{margin:10px 2px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;color:#5e6c7d;font-size:12px}.toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none}.toggle input{accent-color:#111}.link-btn{border:none;background:0 0;color:var(--x-blue);font-size:12px;cursor:pointer;padding:0;margin-left:auto}.session-bar{margin-top:2px;border:1px solid #dce4ef;border-radius:12px;background:#f8fbff;padding:10px;display:none;gap:8px}.session-text{font-size:12px;color:#5d6c80}.session-actions{margin-top:7px;display:flex;flex-wrap:wrap;gap:7px}.mini-btn{border:1px solid #ced9e9;background:#fff;color:#243247;border-radius:999px;min-height:30px;padding:0 12px;font-size:12px;font-weight:600;cursor:pointer}.actions{margin-top:10px;display:grid;gap:8px}.status{min-height:44px;border:1px solid #d8e1ec;border-radius:12px;background:#f8fbff;padding:11px 12px;color:#55667a;font-size:13px;display:flex;align-items:center;justify-content:center;text-align:center;margin-top:4px}.status.ok{color:var(--ok);border-color:rgba(11,138,90,.28);background:rgba(11,138,90,8%)}.status.err{color:var(--err);border-color:rgba(191,29,24,.3);background:rgba(191,29,24,8%)}.status-action{margin-top:8px;display:none;justify-content:center}.status-link{border:1px solid #c8d7ed;border-radius:999px;background:#fff;color:#33558b;font-size:12px;font-weight:600;min-height:30px;padding:0 12px;display:inline-flex;align-items:center;text-decoration:none}@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@media(max-width:960px){.shell{grid-template-columns:1fr;min-height:auto}.hero{padding:32px 24px;border-right:0;border-bottom:1px solid rgba(188,201,220,.42)}.hero p{max-width:none}.panel{padding:28px 20px 22px}}</style><link rel=stylesheet href=/css/app.css></head><body class="app-page auth-page"><main class=shell><section class=hero><div><div class=brand-tag>Xiaoma ID</div><h1><strong>一个姓马马马的创建的第一个网站</strong>，希望大家多多提意见，<span>完善社区功能与修复BUG，谢谢大家~。</span></h1><p>在这里记录游戏战术、图文灵感和成长日常。登录后即可发布、互动、收藏，沉淀你的个人影响力。</p></div><div class=feature-list><div class=feature><span class=feature-dot></span>一键登录后即可发帖、评论、点赞和收藏</div><div class=feature><span class=feature-dot></span>支持密码登录与邮箱验证码登录，回访更顺滑</div><div class=feature><span class=feature-dot></span>个人中心可持续完善昵称、简介和联系方式</div></div></section><section class=panel><h2>登录 xiaoma.cyou</h2><p class=sub>继续访问你的专属页面与功能</p><div id=sessionBar class=session-bar></div><div class=divider>使用账号登录</div><div class=tabs><button class="tab active" data-tab=password>密码登录</button>
-<button class=tab data-tab=otp>验证码登录</button></div><div id=panel-password class="form-panel active"><div class=field><label for=email>邮箱</label>
-<input type=email id=email placeholder=name@example.com autocomplete=email></div><div class=field><label for=password>密码</label>
-<input type=password id=password placeholder=请输入密码 autocomplete=current-password></div><div class=field id=registerOnlyField style=display:none><label for=passwordConfirm>确认密码（注册时）</label>
-<input type=password id=passwordConfirm placeholder=再次输入密码 autocomplete=new-password></div><div class=inline-row><label class=toggle><input type=checkbox id=showPassword>显示密码</label>
-<label class=toggle><input type=checkbox id=rememberMe checked>记住我</label>
-<button class=link-btn id=forgotLink>忘记密码？</button></div><div class=actions><button class="btn primary" id=loginBtn>登录</button>
-<button class="btn secondary" id=registerLink>创建账号</button></div></div><div id=panel-otp class=form-panel><div class=field><label for=otpIdentity id=otpIdentityLabel>邮箱</label>
-<input type=text id=otpIdentity placeholder=name@example.com autocomplete=username></div><div class=actions><button class=btn id=sendOtpBtn>发送验证码</button>
-<button class="btn secondary" id=resendOtpBtn type=button>重新发送</button></div><div class=field><label for=otpCode>邮箱验证码</label>
-<input type=text id=otpCode placeholder=输入邮箱中的验证码 maxlength=12 autocomplete=one-time-code></div><div class=field id=resetPasswordField style=display:none><label for=resetNewPassword>新密码</label>
-<input type=password id=resetNewPassword placeholder=请输入新密码（至少6位） autocomplete=new-password></div><div class=field id=resetPasswordConfirmField style=display:none><label for=resetNewPasswordConfirm>确认新密码</label>
-<input type=password id=resetNewPasswordConfirm placeholder=再次输入新密码 autocomplete=new-password></div><div class=actions><button class="btn primary" id=verifyOtpBtn>验证并登录</button></div><div class=inline-row style=margin-top:8px><span style=color:#6f7c8f;font-size:12px>收不到邮件？检查垃圾箱，或 60 秒后重发</span></div></div><div id=status class=status>请选择登录方式</div><div id=statusAction class=status-action></div></section></main><script src=https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2></script><script src=/js/auth-plus.js data-supabase-url=https://vtplvtwbkyydxmcxgctn.supabase.co data-supabase-anon-key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>注册与登录 | xiaoma.cyou</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f7f9fc;
+      --text: #0f1419;
+      --muted: #5f6b7a;
+      --line: #dde3ec;
+      --line-strong: #bdc8d8;
+      --x-blue: #1d9bf0;
+      --tesla-red: #e82127;
+      --ok: #0b8a5a;
+      --err: #bf1d18;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 500px at -10% 10%, rgba(29, 155, 240, 0.11), transparent 70%),
+        radial-gradient(800px 360px at 110% 90%, rgba(232, 33, 39, 0.09), transparent 70%),
+        linear-gradient(180deg, #f8fafd 0%, #eef2f7 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: min(1040px, 100%);
+      min-height: min(700px, calc(100vh - 48px));
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 28px;
+      box-shadow: 0 28px 90px rgba(31, 52, 87, 0.18);
+      backdrop-filter: blur(10px);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      overflow: hidden;
+      animation: rise 0.6s ease;
+    }
+
+    .hero {
+      position: relative;
+      padding: 52px;
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(246, 250, 255, 0.86)),
+        repeating-linear-gradient(120deg, rgba(26, 41, 61, 0.03) 0 2px, transparent 2px 14px);
+      border-right: 1px solid rgba(188, 201, 220, 0.42);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 26px;
+    }
+
+    .brand-tag {
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .hero h1 {
+      margin-top: 18px;
+      font-family: "Sora", "IBM Plex Sans", sans-serif;
+      font-size: clamp(30px, 4.5vw, 42px);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 strong { color: var(--x-blue); }
+    .hero h1 span { color: var(--tesla-red); }
+
+    .hero p {
+      margin-top: 16px;
+      max-width: 480px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 12px;
+      max-width: 420px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #2f3f54;
+    }
+
+    .feature-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(160deg, var(--x-blue), var(--tesla-red));
+    }
+
+    .panel {
+      background: var(--surface);
+      padding: 38px 30px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .panel h2 {
+      font-family: "Sora", "IBM Plex Sans", sans-serif;
+      font-size: 26px;
+      margin-bottom: 2px;
+    }
+
+    .sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      min-height: 46px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); border-color: var(--line-strong); }
+    .btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+    .btn.primary { border: none; background: #0f1419; color: #fff; }
+    .btn.primary:hover { background: #1c2733; }
+    .btn.secondary { border-color: #cfd8e4; background: #f9fbfd; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #7a8798;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 6px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-top: 1px solid var(--line);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 4px;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .tab {
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      min-height: 36px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6c7a8c;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: var(--text);
+      background: #fff;
+      box-shadow: 0 8px 16px rgba(24, 39, 61, 0.09);
+    }
+
+    .form-panel { display: none; margin-top: 4px; }
+    .form-panel.active { display: block; animation: fade 0.2s ease; }
+
+    .field { margin-top: 10px; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #5f6c7d;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 12px;
+      border: 1px solid #ccd6e3;
+      background: #fff;
+      padding: 0 14px;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .field input::placeholder { color: #9aa7b8; }
+
+    .field input:focus {
+      border-color: var(--x-blue);
+      box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.17);
+    }
+
+    .inline-row {
+      margin: 10px 2px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: #5e6c7d;
+      font-size: 12px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle input { accent-color: #111; }
+
+    .link-btn {
+      border: none;
+      background: transparent;
+      color: var(--x-blue);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 0;
+      margin-left: auto;
+    }
+
+    .session-bar {
+      margin-top: 2px;
+      border: 1px solid #dce4ef;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 10px;
+      display: none;
+      gap: 8px;
+    }
+
+    .session-text {
+      font-size: 12px;
+      color: #5d6c80;
+    }
+
+    .session-actions {
+      margin-top: 7px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .mini-btn {
+      border: 1px solid #ced9e9;
+      background: #fff;
+      color: #243247;
+      border-radius: 999px;
+      min-height: 30px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .actions {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .status {
+      min-height: 44px;
+      border: 1px solid #d8e1ec;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 11px 12px;
+      color: #55667a;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .status.ok {
+      color: var(--ok);
+      border-color: rgba(11, 138, 90, 0.28);
+      background: rgba(11, 138, 90, 0.08);
+    }
+
+    .status.err {
+      color: var(--err);
+      border-color: rgba(191, 29, 24, 0.3);
+      background: rgba(191, 29, 24, 0.08);
+    }
+
+    .status-action {
+      margin-top: 8px;
+      display: none;
+      justify-content: center;
+    }
+
+    .status-link {
+      border: 1px solid #c8d7ed;
+      border-radius: 999px;
+      background: #fff;
+      color: #33558b;
+      font-size: 12px;
+      font-weight: 600;
+      min-height: 30px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 960px) {
+      .shell {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .hero {
+        padding: 32px 24px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(188, 201, 220, 0.42);
+      }
+
+      .hero p { max-width: none; }
+      .panel { padding: 28px 20px 22px; }
+    }
+  </style>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body class="app-page auth-page">
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="brand-tag">Xiaoma ID</div>
+        <h1><strong>一个姓马马马的创建的第一个网站</strong>，希望大家多多提意见，<span>完善社区功能与修复BUG，谢谢大家~。</span></h1>
+        <p>在这里记录游戏战术、图文灵感和成长日常。登录后即可发布、互动、收藏，沉淀你的个人影响力。</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature"><span class="feature-dot"></span>一键登录后即可发帖、评论、点赞和收藏</div>
+        <div class="feature"><span class="feature-dot"></span>支持密码登录与邮箱验证码登录，回访更顺滑</div>
+        <div class="feature"><span class="feature-dot"></span>个人中心可持续完善昵称、简介和联系方式</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>登录 xiaoma.cyou</h2>
+      <p class="sub">继续访问你的专属页面与功能</p>
+      <div id="sessionBar" class="session-bar"></div>
+
+      <div class="divider">使用账号登录</div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="password">密码登录</button>
+        <button class="tab" data-tab="otp">验证码登录</button>
+      </div>
+
+      <div id="panel-password" class="form-panel active">
+        <div class="field">
+          <label for="email">邮箱</label>
+          <input type="email" id="email" placeholder="name@example.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">密码</label>
+          <input type="password" id="password" placeholder="请输入密码" autocomplete="current-password" />
+        </div>
+        <div class="field" id="registerOnlyField" style="display:none">
+          <label for="passwordConfirm">确认密码（注册时）</label>
+          <input type="password" id="passwordConfirm" placeholder="再次输入密码" autocomplete="new-password" />
+        </div>
+        <div class="inline-row">
+          <label class="toggle"><input type="checkbox" id="showPassword" />显示密码</label>
+          <label class="toggle"><input type="checkbox" id="rememberMe" checked />记住我</label>
+          <button class="link-btn" id="forgotLink">忘记密码？</button>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="loginBtn">登录</button>
+          <button class="btn secondary" id="registerLink">创建账号</button>
+        </div>
+      </div>
+
+      <div id="panel-otp" class="form-panel">
+        <div class="field">
+          <label for="otpIdentity" id="otpIdentityLabel">邮箱</label>
+          <input type="text" id="otpIdentity" placeholder="name@example.com" autocomplete="username" />
+        </div>
+        <div class="actions">
+          <button class="btn" id="sendOtpBtn">发送验证码</button>
+          <button class="btn secondary" id="resendOtpBtn" type="button">重新发送</button>
+        </div>
+        <div class="field">
+          <label for="otpCode">邮箱验证码</label>
+          <input type="text" id="otpCode" placeholder="输入邮箱中的验证码" maxlength="12" autocomplete="one-time-code" />
+        </div>
+        <div class="field" id="resetPasswordField" style="display:none">
+          <label for="resetNewPassword">新密码</label>
+          <input type="password" id="resetNewPassword" placeholder="请输入新密码（至少6位）" autocomplete="new-password" />
+        </div>
+        <div class="field" id="resetPasswordConfirmField" style="display:none">
+          <label for="resetNewPasswordConfirm">确认新密码</label>
+          <input type="password" id="resetNewPasswordConfirm" placeholder="再次输入新密码" autocomplete="new-password" />
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="verifyOtpBtn">验证并登录</button>
+        </div>
+        <div class="inline-row" style="margin-top:8px">
+          <span style="color:#6f7c8f;font-size:12px">收不到邮件？检查垃圾箱，或 60 秒后重发</span>
+        </div>
+      </div>
+
+      <div id="status" class="status">请选择登录方式</div>
+      <div id="statusAction" class="status-action"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/auth-plus.js" data-supabase-url="https://vtplvtwbkyydxmcxgctn.supabase.co" data-supabase-anon-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU"></script>
+</body>
+</html>

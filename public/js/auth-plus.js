@@ -143,7 +143,7 @@
   }
 
   function renderOtpButtonState() {
-    if (!resendOtpBtn) return;
+    if (!sendOtpBtn || !resendOtpBtn) return;
     const left = getCooldownLeft(getCurrentOtpIdentity());
     const disabled = left > 0;
     sendOtpBtn.disabled = disabled;
