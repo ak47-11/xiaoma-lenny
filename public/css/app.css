@@ -2753,6 +2753,41 @@ samp {
   letter-spacing: -0.02em;
 }
 
+.auth-page .auth-mode-badge {
+  width: fit-content;
+  min-height: 28px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 36%, var(--color-border-default));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary-soft) 64%, var(--color-bg-surface));
+  color: color-mix(in srgb, var(--color-primary) 86%, var(--color-text-primary));
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-micro);
+  font-weight: var(--font-weight-semibold);
+  display: inline-flex;
+  align-items: center;
+  transition:
+    border-color var(--motion-duration-base) var(--motion-ease-standard),
+    background var(--motion-duration-base) var(--motion-ease-standard),
+    color var(--motion-duration-base) var(--motion-ease-standard);
+}
+
+.auth-page .flow-tip {
+  display: none;
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 24%, var(--color-border-default));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-primary-soft) 52%, var(--color-bg-surface));
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  line-height: 1.72;
+  backdrop-filter: blur(10px);
+  transition:
+    border-color var(--motion-duration-base) var(--motion-ease-standard),
+    background var(--motion-duration-base) var(--motion-ease-standard),
+    color var(--motion-duration-base) var(--motion-ease-standard);
+}
+
 .auth-page .divider {
   display: flex;
   align-items: center;
@@ -2798,6 +2833,33 @@ samp {
   gap: var(--space-3);
 }
 
+.auth-page .link-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--color-primary) 88%, var(--color-text-primary));
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.6;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    color var(--motion-duration-base) var(--motion-ease-standard),
+    text-decoration-color var(--motion-duration-base) var(--motion-ease-standard);
+}
+
+.auth-page .link-btn:hover {
+  color: var(--color-primary-hover);
+}
+
+.auth-page .link-btn.is-active {
+  color: var(--color-primary);
+  text-decoration-thickness: 2px;
+}
+
 .auth-page .session-bar {
   display: none;
 }
@@ -2814,6 +2876,30 @@ samp {
 
 .auth-page .minimal-hidden {
   display: none !important;
+}
+
+.auth-page .panel[data-auth-mode="register"] {
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border-default));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-primary) 22%, transparent),
+    var(--shadow-sm);
+}
+
+.auth-page .panel[data-auth-mode="register"] .auth-mode-badge {
+  border-color: color-mix(in srgb, var(--color-primary) 48%, var(--color-border-default));
+}
+
+.auth-page .panel[data-auth-mode="reset"] {
+  border-color: color-mix(in srgb, var(--color-warning) 32%, var(--color-border-default));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-warning) 18%, transparent),
+    var(--shadow-sm);
+}
+
+.auth-page .panel[data-auth-mode="reset"] .auth-mode-badge {
+  border-color: color-mix(in srgb, var(--color-warning) 48%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-warning-soft) 72%, var(--color-bg-surface));
+  color: color-mix(in srgb, var(--color-warning) 84%, var(--color-text-primary));
 }
 
 /*
@@ -4128,6 +4214,58 @@ body.app-page.auth-page[data-apple-variant="b"] .field input {
 body.app-page.auth-page[data-apple-variant="b"] .status {
   border-color: rgba(29, 29, 31, 0.1);
   background: rgba(255, 255, 255, 0.88);
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .auth-mode-badge {
+  border-color: rgba(29, 29, 31, 0.14);
+  background: rgba(255, 255, 255, 0.88);
+  color: #2f2f35;
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .flow-tip {
+  border-color: rgba(29, 29, 31, 0.09);
+  background: rgba(255, 255, 255, 0.86);
+  color: #56565d;
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .link-btn {
+  color: #4a4a51;
+  text-decoration-color: rgba(29, 29, 31, 0.42);
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .link-btn:hover {
+  color: #1d1d1f;
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .link-btn.is-active {
+  color: #0066cc;
+  text-decoration-color: rgba(0, 102, 204, 0.75);
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .panel[data-auth-mode="register"] {
+  border-color: rgba(0, 102, 204, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(0, 102, 204, 0.13),
+    var(--shadow-md);
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .panel[data-auth-mode="register"] .auth-mode-badge {
+  border-color: rgba(0, 102, 204, 0.28);
+  background: rgba(0, 102, 204, 0.09);
+  color: #0050a6;
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .panel[data-auth-mode="reset"] {
+  border-color: rgba(204, 127, 15, 0.24);
+  box-shadow:
+    0 0 0 1px rgba(204, 127, 15, 0.12),
+    var(--shadow-md);
+}
+
+body.app-page.auth-page[data-apple-variant="b"] .panel[data-auth-mode="reset"] .auth-mode-badge {
+  border-color: rgba(204, 127, 15, 0.34);
+  background: rgba(204, 127, 15, 0.11);
+  color: #9f5f00;
 }
 
 body.app-page[data-apple-variant="b"] .home-page .home-shell {

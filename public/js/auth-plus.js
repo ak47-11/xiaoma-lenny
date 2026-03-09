@@ -6,6 +6,10 @@
   const statusEl = document.getElementById("status");
   const statusActionEl = document.getElementById("statusAction");
   const sessionBarEl = document.getElementById("sessionBar");
+  const authPanelEl = document.getElementById("authPanel");
+  const authModeBadgeEl = document.getElementById("authModeBadge");
+  const registerFlowTipEl = document.getElementById("registerFlowTip");
+  const otpContextEl = document.getElementById("otpContext");
   const tabsEl = document.querySelector(".tabs");
   const panelsEl = document.querySelectorAll(".form-panel");
   const dividerEl = document.querySelector(".divider");
@@ -178,6 +182,53 @@
   let registerMode = false;
   let resetMode = false;
 
+  function getCurrentMode() {
+    if (resetMode) return "reset";
+    if (registerMode) return "register";
+    const activeTab = document.querySelector(".tab.active")?.dataset?.tab;
+    if (activeTab === "otp") return "otp";
+    return "login";
+  }
+
+  function renderModeUI() {
+    const mode = getCurrentMode();
+    if (authPanelEl) authPanelEl.dataset.authMode = mode;
+
+    if (authModeBadgeEl) {
+      const labelMap = {
+        login: "当前模式：密码登录",
+        register: "当前模式：创建账号",
+        otp: "当前模式：验证码登录",
+        reset: "当前模式：找回密码"
+      };
+      authModeBadgeEl.textContent = labelMap[mode] || labelMap.login;
+    }
+
+    if (registerBtn) registerBtn.classList.toggle("is-active", registerMode);
+    if (forgotBtn) forgotBtn.classList.toggle("is-active", resetMode);
+
+    if (registerFlowTipEl) {
+      if (registerMode) {
+        registerFlowTipEl.style.display = "block";
+        registerFlowTipEl.textContent = "注册流程：确认密码后点击“发送注册验证码”，再去邮箱完成验证。";
+      } else {
+        registerFlowTipEl.style.display = "none";
+      }
+    }
+
+    if (otpContextEl) {
+      const showOtpContext = mode === "otp" || mode === "register" || mode === "reset";
+      otpContextEl.style.display = showOtpContext ? "block" : "none";
+      if (resetMode) {
+        otpContextEl.textContent = "找回流程：输入邮箱或用户名，收码后设置新密码。";
+      } else if (registerMode) {
+        otpContextEl.textContent = "注册流程：输入邮箱验证码后即可完成创建。";
+      } else {
+        otpContextEl.textContent = "验证码用于快速登录，也可用于找回密码。";
+      }
+    }
+  }
+
   async function getAuthContext() {
     const localSession = (await sbLocal.auth.getSession()).data.session;
     if (localSession) return { client: sbLocal, session: localSession, mode: "local" };
@@ -272,6 +323,7 @@
     registerMode = enabled;
     if (registerOnlyFieldEl) registerOnlyFieldEl.style.display = enabled ? "block" : "none";
     if (registerBtn) registerBtn.textContent = enabled ? "发送注册验证码" : "创建账号";
+    renderModeUI();
   }
 
   function setResetMode(enabled) {
@@ -281,6 +333,7 @@
     if (otpIdentityLabelEl) otpIdentityLabelEl.textContent = enabled ? "邮箱 / 用户名" : "邮箱";
     if (verifyOtpBtn) verifyOtpBtn.textContent = enabled ? "校验并重置密码" : "验证并登录";
     if (forgotBtn) forgotBtn.textContent = enabled ? "取消找回" : "忘记密码？";
+    renderModeUI();
   }
 
   function switchToOtpTab() {
@@ -291,6 +344,7 @@
     document.querySelectorAll(".form-panel").forEach((panel) => panel.classList.remove("active"));
     const otpPanel = document.getElementById("panel-otp");
     if (otpPanel) otpPanel.classList.add("active");
+    renderModeUI();
   }
 
   async function resolveIdentity(input) {
@@ -391,6 +445,7 @@
       if (activeTab !== "password") setRegisterMode(false);
       if (activeTab !== "otp") setResetMode(false);
       setStatus(activeTab === "password" ? "等待密码登录" : "等待验证码操作");
+      renderModeUI();
     });
   });
 
@@ -562,5 +617,6 @@
   renderOtpButtonState();
   setRegisterMode(false);
   setResetMode(false);
+  renderModeUI();
   renderSessionBar();
 })();

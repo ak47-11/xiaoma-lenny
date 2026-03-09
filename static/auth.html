@@ -34,7 +34,7 @@
       </div>
     </section>
 
-    <section class="panel" data-reveal="up">
+    <section class="panel" data-reveal="up" id="authPanel" data-auth-mode="login">
       <div class="auth-panel-head">
         <h2>登录 xiaoma.cyou</h2>
         <p class="sub">输入账号信息后即可继续。</p>
@@ -48,8 +48,12 @@
       </div>
 
       <div class="divider">secure sign in</div>
+      <div id="authModeBadge" class="auth-mode-badge">当前模式：密码登录</div>
 
       <div id="panel-password" class="form-panel active">
+        <div id="registerFlowTip" class="flow-tip">
+          创建账号：填写邮箱和密码，点击「创建账号」，系统会向邮箱发送验证码。
+        </div>
         <div class="field">
           <label for="email">邮箱</label>
           <input type="email" id="email" placeholder="name@example.com" autocomplete="email" />
@@ -76,6 +80,7 @@
       </div>
 
       <div id="panel-otp" class="form-panel">
+        <div id="otpContext" class="flow-tip">验证码用于快速登录，也可用于找回密码。</div>
         <div class="field">
           <label for="otpIdentity" id="otpIdentityLabel">邮箱</label>
           <input type="text" id="otpIdentity" placeholder="name@example.com" autocomplete="username" />
