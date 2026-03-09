@@ -62,12 +62,12 @@
     if (adminNav) adminNav.style.display = admin ? "inline-flex" : "none";
 
     if (logoutNav) {
-      logoutNav.onclick = async function (event) {
+      logoutNav.addEventListener("click", async function (event) {
         event.preventDefault();
         await localClient.auth.signOut();
         await sessionClient.auth.signOut();
         window.location.href = "/auth.html";
-      };
+      });
     }
   }
 

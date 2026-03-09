@@ -3,25 +3,310 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>社区入口已合并</title>
-  <meta http-equiv="refresh" content="0; url=/" />
+  <title>社区入口 | xiaoma.cyou</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #161b22;
+      --surface-soft: #121922;
+      --line: rgba(83, 100, 113, 0.34);
+      --text: #e7e9ea;
+      --muted: #536471;
+      --primary: #1d9bf0;
+      --accent: #f91880;
+      --radius: 12px;
+      --space-16: 16px;
+      --space-24: 24px;
+      --space-32: 32px;
+      --title-size: 20px;
+      --body-size: 16px;
+      --meta-size: 13px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.26);
+      --transition: 150ms ease;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(980px 460px at 100% -20%, rgba(29, 155, 240, 0.12), transparent 62%),
+        var(--bg);
+      font-size: var(--body-size);
+      line-height: 1.6;
+    }
+
+    .shell {
+      width: min(680px, calc(100% - 32px));
+      margin: var(--space-24) auto var(--space-32);
+      display: grid;
+      gap: var(--space-24);
+    }
+
+    .top,
+    .hero,
+    .section,
+    .card,
+    .foot {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .top,
+    .hero,
+    .section,
+    .foot {
+      padding: var(--space-24);
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-16);
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+    }
+
+    .brand {
+      font-size: var(--title-size);
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .top-links,
+    .minor-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .mini-link,
+    .cta {
+      transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        color var(--transition);
+    }
+
+    .mini-link {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: var(--meta-size);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .mini-link:hover {
+      color: var(--text);
+      background: rgba(231, 233, 234, 0.08);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(249, 24, 128, 0.5);
+      background: rgba(249, 24, 128, 0.12);
+      color: #ffd0e8;
+      font-size: var(--meta-size);
+      font-weight: 600;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-size: var(--title-size);
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      margin-top: var(--space-16);
+    }
+
+    .sub,
+    .meta,
+    .foot {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--meta-size);
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .sub {
+      margin-top: var(--space-16);
+    }
+
+    .cta {
+      margin-top: var(--space-24);
+      min-height: 44px;
+      border-radius: 999px;
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: var(--body-size);
+      font-weight: 700;
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cta:hover {
+      background: #188cd8;
+    }
+
+    .minor-links {
+      margin-top: var(--space-16);
+    }
+
+    .section {
+      display: grid;
+      gap: var(--space-16);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-16);
+    }
+
+    .card {
+      padding: var(--space-16);
+      display: grid;
+      gap: 8px;
+    }
+
+    .card h3 {
+      font-size: var(--body-size);
+    }
+
+    .line {
+      font-size: var(--body-size);
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: calc(100% - 24px);
+        margin: var(--space-16) auto var(--space-24);
+        gap: var(--space-16);
+      }
+
+      .top,
+      .hero,
+      .section,
+      .foot {
+        padding: var(--space-16);
+      }
+
+      .top {
+        position: static;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
   <link rel="stylesheet" href="/css/app.css" />
 </head>
-<body class="app-page">
-  <main class="shell" style="max-width:720px;padding:48px 16px;">
-    <section class="panel" style="text-align:center;display:grid;gap:12px;">
-      <h1 style="margin:0;">社区入口已合并到首页</h1>
-      <p class="muted" style="margin:0;">正在跳转到主页。如果没有自动跳转，请点击下方按钮。</p>
-      <div class="actions" style="justify-content:center;">
-        <a class="action-btn" href="/">前往首页</a>
+<body class="app-page home-page community-gateway-page">
+  <main class="shell">
+    <header class="top" data-reveal="down">
+      <div class="brand">社区入口</div>
+      <nav class="top-links">
+        <a class="mini-link" href="/">首页</a>
+        <a class="mini-link" href="/m.html">M</a>
+        <a class="mini-link" href="/mi.html">Mi</a>
+        <a class="mini-link" href="/lenny.html">Lenny</a>
+        <a class="mini-link" href="/profile.html" id="profileNav" style="display:none">我的资料</a>
+        <a class="mini-link" href="/admin.html" id="adminNav" style="display:none">控制�?/a>
+        <a class="mini-link" href="/auth.html" id="loginNav">账号入口</a>
+        <a class="mini-link" href="#" id="logoutNav" style="display:none">退出账�?/a>
+      </nav>
+    </header>
+
+    <section class="hero" data-reveal="up">
+      <span class="badge">Community Gateway</span>
+      <h1>立即登录并开始发布，最�?1 步进入创作状态�?/h1>
+      <p class="sub">其余入口保持次级链接，先降低选择压力，再引导你进入真实内容流�?/p>
+      <a class="cta" href="/auth.html?next=/m-publish.html">立即登录并开始发�?/a>
+      <div class="minor-links">
+        <a class="mini-link" href="/m.html">浏览 M</a>
+        <a class="mini-link" href="/mi.html">浏览 Mi</a>
+        <a class="mini-link" href="/lenny.html">浏览 Lenny</a>
       </div>
     </section>
+
+
+    <section class="section hero-playground-shell" data-reveal="up">
+      <div class="hero-playground">
+        <div class="playground-head">
+          <strong>���Ⲷ�� Mini Game</strong>
+          <span>15 ����ս������ƶ���㣬������ķ�Ӧ�ٶȡ�</span>
+        </div>
+        <div class="playground-stage" data-flow-catch aria-label="���Ⲷ����Ϸ����">
+          <canvas class="playground-canvas" aria-hidden="true"></canvas>
+          <button class="playground-start" type="button" data-flow-start>��ʼ 15 ����ս</button>
+          <div class="playground-hud">
+            <span>�÷� <b data-flow-score>0</b></span>
+            <span>��� <b data-flow-best>0</b></span>
+            <span>ʣ�� <b data-flow-time>15</b>s</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section" data-reveal="up">
+      <h2>示例内容预览</h2>
+      <div class="grid">
+        <article class="card" data-tilt-card>
+          <h3>M · 动态示�?/h3>
+          <div class="line">Yuki：首屏改�?1 个主行动后，注册转化提升 19%�?/div>
+          <div class="meta">6 分钟�?· 👍 182 · 🔁 27 · #增长实验</div>
+        </article>
+        <article class="card" data-tilt-card>
+          <h3>Mi · 视频示例</h3>
+          <div class="line">Ivy：前端性能优化 Checklist�?026）已更新�?/div>
+          <div class="meta">19 分钟�?· �?5520 · �?236 · #前端性能</div>
+        </article>
+        <article class="card" data-tilt-card>
+          <h3>Lenny · 文章示例</h3>
+          <div class="line">Seth：骨架屏从假加载到真实占位的完整实践�?/div>
+          <div class="meta">35 分钟�?· 👁 6122 · 🔖 227 · #UX #前端</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="foot" data-reveal="up">如果后端暂时没有真实数据，社区页会自动展示示例卡片，保证第一眼就有可读内容�?/section>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/app-core.js"></script>
+  <script src="/js/home-playground.js"></script>
   <script>
-    window.location.replace("/");
+    window.XiaomaCore?.applyNavState();
   </script>
 </body>
 </html>
+

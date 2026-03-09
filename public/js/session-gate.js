@@ -56,12 +56,12 @@
     if (adminNav) adminNav.style.display = isAdmin ? "inline-block" : "none";
 
     if (logoutNav) {
-      logoutNav.onclick = async function (event) {
+      logoutNav.addEventListener("click", async function (event) {
         event.preventDefault();
         await sbLocal.auth.signOut();
         await sbSession.auth.signOut();
         window.location.href = "/auth.html";
-      };
+      });
     }
   }
 

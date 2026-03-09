@@ -7,9 +7,9 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/hub.css" />
 </head>
-<body class="app-page hub-page page-mi">
+<body class="accent-mi">
   <main class="hub-shell">
     <header class="hub-top">
       <div class="hub-brand">
@@ -17,10 +17,10 @@
         <span>个人页面 · 上传与管理我的视频</span>
       </div>
       <nav class="hub-nav">
-        <a class="pill mi is-current" href="/mi.html">Mi 公共社区</a>
+        <a class="pill mi" href="/mi.html">Mi 公共社区</a>
         <a class="pill m" href="/m.html">M</a>
         <a class="pill lenny" href="/lenny.html">Lenny</a>
-        <a href="/">社区入口</a>
+        <a href="/community.html">社区入口</a>
         <a href="/profile.html" id="profileNav" style="display:none">我的资料</a>
         <a href="/admin.html" id="adminNav" style="display:none">控制台</a>
         <a href="/auth.html" id="loginNav">账号入口</a>
@@ -29,7 +29,7 @@
     </header>
 
     <section class="hub-layout">
-      <aside class="panel panel-left">
+      <aside class="panel">
         <h3>页面说明</h3>
         <div class="hint">这是 Mi 的个人发布页。公开浏览请返回 Mi 公共社区，两个页面职责分离。</div>
         <div class="actions" style="margin-top:10px;">
@@ -37,7 +37,7 @@
         </div>
       </aside>
 
-      <section class="panel panel-main">
+      <section class="panel">
         <h2>上传视频信息</h2>
         <p id="userHint" class="muted" style="margin:0 0 8px;">正在验证登录状态...</p>
         <form id="miUploader">
@@ -85,7 +85,7 @@
         <div id="miMineGrid" class="video-grid"></div>
       </section>
 
-      <aside class="panel panel-right">
+      <aside class="panel">
         <h3>上传建议</h3>
         <ul class="list-text">
           <li>标题尽量说明“看完学到什么”</li>
