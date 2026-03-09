@@ -3909,29 +3909,60 @@ body.app-page {
 }
 
 body.app-page[data-apple-variant="b"] {
-  --color-primary: #5e5ce6;
-  --color-primary-hover: #4d49cf;
-  --color-primary-active: #3f3ab8;
-  --color-primary-soft: rgba(94, 92, 230, 0.15);
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
-  --shadow-md: 0 12px 30px rgba(16, 24, 40, 0.1);
-  --shadow-lg: 0 22px 50px rgba(16, 24, 40, 0.14);
+  --color-bg-canvas: #fbfbfd;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-muted: #f5f5f7;
+  --color-bg-subtle: rgba(29, 29, 31, 0.03);
+
+  --color-text-primary: #1d1d1f;
+  --color-text-secondary: #424245;
+  --color-text-tertiary: #6e6e73;
+
+  --color-border-default: rgba(29, 29, 31, 0.1);
+  --color-border-strong: rgba(29, 29, 31, 0.16);
+
+  --color-primary: #0071e3;
+  --color-primary-hover: #0068d1;
+  --color-primary-active: #005cba;
+  --color-primary-soft: rgba(0, 113, 227, 0.12);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.11);
+
+  --font-family-base:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Helvetica Neue",
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
 }
 
 body.app-page[data-apple-variant="b"] {
   background:
-    radial-gradient(1200px 560px at 102% -18%, rgba(94, 92, 230, 0.12), transparent 60%),
-    radial-gradient(980px 540px at -8% 0%, rgba(100, 210, 255, 0.11), transparent 58%),
-    linear-gradient(180deg, #f4f5fb 0%, #f4f6fb 46%, #f7f7fc 100%);
+    radial-gradient(980px 480px at 100% -18%, rgba(0, 113, 227, 0.07), transparent 60%),
+    radial-gradient(760px 420px at -10% 2%, rgba(255, 255, 255, 0.86), transparent 56%),
+    linear-gradient(180deg, #fbfbfd 0%, #f8f8fa 100%);
+}
+
+body.app-page[data-apple-variant="b"] h1,
+body.app-page[data-apple-variant="b"] h2,
+body.app-page[data-apple-variant="b"] h3 {
+  letter-spacing: -0.02em;
 }
 
 body.app-page[data-apple-variant="b"] .top,
 body.app-page[data-apple-variant="b"] .hub-top {
-  background: color-mix(in srgb, var(--color-bg-surface) 76%, transparent);
-  border-color: color-mix(in srgb, var(--color-primary) 20%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-bg-surface) 78%, transparent);
+  border-color: rgba(29, 29, 31, 0.08);
+  backdrop-filter: blur(20px);
   box-shadow:
-    0 1px 0 color-mix(in srgb, var(--color-primary) 10%, transparent),
-    0 14px 34px rgba(16, 24, 40, 0.09);
+    0 1px 0 rgba(255, 255, 255, 0.65),
+    0 14px 30px rgba(15, 23, 42, 0.07);
 }
 
 body.app-page[data-apple-variant="b"] .panel,
@@ -3940,33 +3971,134 @@ body.app-page[data-apple-variant="b"] .section,
 body.app-page[data-apple-variant="b"] .foot,
 body.app-page[data-apple-variant="b"] .article-view,
 body.app-page[data-apple-variant="b"] .detail-card,
-body.app-page[data-apple-variant="b"] .portal {
-  border-color: color-mix(in srgb, var(--color-primary) 16%, var(--color-border-default));
+body.app-page[data-apple-variant="b"] .portal,
+body.app-page[data-apple-variant="b"] .card {
+  border-color: rgba(29, 29, 31, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
-body.app-page[data-apple-variant="b"] .home-page .hero,
-body.app-page[data-apple-variant="b"] .home-page .trust-strip,
-body.app-page[data-apple-variant="b"] .home-page .creator-fit,
-body.app-page[data-apple-variant="b"] .home-page .cta-band,
-body.app-page[data-apple-variant="b"] .community-gateway-page .hero,
-body.app-page[data-apple-variant="b"] .auth-page .hero {
-  background:
-    linear-gradient(
-      152deg,
-      color-mix(in srgb, var(--color-primary-soft) 44%, var(--color-bg-surface)),
-      color-mix(in srgb, #64d2ff 10%, var(--color-bg-surface))
-    );
+body.app-page[data-apple-variant="b"] .button--primary,
+body.app-page[data-apple-variant="b"] .btn.primary,
+body.app-page[data-apple-variant="b"] .action-btn,
+body.app-page[data-apple-variant="b"] .cta,
+body.app-page[data-apple-variant="b"] .hero-actions .ai-primary,
+body.app-page[data-apple-variant="b"] .hub-nav .pill.is-current,
+body.app-page[data-apple-variant="b"] .nav .entry.ai {
+  --button-bg: #1d1d1f;
+  --button-bg-hover: #2a2a2c;
+  --button-bg-active: #111113;
+  --button-border: #1d1d1f;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .home-shell {
+  gap: var(--space-5);
+}
+
+html[data-apple-variant="b"].motion-ready [data-reveal] {
+  transform: translateY(10px) scale(0.995);
+  filter: none;
+}
+
+html[data-apple-variant="b"].motion-ready [data-reveal].is-visible {
+  transform: translateY(0) scale(1);
+}
+
+body.app-page[data-apple-variant="b"] .home-page .hero {
+  padding: clamp(36px, 5vw, 84px);
+  border-radius: 34px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9f9fb 100%);
+  box-shadow: var(--shadow-md);
+}
+
+body.app-page[data-apple-variant="b"] .home-page .home-hero-grid {
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+body.app-page[data-apple-variant="b"] .home-page .hero-main {
+  justify-items: center;
+  text-align: center;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .hero h1 {
+  max-width: 12ch;
+  font-size: clamp(44px, 8vw, 84px);
+  line-height: 1.02;
 }
 
 body.app-page[data-apple-variant="b"] .home-page .hero h1 span {
-  background: linear-gradient(112deg, #3f3ab8, #5e5ce6, #0a84ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  background: none;
+  color: #4d4d52;
 }
 
-body.app-page[data-apple-variant="b"] .home-page .nav .entry {
-  border-color: color-mix(in srgb, var(--color-primary) 18%, var(--color-border-default));
+body.app-page[data-apple-variant="b"] .home-page .hero p {
+  max-width: 62ch;
+  text-align: center;
+  font-size: clamp(17px, 2vw, 22px);
+  color: #4a4a50;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .hero-actions,
+body.app-page[data-apple-variant="b"] .home-page .hero-points,
+body.app-page[data-apple-variant="b"] .home-page .creator-actions,
+body.app-page[data-apple-variant="b"] .home-page .cta-band-actions {
+  justify-content: center;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .metric-grid {
+  width: min(940px, 100%);
+  margin-inline: auto;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .hero::after,
+body.app-page[data-apple-variant="b"] .community-gateway-page .hero::after {
+  display: none;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .hero-side {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+body.app-page[data-apple-variant="b"] .home-page .launch-card,
+body.app-page[data-apple-variant="b"] .home-page .signal-card {
+  border-radius: 22px;
+  background: #ffffff;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .section-head {
+  justify-items: center;
+  text-align: center;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .section-head p {
+  max-width: 64ch;
+  text-align: center;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .nav .entry,
+body.app-page[data-apple-variant="b"] .home-page .nav .entry.m,
+body.app-page[data-apple-variant="b"] .home-page .nav .entry.mi,
+body.app-page[data-apple-variant="b"] .home-page .nav .entry.lenny {
+  background: color-mix(in srgb, #ffffff 92%, var(--color-bg-muted));
+  color: #343438;
+  border-color: rgba(29, 29, 31, 0.1);
+  box-shadow: none;
+}
+
+body.app-page[data-apple-variant="b"] .home-page .portal {
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #fafafc 100%);
+}
+
+body.app-page[data-apple-variant="b"] .home-page .portal:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+body.app-page[data-apple-variant="b"] .home-page .portal,
+body.app-page[data-apple-variant="b"] .community-gateway-page .card {
+  transform: none !important;
 }
 
 body.app-page[data-apple-variant="b"] .home-page .portal.is-focused,
@@ -3975,18 +4107,76 @@ body.app-page[data-apple-variant="b"] .article-card.active,
 body.app-page[data-apple-variant="b"] .thread-item.active,
 body.app-page[data-apple-variant="b"] .side-menu button.active {
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-primary) 42%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-primary) 34%, transparent),
     var(--shadow-md);
+}
+
+body.app-page.page-m[data-apple-variant="b"],
+body.app-page.page-mi[data-apple-variant="b"],
+body.app-page.page-lenny[data-apple-variant="b"] {
+  --color-bg-canvas: #fbfbfd;
+  --color-bg-surface: #ffffff;
+  --color-bg-muted: #f5f5f7;
+  --color-text-primary: #1d1d1f;
+  --color-text-secondary: #424245;
+  --color-text-tertiary: #6e6e73;
+  --color-border-default: rgba(29, 29, 31, 0.1);
+}
+
+body.app-page[data-apple-variant="b"] .scene-intro {
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8fa 100%);
+}
+
+body.app-page.community-gateway-page[data-apple-variant="b"] .hero,
+body.app-page.community-gateway-page[data-apple-variant="b"] .section {
+  border-radius: 28px;
+}
+
+body.app-page.community-gateway-page[data-apple-variant="b"] .hero {
+  padding: clamp(32px, 5vw, 68px);
+}
+
+body.app-page.community-gateway-page[data-apple-variant="b"] .hero h1,
+body.app-page.community-gateway-page[data-apple-variant="b"] .hero .sub {
+  max-width: 42ch;
+}
+
+body.app-page.community-gateway-page[data-apple-variant="b"] .grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body.app-page.openclaw-page[data-apple-variant="b"] .sidebar,
+body.app-page.openclaw-page[data-apple-variant="b"] .main {
+  background: color-mix(in srgb, #ffffff 90%, transparent);
 }
 
 body.app-page.openclaw-page[data-apple-variant="b"] {
   background:
-    radial-gradient(980px 460px at 92% -10%, rgba(94, 92, 230, 0.16), transparent 62%),
-    radial-gradient(860px 420px at -10% 116%, rgba(100, 210, 255, 0.09), transparent 64%),
+    radial-gradient(980px 460px at 92% -10%, rgba(0, 113, 227, 0.1), transparent 62%),
+    radial-gradient(860px 420px at -10% 116%, rgba(255, 255, 255, 0.7), transparent 64%),
     var(--color-bg-canvas);
 }
 
+body.app-page.openclaw-page[data-apple-variant="b"] .chat-feed {
+  background: color-mix(in srgb, var(--color-bg-muted) 66%, transparent);
+}
+
 body.app-page.openclaw-page[data-apple-variant="b"] .msg.user {
-  border-color: color-mix(in srgb, #5e5ce6 54%, var(--color-border-default));
-  background: color-mix(in srgb, rgba(94, 92, 230, 0.24) 68%, var(--color-bg-surface));
+  border-color: color-mix(in srgb, var(--color-primary) 48%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-primary-soft) 62%, #ffffff);
+}
+
+@media (max-width: 1023px) {
+  body.app-page[data-apple-variant="b"] .home-page .hero-side {
+    grid-template-columns: 1fr;
+  }
+
+  body.app-page[data-apple-variant="b"] .home-page .hero {
+    padding: var(--space-5);
+  }
+
+  body.app-page.community-gateway-page[data-apple-variant="b"] .grid {
+    grid-template-columns: 1fr;
+  }
 }

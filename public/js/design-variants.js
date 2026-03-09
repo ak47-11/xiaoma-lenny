@@ -1,6 +1,6 @@
 (function () {
-  var STORAGE_KEY = "xiaoma_apple_variant_v1";
-  var DEFAULT_VARIANT = "a";
+  var STORAGE_KEY = "xiaoma_apple_variant_v2";
+  var DEFAULT_VARIANT = "b";
 
   function normalizeVariant(value) {
     return value === "b" ? "b" : "a";
@@ -32,8 +32,8 @@
   }
 
   function getToggleLabel(variant) {
-    if (variant === "b") return "视觉 B · 切换 A";
-    return "视觉 A · 切换 B";
+    if (variant === "b") return "高级版 · 切换标准";
+    return "标准版 · 切换高级";
   }
 
   function findHostContainer() {
