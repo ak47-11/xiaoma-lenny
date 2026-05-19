@@ -2,6 +2,9 @@
   const STORE_KEY = "xiaoma.openclaw.agent.v1";
   const USER_STORE_PREFIX = "xiaoma.openclaw.agent.user.";
   const CLOUD_TABLE = "openclaw_states";
+  const METADATA_KEY = "openclawState";
+  const METADATA_MAX_THREADS = 8;
+  const METADATA_MAX_MESSAGES = 24;
   const MAX_DOC_CHARS = 28000;
   const MAX_DOCS = 12;
 
@@ -100,6 +103,20 @@
     };
   }
 
+  function metadataSnapshot() {
+    const snapshot = snapshotState();
+    return {
+      ...snapshot,
+      docs: [],
+      threads: snapshot.threads.slice(0, METADATA_MAX_THREADS).map(function (thread) {
+        return {
+          ...thread,
+          messages: Array.isArray(thread.messages) ? thread.messages.slice(-METADATA_MAX_MESSAGES) : []
+        };
+      })
+    };
+  }
+
   function applySavedState(saved) {
     if (!saved || typeof saved !== "object") return;
     if (saved.config) state.config = { ...state.config, ...saved.config };
@@ -109,6 +126,29 @@
     if (Array.isArray(saved.threads)) state.threads = saved.threads;
     migrateThreads();
     ensureActiveThread();
+  }
+
+  function stateWeight(saved) {
+    if (!saved || typeof saved !== "object") return 0;
+    const agents = Array.isArray(saved.agents) ? saved.agents.filter((agent) => agent.id !== "agent-default").length : 0;
+    const groups = Array.isArray(saved.groups) ? saved.groups.filter((group) => group.id !== "group-default").length : 0;
+    const docs = Array.isArray(saved.docs) ? saved.docs.length : 0;
+    const messages = Array.isArray(saved.threads) ? saved.threads.reduce(function (sum, thread) {
+      return sum + (Array.isArray(thread.messages) ? thread.messages.length : 0);
+    }, 0) : 0;
+    return agents * 10 + groups * 6 + docs * 4 + messages;
+  }
+
+  function applyRemoteState(remote) {
+    if (!remote || typeof remote !== "object") return false;
+    const local = snapshotState();
+    if (stateWeight(local) > stateWeight(remote)) {
+      queueCloudSave();
+      return false;
+    }
+    applySavedState(remote);
+    localStorage.setItem(state.userStoreKey, JSON.stringify(snapshotState()));
+    return true;
   }
 
   function loadState() {
@@ -130,35 +170,40 @@
 
   async function loadCloudState() {
     if (!state.client || !state.session?.user) return false;
+    let loadedFromTable = false;
     try {
       const result = await state.client.from(CLOUD_TABLE).select("state,updated_at").eq("user_id", state.session.user.id).maybeSingle();
       if (result.error) throw result.error;
       state.cloudReady = true;
       if (result.data?.state) {
-        applySavedState(result.data.state);
-        localStorage.setItem(state.userStoreKey, JSON.stringify(snapshotState()));
-        return true;
+        loadedFromTable = applyRemoteState(result.data.state);
       }
-      await saveCloudState();
-      return false;
     } catch (error) {
       state.cloudReady = false;
-      if (!state.syncWarningShown) {
-        state.syncWarningShown = true;
-        setStatus("云同步未初始化：请执行 supabase/community_admin_setup.sql 后刷新。当前仅保存在本浏览器。");
-      }
-      return false;
     }
+
+    const loadedFromMetadata = loadedFromTable ? false : loadMetadataState();
+    if (!loadedFromTable && !loadedFromMetadata) await saveCloudState();
+    return loadedFromTable || loadedFromMetadata || state.cloudReady;
+  }
+
+  function loadMetadataState() {
+    const saved = state.session?.user?.user_metadata?.[METADATA_KEY];
+    if (!saved || typeof saved !== "object") return false;
+    const applied = applyRemoteState(saved);
+    state.cloudReady = true;
+    return applied;
   }
 
   function queueCloudSave() {
-    if (!state.cloudReady || !state.client || !state.session?.user) return;
+    if (!state.client || !state.session?.user) return;
     clearTimeout(state.cloudSaveTimer);
     state.cloudSaveTimer = setTimeout(saveCloudState, 650);
   }
 
   async function saveCloudState() {
     if (!state.client || !state.session?.user) return;
+    let tableSaved = false;
     try {
       const result = await state.client.from(CLOUD_TABLE).upsert({
         user_id: state.session.user.id,
@@ -166,12 +211,23 @@
         updated_at: new Date().toISOString()
       }, { onConflict: "user_id" });
       if (result.error) throw result.error;
-      state.cloudReady = true;
+      tableSaved = true;
     } catch (error) {
-      state.cloudReady = false;
+      tableSaved = false;
+    }
+
+    try {
+      const metadata = { ...(state.session.user.user_metadata || {}), [METADATA_KEY]: metadataSnapshot() };
+      const result = await state.client.auth.updateUser({ data: metadata });
+      if (result.error) throw result.error;
+      if (result.data?.user) state.session.user = result.data.user;
+      state.cloudReady = true;
+      state.syncWarningShown = false;
+    } catch (error) {
+      state.cloudReady = tableSaved;
       if (!state.syncWarningShown) {
         state.syncWarningShown = true;
-        setStatus("云同步保存失败：请确认 openclaw_states 表已初始化。当前仅保存在本浏览器。");
+        setStatus(tableSaved ? "云同步已保存到数据库，账号元数据备份失败。" : "云同步保存失败：当前仅保存在本浏览器。");
       }
     }
   }
