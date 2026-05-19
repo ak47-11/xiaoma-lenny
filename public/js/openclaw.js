@@ -41,7 +41,6 @@
     addAgent: document.getElementById("addAgentBtn"),
     groupName: document.getElementById("groupNameInput"),
     addGroup: document.getElementById("addGroupBtn"),
-    systemPrompt: document.getElementById("systemPromptInput"),
     saveConfig: document.getElementById("saveConfigBtn"),
     docInput: document.getElementById("docInput"),
     docList: document.getElementById("docList"),
@@ -149,7 +148,6 @@
   function renderConfig() {
     els.endpoint.value = state.config.endpoint || "";
     els.apiKey.value = state.config.apiKey || "";
-    els.systemPrompt.value = state.config.systemPrompt || "";
     renderAgents();
     renderGroups();
   }
@@ -242,15 +240,14 @@
 
   function renderDocs() {
     if (!state.docs.length) {
-      els.docList.innerHTML = '<p class="hint">还没有上传资料。</p>';
+      els.docList.innerHTML = '<p class="hint">后台资料库为空。</p>';
       els.tip.textContent = "当前无资料上下文；可先直接练习 Prompt。";
       return;
     }
 
-    els.docList.innerHTML = state.docs.map(function (doc) {
-      return '<article class="doc-item"><strong>' + escapeHtml(doc.name) + '</strong><span>' + Math.round(doc.content.length / 1000) + 'k chars</span></article>';
-    }).join("");
-    els.tip.textContent = "已加载 " + state.docs.length + " 份资料，会作为上下文发送。";
+    const totalChars = state.docs.reduce((sum, doc) => sum + doc.content.length, 0);
+    els.docList.innerHTML = '<p class="hint">后台已保存 ' + state.docs.length + ' 份资料，约 ' + Math.round(totalChars / 1000) + 'k 字符。</p>';
+    els.tip.textContent = "后台资料会作为上下文发送。";
   }
 
   function renderThreads() {
@@ -421,11 +418,10 @@
 
   function bindEvents() {
     els.saveConfig.addEventListener("click", function () {
-      state.config.systemPrompt = els.systemPrompt.value.trim();
       saveState();
       renderAgents();
       renderGroups();
-      setStatus("全局系统 Prompt 已保存。");
+      setStatus("设置已保存。");
     });
 
     els.toggleAgentForm.addEventListener("click", function () {
@@ -567,11 +563,6 @@
       setStatus("已进入群聊：" + (group?.name || "群聊"));
     });
 
-    els.systemPrompt.addEventListener("change", function () {
-      state.config.systemPrompt = els.systemPrompt.value.trim();
-      saveState();
-    });
-
     els.docInput.addEventListener("change", function (event) {
       addDocs(event.target.files).finally(function () { event.target.value = ""; });
     });
@@ -602,7 +593,6 @@
 
     els.form.addEventListener("submit", function (event) {
       event.preventDefault();
-      state.config.systemPrompt = els.systemPrompt.value.trim();
       saveState();
       sendPrompt(els.prompt.value);
     });

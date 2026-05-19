@@ -3272,6 +3272,11 @@ samp {
   font-size: var(--font-size-micro);
 }
 
+.openclaw-page .quiet-doc-list {
+  max-height: none;
+  overflow: visible;
+}
+
 .openclaw-page .agent-mode-row {
   grid-template-columns: 1fr;
 }

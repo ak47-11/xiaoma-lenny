@@ -99,7 +99,7 @@
           <small>支持 PDF、Word、Excel、txt、md、json、csv 等常用文件</small>
         </label>
         <input id="docInput" class="sr-only" type="file" multiple accept=".pdf,.docx,.xlsx,.xls,.txt,.md,.markdown,.json,.csv,.log,.yaml,.yml,.xml,.html,.css,.js,.ts" />
-        <div id="docList" class="doc-list"></div>
+        <div id="docList" class="doc-list quiet-doc-list"></div>
         <div class="actions compact-actions">
           <button id="clearDocsBtn" type="button">清空资料</button>
         </div>
@@ -138,10 +138,6 @@
       </div>
 
       <form id="composerForm" class="composer">
-        <div class="field prompt-field">
-          <label for="systemPromptInput">系统 Prompt</label>
-          <textarea id="systemPromptInput" rows="3" placeholder="定义智能体身份、回答风格、边界和输出格式。"></textarea>
-        </div>
         <textarea id="promptInput" rows="4" placeholder="输入问题。Shift + Enter 换行，Enter 发送。"></textarea>
         <div class="composer-row">
           <span id="composerTip" class="composer-tip">资料会作为上下文发送；请勿上传敏感信息到不可信模型接口。</span>
