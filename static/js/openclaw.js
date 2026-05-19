@@ -1,28 +1,22 @@
 (function () {
   const STORE_KEY = "xiaoma.openclaw.agent.v1";
-  const SECRET_STORE_KEY = "xiaoma.openclaw.agent.secrets.v1";
   const MAX_DOC_CHARS = 28000;
   const MAX_DOCS = 12;
 
   const state = {
     config: {
-      endpoint: "",
       model: "openclaw-agent",
-      apiKey: "",
-      bridgeToken: "",
       systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
     },
     docs: [],
     threads: [],
     activeThreadId: null,
+    session: null,
     abortController: null
   };
 
   const els = {
-    endpoint: document.getElementById("endpointInput"),
     model: document.getElementById("modelInput"),
-    apiKey: document.getElementById("apiKeyInput"),
-    bridgeToken: document.getElementById("bridgeTokenInput"),
     systemPrompt: document.getElementById("systemPromptInput"),
     saveConfig: document.getElementById("saveConfigBtn"),
     docInput: document.getElementById("docInput"),
@@ -38,7 +32,8 @@
     stop: document.getElementById("stopBtn"),
     status: document.getElementById("statusText"),
     mode: document.getElementById("agentMode"),
-    tip: document.getElementById("composerTip")
+    tip: document.getElementById("composerTip"),
+    userHint: document.getElementById("userHint")
   };
 
   const welcomeTemplate = els.chatFeed.querySelector(".welcome")?.outerHTML || "";
@@ -47,32 +42,21 @@
     try {
       const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
       if (saved.config) state.config = { ...state.config, ...saved.config };
-      delete state.config.apiKey;
-      delete state.config.bridgeToken;
-      const secrets = JSON.parse(sessionStorage.getItem(SECRET_STORE_KEY) || "{}");
-      state.config.apiKey = secrets.apiKey || "";
-      state.config.bridgeToken = secrets.bridgeToken || "";
       if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
       if (Array.isArray(saved.threads)) state.threads = saved.threads;
       state.activeThreadId = saved.activeThreadId || state.threads[0]?.id || createThread().id;
+      saveState();
     } catch (error) {
       state.activeThreadId = createThread().id;
     }
   }
 
   function saveState() {
-    const safeConfig = { ...state.config };
-    delete safeConfig.apiKey;
-    delete safeConfig.bridgeToken;
     localStorage.setItem(STORE_KEY, JSON.stringify({
-      config: safeConfig,
+      config: state.config,
       docs: state.docs,
       threads: state.threads.slice(0, 20),
       activeThreadId: state.activeThreadId
-    }));
-    sessionStorage.setItem(SECRET_STORE_KEY, JSON.stringify({
-      apiKey: state.config.apiKey || "",
-      bridgeToken: state.config.bridgeToken || ""
     }));
   }
 
@@ -114,11 +98,29 @@
   }
 
   function renderConfig() {
-    els.endpoint.value = state.config.endpoint || "";
     els.model.value = state.config.model || "";
-    els.apiKey.value = state.config.apiKey || "";
-    els.bridgeToken.value = state.config.bridgeToken || "";
     els.systemPrompt.value = state.config.systemPrompt || "";
+  }
+
+  async function loadSession() {
+    if (!window.XiaomaCore) {
+      setStatus("账号模块未加载，请刷新页面。");
+      return;
+    }
+    await window.XiaomaCore.applyNavState();
+    const context = await window.XiaomaCore.getSessionContext();
+    state.session = context.session;
+    if (!state.session?.user) {
+      els.userHint.textContent = "请先登录账号，登录后可直接使用智能体。";
+      setStatus("未登录：请先登录后使用。 ");
+      els.mode.textContent = "Login Required";
+      els.send.disabled = true;
+      return;
+    }
+    els.userHint.textContent = "当前账号：" + (state.session.user.email || state.session.user.id);
+    setStatus("已登录：可以使用服务端代理调用模型。 ");
+    els.mode.textContent = "Signed In";
+    els.send.disabled = false;
   }
 
   function renderDocs() {
@@ -197,10 +199,10 @@
   }
 
   async function callModel(messages) {
-    const endpoint = state.config.endpoint.trim() || "/api/openclaw";
+    if (!state.session?.access_token) throw new Error("请先登录账号后再使用智能体。");
+    const endpoint = "/api/openclaw";
     const headers = { "Content-Type": "application/json" };
-    if (state.config.apiKey.trim()) headers.Authorization = "Bearer " + state.config.apiKey.trim().replace(/^Bearer\s+/i, "");
-    if (state.config.bridgeToken.trim()) headers["X-OpenClaw-Bridge-Token"] = state.config.bridgeToken.trim();
+    headers.Authorization = "Bearer " + state.session.access_token;
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -252,7 +254,8 @@
   async function addDocs(files) {
     const accepted = Array.from(files || []).slice(0, MAX_DOCS - state.docs.length);
     for (const file of accepted) {
-      const content = await file.text();
+      setStatus("正在解析资料：" + file.name);
+      const content = await extractFileText(file);
       state.docs.push({ name: file.name, content: content.slice(0, MAX_DOC_CHARS), addedAt: new Date().toISOString() });
     }
     saveState();
@@ -262,13 +265,10 @@
 
   function bindEvents() {
     els.saveConfig.addEventListener("click", function () {
-      state.config.endpoint = els.endpoint.value.trim();
       state.config.model = els.model.value.trim() || "openclaw-agent";
-      state.config.apiKey = els.apiKey.value.trim();
-      state.config.bridgeToken = els.bridgeToken.value.trim();
       state.config.systemPrompt = els.systemPrompt.value.trim();
       saveState();
-      setStatus("接口和系统 Prompt 已保存。");
+      setStatus("模型和系统 Prompt 已保存。");
     });
 
     els.systemPrompt.addEventListener("change", function () {
@@ -330,10 +330,48 @@
     });
   }
 
+  async function extractFileText(file) {
+    const name = file.name.toLowerCase();
+    if (name.endsWith(".pdf")) return extractPdfText(file);
+    if (name.endsWith(".docx")) return extractDocxText(file);
+    if (name.endsWith(".xlsx") || name.endsWith(".xls")) return extractSheetText(file);
+    return file.text();
+  }
+
+  async function extractPdfText(file) {
+    const pdfjs = window.pdfjsLib || await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+    const bytes = await file.arrayBuffer();
+    const pdf = await pdfjs.getDocument({ data: bytes }).promise;
+    const pages = [];
+    for (let index = 1; index <= pdf.numPages; index += 1) {
+      const page = await pdf.getPage(index);
+      const text = await page.getTextContent();
+      pages.push(text.items.map((item) => item.str || "").join(" "));
+    }
+    return pages.join("\n\n");
+  }
+
+  async function extractDocxText(file) {
+    if (!window.mammoth) throw new Error("Word 解析器加载失败，请刷新页面后重试。");
+    const result = await window.mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    return result.value || "";
+  }
+
+  async function extractSheetText(file) {
+    if (!window.XLSX) throw new Error("Excel 解析器加载失败，请刷新页面后重试。");
+    const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
+    return workbook.SheetNames.map(function (sheetName) {
+      const rows = window.XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+      return "[Sheet: " + sheetName + "]\n" + rows;
+    }).join("\n\n");
+  }
+
   loadState();
   renderConfig();
   renderDocs();
   renderThreads();
   renderChat();
   bindEvents();
+  loadSession();
 })();

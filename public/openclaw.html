@@ -19,38 +19,29 @@
 
       <div class="action-stack">
         <button id="newChatBtn" class="btn primary" type="button">新建对话</button>
+        <a id="loginNav" class="btn" href="/auth.html">登录使用</a>
+        <a id="profileNav" class="btn" href="/profile.html" style="display:none">我的账号</a>
         <a class="btn secondary" href="/">返回首页</a>
       </div>
 
       <section class="config-card panel" aria-label="接口设置">
-        <strong>Model API</strong>
-        <div class="field">
-          <label for="endpointInput">请求地址</label>
-          <input id="endpointInput" placeholder="http://127.0.0.1:11434/v1/chat/completions" autocomplete="off" />
-        </div>
+        <strong>Agent Access</strong>
+        <p id="userHint" class="hint">正在检查登录状态...</p>
         <div class="field">
           <label for="modelInput">模型名</label>
           <input id="modelInput" placeholder="qwen2.5:7b / llama3.1 / openclaw-agent" autocomplete="off" />
         </div>
-        <div class="field">
-          <label for="apiKeyInput">API Key（可选，仅本会话保存）</label>
-          <input id="apiKeyInput" type="password" placeholder="Bearer Token / sk-..." autocomplete="off" />
-        </div>
-        <div class="field">
-          <label for="bridgeTokenInput">代理口令（必填，除非服务端显式放行）</label>
-          <input id="bridgeTokenInput" type="password" placeholder="OPENCLAW_BRIDGE_TOKEN" autocomplete="off" />
-        </div>
-        <button id="saveConfigBtn" class="btn" type="button">保存接口设置</button>
-        <p class="hint">留空请求地址时，会调用站点代理 <code>/api/openclaw</code>。中转站密钥请只放服务端环境变量，前端只填写代理口令。</p>
+        <button id="saveConfigBtn" class="btn" type="button">保存模型设置</button>
+        <p class="hint">请求地址和中转站密钥只在服务端环境变量中保存。登录用户可直接使用，不会在网页源码或浏览器里暴露密钥。</p>
       </section>
 
       <section class="config-card panel" aria-label="文档资料">
         <strong>MCP / Knowledge</strong>
         <label class="file-drop" for="docInput">
           <span>上传资料</span>
-          <small>支持 txt、md、json、csv、log 等文本文件</small>
+          <small>支持 PDF、Word、Excel、txt、md、json、csv 等常用文件</small>
         </label>
-        <input id="docInput" class="sr-only" type="file" multiple accept=".txt,.md,.markdown,.json,.csv,.log,.yaml,.yml,.xml,.html,.css,.js,.ts" />
+        <input id="docInput" class="sr-only" type="file" multiple accept=".pdf,.docx,.xlsx,.xls,.txt,.md,.markdown,.json,.csv,.log,.yaml,.yml,.xml,.html,.css,.js,.ts" />
         <div id="docList" class="doc-list"></div>
         <div class="actions compact-actions">
           <button id="clearDocsBtn" type="button">清空资料</button>
@@ -80,7 +71,7 @@
       <div id="chatFeed" class="chat-feed" aria-live="polite">
         <section class="welcome panel">
           <h2>你的本地 AI 智能体工作台</h2>
-          <p>先在左侧填入本地大模型的 OpenAI 兼容接口，例如 <code>http://127.0.0.1:11434/v1/chat/completions</code>。上传资料后，智能体会把资料摘要放入上下文，回答时优先参考这些内容。</p>
+          <p>登录后即可通过服务端代理调用你的中转站模型。上传资料后，智能体会把资料文本作为上下文，回答时优先参考这些内容。</p>
           <div class="suggestion-grid">
             <button type="button" data-prompt="请先阅读我上传的资料，提炼核心结论，并列出我接下来应该追问的 5 个问题。">资料总结</button>
             <button type="button" data-prompt="你是我的执行型智能体。请基于资料给我一个可落地的行动计划，包含优先级、风险和下一步。">行动计划</button>
@@ -106,6 +97,11 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="/js/app-core.js"></script>
   <script src="/js/design-variants.js"></script>
   <script src="/js/openclaw.js"></script>
 </body>

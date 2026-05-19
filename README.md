@@ -2,9 +2,30 @@
 
 账号体系、三社区公开流与个人发布流已接入。
 
-## 本地 OpenClaw 接入（推荐：Cloudflare Tunnel）
+## OpenClaw / 中转站模型接入
 
-当前方案使用：`Cloudflare Tunnel + 站点 API 代理 (/api/openclaw)`。
+当前方案使用：`站点 API 代理 (/api/openclaw) + Supabase 登录鉴权`。用户登录后可使用，模型 API Key 只保存在部署平台环境变量中，不会暴露到浏览器。
+
+### 中转站配置
+
+在 Vercel 项目里设置：
+
+- `OPENCLAW_ENDPOINT`：例如 `https://jmrai.net/v1/chat/completions`
+- `OPENCLAW_MODEL`：你的默认模型名
+- `OPENCLAW_API_KEY`：你的中转站 API Key
+- `SUPABASE_ANON_KEY`：站点 Supabase anon key，用于服务端验证登录用户
+- `OPENCLAW_TIMEOUT_MS`：可选，默认 `30000`
+- `OPENCLAW_ALLOWED_ORIGIN`：可选，限制浏览器来源，例如 `https://xiaoma.cyou`
+
+网页 `/openclaw.html` 不再填写请求地址或 API Key。登录站点账号后即可使用。
+
+### 文件资料上下文
+
+页面支持上传 PDF、Word、Excel、txt、md、json、csv 等常用文件。当前实现是浏览器端提取文本后作为知识上下文发送给模型，并不是把文件真正训练进模型；后续如需长期知识库，可继续接向量库或 MCP Server。
+
+## 本地 OpenClaw 接入（可选：Cloudflare Tunnel）
+
+如需连接家里电脑上的本地模型，可继续使用：`Cloudflare Tunnel + 站点 API 代理 (/api/openclaw)`。
 
 ### 1) 在本机启动 OpenClaw
 

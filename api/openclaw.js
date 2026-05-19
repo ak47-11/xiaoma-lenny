@@ -15,18 +15,22 @@ module.exports = async function handler(req, res) {
 
   const endpoint = process.env.OPENCLAW_ENDPOINT;
   if (!endpoint) {
-    return res.status(500).json({ error: { message: "Missing OPENCLAW_ENDPOINT. Set it in Vercel or fill a direct API URL in the page." } });
+    return res.status(500).json({ error: { message: "Missing OPENCLAW_ENDPOINT. Set your relay API URL in Vercel." } });
   }
 
   const bridgeToken = String(process.env.OPENCLAW_BRIDGE_TOKEN || "").trim();
   const allowUnauthenticated = String(process.env.OPENCLAW_ALLOW_UNAUTHENTICATED || "").trim() === "1";
-  if (!bridgeToken && !allowUnauthenticated) {
-    return res.status(500).json({ error: { message: "Missing OPENCLAW_BRIDGE_TOKEN. Set a proxy password to protect your model API key." } });
-  }
-
+  const authHeader = String(req.headers.authorization || "").trim();
   const incomingToken = String(req.headers["x-openclaw-bridge-token"] || "").trim();
-  if (bridgeToken && incomingToken !== bridgeToken) {
-    return res.status(401).json({ error: { message: "Bridge token invalid" } });
+  if (!allowUnauthenticated) {
+    if (authHeader.toLowerCase().startsWith("bearer ")) {
+      const user = await verifySupabaseUser(authHeader.slice(7).trim());
+      if (!user) return res.status(401).json({ error: { message: "Please sign in before using the agent." } });
+    } else if (bridgeToken && incomingToken === bridgeToken) {
+      // Optional machine-to-machine fallback for private testing.
+    } else {
+      return res.status(401).json({ error: { message: "Please sign in before using the agent." } });
+    }
   }
 
   const timeout = Number(process.env.OPENCLAW_TIMEOUT_MS || 30000);
@@ -61,3 +65,23 @@ module.exports = async function handler(req, res) {
     clearTimeout(timer);
   }
 };
+
+async function verifySupabaseUser(accessToken) {
+  const supabaseUrl = String(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "https://vtplvtwbkyydxmcxgctn.supabase.co").trim();
+  const supabaseAnonKey = String(process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
+  if (!accessToken || !supabaseUrl || !supabaseAnonKey) return null;
+
+  try {
+    const response = await fetch(supabaseUrl.replace(/\/$/, "") + "/auth/v1/user", {
+      headers: {
+        apikey: supabaseAnonKey,
+        Authorization: "Bearer " + accessToken
+      }
+    });
+    if (!response.ok) return null;
+    const user = await response.json();
+    return user?.id ? user : null;
+  } catch (error) {
+    return null;
+  }
+}
