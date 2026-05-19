@@ -11,6 +11,7 @@
       mode: "single",
       activeAgentId: "agent-default",
       activeGroupId: "group-default",
+      activeThreadIds: {},
       systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
     },
     agents: [createDefaultAgent()],
@@ -46,6 +47,9 @@
     clearDocs: document.getElementById("clearDocsBtn"),
     threadList: document.getElementById("threadList"),
     threadCount: document.getElementById("threadCount"),
+    promptHistoryPanel: document.getElementById("promptHistoryPanel"),
+    togglePromptHistory: document.getElementById("togglePromptHistoryBtn"),
+    closePromptHistory: document.getElementById("closePromptHistoryBtn"),
     newChat: document.getElementById("newChatBtn"),
     chatFeed: document.getElementById("chatFeed"),
     form: document.getElementById("composerForm"),
@@ -88,6 +92,7 @@
       if (Array.isArray(saved.groups) && saved.groups.length) state.groups = saved.groups;
       if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
       if (Array.isArray(saved.threads)) state.threads = saved.threads;
+      migrateThreads();
       ensureActiveThread();
       saveState();
     } catch (error) {
@@ -118,15 +123,26 @@
     return activeAgent().name || "模型好友";
   }
 
+  function migrateThreads() {
+    state.config.activeThreadIds = state.config.activeThreadIds || {};
+    state.threads.forEach(function (thread, index) {
+      if (!thread.roomId) thread.roomId = String(thread.id || "").startsWith("group:") || String(thread.id || "").startsWith("agent:") ? thread.id : currentRoomId();
+      if (thread.id === thread.roomId) thread.id = "thread-" + Date.now() + "-" + index;
+    });
+  }
+
   function createThread(roomId, title) {
+    const targetRoomId = roomId || currentRoomId();
     const thread = {
-      id: roomId || currentRoomId(),
+      id: "thread-" + Date.now() + "-" + Math.random().toString(16).slice(2),
+      roomId: targetRoomId,
       title: title || currentRoomTitle(),
       createdAt: new Date().toISOString(),
       messages: []
     };
-    state.threads = state.threads.filter((item) => item.id !== thread.id);
     state.threads.unshift(thread);
+    state.config.activeThreadIds = state.config.activeThreadIds || {};
+    state.config.activeThreadIds[targetRoomId] = thread.id;
     return thread;
   }
 
@@ -136,8 +152,11 @@
 
   function activeThread() {
     const roomId = currentRoomId();
-    let thread = state.threads.find((item) => item.id === roomId);
+    state.config.activeThreadIds = state.config.activeThreadIds || {};
+    let thread = state.threads.find((item) => item.id === state.config.activeThreadIds[roomId] && item.roomId === roomId);
+    if (!thread) thread = state.threads.find((item) => item.roomId === roomId);
     if (!thread) thread = createThread(roomId, currentRoomTitle());
+    state.config.activeThreadIds[roomId] = thread.id;
     thread.title = currentRoomTitle();
     return thread;
   }
@@ -238,6 +257,7 @@
       mode: "single",
       activeAgentId: "agent-default",
       activeGroupId: "group-default",
+      activeThreadIds: {},
       systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
     };
     state.agents = [];
@@ -268,9 +288,11 @@
   }
 
   function renderThreads() {
-    els.threadCount.textContent = String(state.threads.length);
-    els.threadList.innerHTML = state.threads.map(function (thread) {
-      const active = thread.id === currentRoomId() ? " is-active" : "";
+    const roomId = currentRoomId();
+    const roomThreads = state.threads.filter((thread) => thread.roomId === roomId);
+    els.threadCount.textContent = String(roomThreads.length);
+    els.threadList.innerHTML = roomThreads.map(function (thread) {
+      const active = thread.id === state.config.activeThreadIds?.[roomId] ? " is-active" : "";
       const last = thread.messages[thread.messages.length - 1];
       return '<li><button type="button" class="thread-item' + active + '" data-thread-id="' + thread.id + '"><strong>' + escapeHtml(thread.title) + '</strong><span>' + escapeHtml(last?.content || "暂无消息") + '</span></button></li>';
     }).join("");
@@ -454,6 +476,14 @@
       closeModal(els.groupForm);
     });
 
+    els.togglePromptHistory.addEventListener("click", function () {
+      els.promptHistoryPanel.classList.toggle("hidden");
+    });
+
+    els.closePromptHistory.addEventListener("click", function () {
+      els.promptHistoryPanel.classList.add("hidden");
+    });
+
     els.agentForm.addEventListener("click", function (event) {
       if (event.target === els.agentForm) closeModal(els.agentForm);
     });
@@ -593,20 +623,15 @@
       saveState();
       renderThreads();
       renderChat();
-      setStatus("已新建对话。");
+      setStatus("已新建对话，原聊天记录已保留在 Prompts 中。");
     });
 
     els.threadList.addEventListener("click", function (event) {
       const button = event.target.closest("[data-thread-id]");
       if (!button) return;
       const id = button.dataset.threadId;
-      if (id.startsWith("agent:")) {
-        state.config.mode = "single";
-        state.config.activeAgentId = id.slice(6);
-      } else if (id.startsWith("group:")) {
-        state.config.mode = "group";
-        state.config.activeGroupId = id.slice(6);
-      }
+      state.config.activeThreadIds = state.config.activeThreadIds || {};
+      state.config.activeThreadIds[currentRoomId()] = id;
       saveState();
       renderAgents();
       renderGroups();
@@ -645,6 +670,7 @@
       if (event.key !== "Escape") return;
       closeModal(els.agentForm);
       closeModal(els.groupForm);
+      els.promptHistoryPanel.classList.add("hidden");
     });
   }
 

@@ -106,13 +106,19 @@
         <p class="hint">当前版本先把资料作为上下文随问题发送，后续可再接真正 MCP Server 或向量库。</p>
       </section>
 
-      <details class="prompt-history">
-        <summary class="threads-head">
+      <section class="prompt-history">
+        <button id="togglePromptHistoryBtn" class="prompt-history-trigger" type="button">
           <strong>Prompts</strong>
           <span id="threadCount">0</span>
-        </summary>
+        </button>
+        <div id="promptHistoryPanel" class="prompt-history-panel hidden">
+          <div class="threads-head">
+            <strong>历史记录</strong>
+            <button id="closePromptHistoryBtn" class="mini-btn" type="button">关闭</button>
+          </div>
         <ul id="threadList" class="thread-list" aria-label="历史对话"></ul>
-      </details>
+        </div>
+      </section>
     </aside>
 
     <section class="main" aria-label="智能体对话">

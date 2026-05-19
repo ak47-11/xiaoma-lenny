@@ -3053,22 +3053,42 @@ samp {
 }
 
 .openclaw-page .prompt-history {
+  position: relative;
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
   background: var(--color-bg-muted);
-  padding: var(--space-2);
 }
 
-.openclaw-page .prompt-history > summary {
-  list-style: none;
+.openclaw-page .prompt-history-trigger {
+  width: 100%;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  padding: 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: inherit;
+  font-size: var(--font-size-caption);
   cursor: pointer;
 }
 
-.openclaw-page .prompt-history > summary::-webkit-details-marker {
-  display: none;
+.openclaw-page .prompt-history-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 50;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-3);
 }
 
-.openclaw-page .prompt-history .thread-list {
+.openclaw-page .prompt-history-panel .thread-list {
+  max-height: min(360px, 48vh);
   margin-top: var(--space-2);
 }
 
