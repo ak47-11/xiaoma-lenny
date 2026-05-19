@@ -614,6 +614,9 @@
       }
     });
 
+    els.prompt.addEventListener("input", resizePrompt);
+    resizePrompt();
+
     els.stop.addEventListener("click", function () {
       if (state.abortController) state.abortController.abort();
     });
@@ -635,6 +638,11 @@
   function openModal(modal) {
     if (modal.parentElement !== document.body) document.body.appendChild(modal);
     modal.classList.remove("hidden");
+  }
+
+  function resizePrompt() {
+    els.prompt.style.height = "auto";
+    els.prompt.style.height = Math.min(els.prompt.scrollHeight, Math.round(window.innerHeight * 0.45)) + "px";
   }
 
   function closeModal(modal) {

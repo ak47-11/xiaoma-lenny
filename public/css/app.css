@@ -2969,13 +2969,13 @@ samp {
     radial-gradient(980px 420px at 94% -8%, rgba(47, 109, 246, 0.16), transparent 62%),
     radial-gradient(860px 420px at -10% 116%, rgba(47, 109, 246, 0.08), transparent 64%),
     var(--color-bg-canvas);
-  overflow: hidden;
+  overflow: auto;
 }
 
 .openclaw-page .chat-shell {
   width: min(1360px, calc(100% - 24px));
   margin: 12px auto;
-  height: calc(100vh - 24px);
+  min-height: calc(100vh - 24px);
   display: grid;
   gap: var(--space-3);
   grid-template-columns: 300px minmax(0, 1fr);
@@ -3046,6 +3046,7 @@ samp {
   padding: 0 4px 0 0;
   display: grid;
   gap: var(--space-2);
+  max-height: 280px;
   overflow: auto;
   align-content: start;
 }
@@ -3102,7 +3103,7 @@ samp {
 }
 
 .openclaw-page .chat-feed {
-  overflow: auto;
+  overflow: visible;
   padding: var(--space-5);
   display: grid;
   gap: var(--space-3);
@@ -3161,6 +3162,12 @@ samp {
   display: grid;
   gap: var(--space-3);
   background: color-mix(in srgb, var(--color-bg-surface) 92%, transparent);
+}
+
+.openclaw-page #promptInput {
+  min-height: 116px;
+  max-height: 45vh;
+  field-sizing: content;
 }
 
 .openclaw-page .composer-row {
@@ -3302,7 +3309,7 @@ samp {
 }
 
 .openclaw-page .roster-list {
-  max-height: 220px;
+  max-height: 360px;
   overflow: auto;
 }
 
