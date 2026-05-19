@@ -2993,7 +2993,7 @@ samp {
 .openclaw-page .sidebar {
   padding: var(--space-4);
   display: grid;
-  grid-template-rows: auto auto minmax(360px, auto) auto auto minmax(180px, auto);
+  grid-template-rows: auto auto minmax(360px, auto) auto auto;
   gap: var(--space-3);
   align-content: start;
 }
@@ -3047,9 +3047,29 @@ samp {
   padding: 0 4px 0 0;
   display: grid;
   gap: var(--space-2);
-  max-height: 280px;
+  max-height: 180px;
   overflow: auto;
   align-content: start;
+}
+
+.openclaw-page .prompt-history {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-muted);
+  padding: var(--space-2);
+}
+
+.openclaw-page .prompt-history > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.openclaw-page .prompt-history > summary::-webkit-details-marker {
+  display: none;
+}
+
+.openclaw-page .prompt-history .thread-list {
+  margin-top: var(--space-2);
 }
 
 .openclaw-page .thread-item {
