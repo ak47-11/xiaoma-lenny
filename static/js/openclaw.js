@@ -86,7 +86,7 @@
     try {
       const saved = JSON.parse(localStorage.getItem(state.userStoreKey) || "{}");
       if (saved.config) state.config = { ...state.config, ...saved.config };
-      if (Array.isArray(saved.agents) && saved.agents.length) state.agents = saved.agents;
+      if (Array.isArray(saved.agents)) state.agents = saved.agents.length ? saved.agents : [];
       if (Array.isArray(saved.groups) && saved.groups.length) state.groups = saved.groups;
       if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
       if (Array.isArray(saved.threads)) state.threads = saved.threads;
@@ -159,7 +159,12 @@
   }
 
   function renderAgents() {
-    if (!state.agents.length) state.agents = [createDefaultAgent()];
+    if (!state.agents.length) {
+      els.agentList.innerHTML = '<p class="hint">还没有模型好友，点击右侧添加。</p>';
+      renderGroupMemberList();
+      return;
+    }
+
     if (!state.agents.some((agent) => agent.id === state.config.activeAgentId)) state.config.activeAgentId = state.agents[0].id;
     const activeGroup = state.groups.find((group) => group.id === state.config.activeGroupId) || state.groups[0] || createDefaultGroup();
 
@@ -177,7 +182,6 @@
     if (!state.groups.length) state.groups = [createDefaultGroup()];
     state.groups.forEach(function (group) {
       group.memberIds = group.memberIds.filter((id) => state.agents.some((agent) => agent.id === id));
-      if (!group.memberIds.length && state.agents[0]) group.memberIds = [state.agents[0].id];
     });
     if (!state.groups.some((group) => group.id === state.config.activeGroupId)) state.config.activeGroupId = state.groups[0].id;
 
@@ -220,7 +224,7 @@
       activeGroupId: "group-default",
       systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
     };
-    state.agents = [createDefaultAgent()];
+    state.agents = [];
     state.groups = [createDefaultGroup()];
     state.docs = [];
     state.threads = [];
@@ -495,6 +499,10 @@
     });
 
     els.addAgent.addEventListener("click", function () {
+      if (!state.session?.user || !state.userStoreKey) {
+        setStatus("请等待登录状态加载完成后再添加模型好友。");
+        return;
+      }
       const name = els.agentName.value.trim();
       const model = els.agentModel.value.trim();
       const endpoint = els.endpoint.value.trim();
@@ -505,6 +513,10 @@
       state.agents.push(agent);
       state.config.activeAgentId = agent.id;
       state.config.mode = "single";
+      if (!state.groups.length) state.groups = [createDefaultGroup()];
+      state.groups.forEach(function (group) {
+        if (!group.memberIds.includes(agent.id)) group.memberIds.push(agent.id);
+      });
       els.agentName.value = "";
       els.agentModel.value = "";
       els.endpoint.value = "";
@@ -514,6 +526,7 @@
       saveState();
       renderAgents();
       renderGroups();
+      renderGroupMemberList();
       setStatus("已添加角色模型：" + name);
     });
 
