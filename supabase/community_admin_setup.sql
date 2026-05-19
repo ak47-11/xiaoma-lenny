@@ -89,6 +89,12 @@ create table if not exists operation_logs (
   created_at timestamptz default now()
 );
 
+create table if not exists openclaw_states (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  state jsonb not null default '{}'::jsonb,
+  updated_at timestamptz default now()
+);
+
 create table if not exists m_posts (
   id uuid primary key default gen_random_uuid(),
   content text not null check (char_length(content) <= 280),
@@ -410,6 +416,7 @@ alter table follows enable row level security;
 alter table notifications enable row level security;
 alter table moderation_queue enable row level security;
 alter table operation_logs enable row level security;
+alter table openclaw_states enable row level security;
 alter table m_posts enable row level security;
 alter table m_comments enable row level security;
 alter table m_reactions enable row level security;
@@ -441,6 +448,9 @@ drop policy if exists "queue_read_admin_or_mod" on moderation_queue;
 drop policy if exists "queue_update_admin_or_mod" on moderation_queue;
 drop policy if exists "logs_insert_admin_or_mod" on operation_logs;
 drop policy if exists "logs_read_admin_or_mod" on operation_logs;
+drop policy if exists "openclaw_states_select_self" on openclaw_states;
+drop policy if exists "openclaw_states_insert_self" on openclaw_states;
+drop policy if exists "openclaw_states_update_self" on openclaw_states;
 drop policy if exists "m_posts_select_public" on m_posts;
 drop policy if exists "m_posts_insert_self" on m_posts;
 drop policy if exists "m_posts_update_owner_or_admin" on m_posts;
@@ -570,6 +580,20 @@ with check (
   public.is_admin_or_moderator(auth.uid())
   and auth.uid() = admin_id
 );
+
+-- OpenClaw private per-user state
+create policy "openclaw_states_select_self"
+on openclaw_states for select
+using (auth.uid() = user_id);
+
+create policy "openclaw_states_insert_self"
+on openclaw_states for insert
+with check (auth.uid() = user_id);
+
+create policy "openclaw_states_update_self"
+on openclaw_states for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
 -- M posts / comments / reactions
 create policy "m_posts_select_public"

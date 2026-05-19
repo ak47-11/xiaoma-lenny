@@ -1,6 +1,7 @@
 (function () {
   const STORE_KEY = "xiaoma.openclaw.agent.v1";
   const USER_STORE_PREFIX = "xiaoma.openclaw.agent.user.";
+  const CLOUD_TABLE = "openclaw_states";
   const MAX_DOC_CHARS = 28000;
   const MAX_DOCS = 12;
 
@@ -19,8 +20,12 @@
     docs: [],
     threads: [],
     session: null,
+    client: null,
     userStoreKey: "",
-    abortController: null
+    abortController: null,
+    cloudReady: false,
+    cloudSaveTimer: null,
+    syncWarningShown: false
   };
 
   let editingAgentId = "";
@@ -85,17 +90,32 @@
     };
   }
 
+  function snapshotState() {
+    return {
+      config: state.config,
+      agents: state.agents,
+      groups: state.groups,
+      docs: state.docs,
+      threads: state.threads.slice(0, 20)
+    };
+  }
+
+  function applySavedState(saved) {
+    if (!saved || typeof saved !== "object") return;
+    if (saved.config) state.config = { ...state.config, ...saved.config };
+    if (Array.isArray(saved.agents)) state.agents = saved.agents.length ? saved.agents : [];
+    if (Array.isArray(saved.groups) && saved.groups.length) state.groups = saved.groups;
+    if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
+    if (Array.isArray(saved.threads)) state.threads = saved.threads;
+    migrateThreads();
+    ensureActiveThread();
+  }
+
   function loadState() {
     if (!state.userStoreKey) return;
     try {
       const saved = JSON.parse(localStorage.getItem(state.userStoreKey) || "{}");
-      if (saved.config) state.config = { ...state.config, ...saved.config };
-      if (Array.isArray(saved.agents)) state.agents = saved.agents.length ? saved.agents : [];
-      if (Array.isArray(saved.groups) && saved.groups.length) state.groups = saved.groups;
-      if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
-      if (Array.isArray(saved.threads)) state.threads = saved.threads;
-      migrateThreads();
-      ensureActiveThread();
+      applySavedState(saved);
       saveState();
     } catch (error) {
       ensureActiveThread();
@@ -104,13 +124,56 @@
 
   function saveState() {
     if (!state.userStoreKey) return;
-    localStorage.setItem(state.userStoreKey, JSON.stringify({
-      config: state.config,
-      agents: state.agents,
-      groups: state.groups,
-      docs: state.docs,
-      threads: state.threads.slice(0, 20),
-    }));
+    localStorage.setItem(state.userStoreKey, JSON.stringify(snapshotState()));
+    queueCloudSave();
+  }
+
+  async function loadCloudState() {
+    if (!state.client || !state.session?.user) return false;
+    try {
+      const result = await state.client.from(CLOUD_TABLE).select("state,updated_at").eq("user_id", state.session.user.id).maybeSingle();
+      if (result.error) throw result.error;
+      state.cloudReady = true;
+      if (result.data?.state) {
+        applySavedState(result.data.state);
+        localStorage.setItem(state.userStoreKey, JSON.stringify(snapshotState()));
+        return true;
+      }
+      await saveCloudState();
+      return false;
+    } catch (error) {
+      state.cloudReady = false;
+      if (!state.syncWarningShown) {
+        state.syncWarningShown = true;
+        setStatus("云同步未初始化：请执行 supabase/community_admin_setup.sql 后刷新。当前仅保存在本浏览器。");
+      }
+      return false;
+    }
+  }
+
+  function queueCloudSave() {
+    if (!state.cloudReady || !state.client || !state.session?.user) return;
+    clearTimeout(state.cloudSaveTimer);
+    state.cloudSaveTimer = setTimeout(saveCloudState, 650);
+  }
+
+  async function saveCloudState() {
+    if (!state.client || !state.session?.user) return;
+    try {
+      const result = await state.client.from(CLOUD_TABLE).upsert({
+        user_id: state.session.user.id,
+        state: snapshotState(),
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id" });
+      if (result.error) throw result.error;
+      state.cloudReady = true;
+    } catch (error) {
+      state.cloudReady = false;
+      if (!state.syncWarningShown) {
+        state.syncWarningShown = true;
+        setStatus("云同步保存失败：请确认 openclaw_states 表已初始化。当前仅保存在本浏览器。");
+      }
+    }
   }
 
   function currentRoomId() {
@@ -245,6 +308,7 @@
     await window.XiaomaCore.applyNavState();
     const context = await window.XiaomaCore.getSessionContext();
     state.session = context.session;
+    state.client = context.client;
     if (!state.session?.user) {
       els.userHint.textContent = "请先登录账号，登录后可直接使用智能体。";
       setStatus("未登录：请先登录后使用。 ");
@@ -268,12 +332,13 @@
     state.docs = [];
     state.threads = [];
     loadState();
+    await loadCloudState();
     renderConfig();
     renderDocs();
     renderThreads();
     renderChat();
     els.userHint.textContent = "当前账号：" + (state.session.user.email || state.session.user.id);
-    setStatus("已登录：可以使用服务端代理调用模型。 ");
+    setStatus(state.cloudReady ? "已登录：模型好友和聊天记录会跨浏览器同步。" : "已登录：云同步未启用，当前仍只保存在本浏览器。");
     els.mode.textContent = "Signed In";
     els.send.disabled = false;
   }
