@@ -3017,7 +3017,7 @@ html:has(body.openclaw-page) {
   overflow-y: auto;
   padding-right: 14px;
   overscroll-behavior: contain;
-  scrollbar-color: var(--color-primary) color-mix(in srgb, var(--color-border-default) 45%, transparent);
+  scrollbar-color: color-mix(in srgb, var(--color-text-tertiary) 64%, transparent) color-mix(in srgb, var(--color-border-default) 38%, transparent);
   scrollbar-gutter: stable both-edges;
   scrollbar-width: auto;
 }
@@ -3039,12 +3039,12 @@ html:has(body.openclaw-page) {
 .openclaw-page .sidebar-scroll::-webkit-scrollbar-thumb {
   border: 3px solid color-mix(in srgb, var(--color-bg-surface) 92%, transparent);
   border-radius: 999px;
-  background: var(--color-primary);
+  background: color-mix(in srgb, var(--color-text-tertiary) 64%, transparent);
   background-clip: padding-box;
 }
 
 .openclaw-page .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-hover);
+  background: color-mix(in srgb, var(--color-text-secondary) 74%, transparent);
   background-clip: padding-box;
 }
 
@@ -3434,7 +3434,7 @@ html:has(body.openclaw-page) {
   overflow-x: hidden;
   overflow-y: auto;
   padding-right: 8px;
-  scrollbar-color: var(--color-primary) color-mix(in srgb, var(--color-border-default) 45%, transparent);
+  scrollbar-color: color-mix(in srgb, var(--color-text-tertiary) 64%, transparent) color-mix(in srgb, var(--color-border-default) 38%, transparent);
   scrollbar-width: thin;
 }
 
@@ -3450,7 +3450,7 @@ html:has(body.openclaw-page) {
 .openclaw-page .roster-list::-webkit-scrollbar-thumb {
   border: 2px solid var(--color-bg-muted);
   border-radius: 999px;
-  background: var(--color-primary);
+  background: color-mix(in srgb, var(--color-text-tertiary) 64%, transparent);
   background-clip: padding-box;
 }
 
