@@ -17,7 +17,6 @@
     groups: [createDefaultGroup()],
     docs: [],
     threads: [],
-    activeThreadId: null,
     session: null,
     userStoreKey: "",
     abortController: null
@@ -89,10 +88,10 @@
       if (Array.isArray(saved.groups) && saved.groups.length) state.groups = saved.groups;
       if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
       if (Array.isArray(saved.threads)) state.threads = saved.threads;
-      state.activeThreadId = saved.activeThreadId || state.threads[0]?.id || createThread().id;
+      ensureActiveThread();
       saveState();
     } catch (error) {
-      state.activeThreadId = createThread().id;
+      ensureActiveThread();
     }
   }
 
@@ -104,24 +103,43 @@
       groups: state.groups,
       docs: state.docs,
       threads: state.threads.slice(0, 20),
-      activeThreadId: state.activeThreadId
     }));
   }
 
-  function createThread() {
+  function currentRoomId() {
+    return state.config.mode === "group" ? "group:" + state.config.activeGroupId : "agent:" + state.config.activeAgentId;
+  }
+
+  function currentRoomTitle() {
+    if (state.config.mode === "group") {
+      const group = state.groups.find((entry) => entry.id === state.config.activeGroupId);
+      return group?.name || "群聊";
+    }
+    return activeAgent().name || "模型好友";
+  }
+
+  function createThread(roomId, title) {
     const thread = {
-      id: "thread-" + Date.now(),
-      title: "新对话",
+      id: roomId || currentRoomId(),
+      title: title || currentRoomTitle(),
       createdAt: new Date().toISOString(),
       messages: []
     };
+    state.threads = state.threads.filter((item) => item.id !== thread.id);
     state.threads.unshift(thread);
-    state.activeThreadId = thread.id;
     return thread;
   }
 
+  function ensureActiveThread() {
+    return activeThread();
+  }
+
   function activeThread() {
-    return state.threads.find((thread) => thread.id === state.activeThreadId) || createThread();
+    const roomId = currentRoomId();
+    let thread = state.threads.find((item) => item.id === roomId);
+    if (!thread) thread = createThread(roomId, currentRoomTitle());
+    thread.title = currentRoomTitle();
+    return thread;
   }
 
   function escapeHtml(value) {
@@ -226,7 +244,6 @@
     state.groups = [createDefaultGroup()];
     state.docs = [];
     state.threads = [];
-    state.activeThreadId = null;
     loadState();
     renderConfig();
     renderDocs();
@@ -253,7 +270,7 @@
   function renderThreads() {
     els.threadCount.textContent = String(state.threads.length);
     els.threadList.innerHTML = state.threads.map(function (thread) {
-      const active = thread.id === state.activeThreadId ? " is-active" : "";
+      const active = thread.id === currentRoomId() ? " is-active" : "";
       const last = thread.messages[thread.messages.length - 1];
       return '<li><button type="button" class="thread-item' + active + '" data-thread-id="' + thread.id + '"><strong>' + escapeHtml(thread.title) + '</strong><span>' + escapeHtml(last?.content || "暂无消息") + '</span></button></li>';
     }).join("");
@@ -281,7 +298,7 @@
     if (shouldPersist) {
       const thread = activeThread();
       thread.messages.push({ role, content, createdAt: createdAt || new Date().toISOString(), error: Boolean(isError) });
-      if (role === "user" && (thread.title === "新对话" || !thread.title)) thread.title = content.slice(0, 24);
+      thread.title = currentRoomTitle();
       saveState();
       renderThreads();
     }
@@ -394,13 +411,7 @@
     }
 
     if (answers.length > 1) {
-      const moderator = activeAgent();
-      const summaryPrompt = "请作为主持人，总结以下多个模型角色的观点，给出统一结论、分歧点和建议下一步：\n\n" + answers.map(function (item) {
-        return "[" + item.agent.name + "]\n" + item.answer;
-      }).join("\n\n---\n\n");
-      setStatus("群聊中：正在汇总多模型观点...");
-      const summary = await callAgentModel(moderator, buildMessages(summaryPrompt, moderator));
-      appendMessage("assistant", "[群聊总结]\n" + summary, new Date().toISOString(), false, true);
+      setStatus("群聊讨论完成。");
     }
   }
 
@@ -491,6 +502,7 @@
       saveState();
       renderAgents();
       renderGroups();
+      renderChat();
       setStatus("已切换单聊：" + activeAgent().name);
     });
 
@@ -539,6 +551,7 @@
       saveState();
       renderGroups();
       renderAgents();
+      renderChat();
       setStatus("已创建群聊：" + name);
     });
 
@@ -559,6 +572,7 @@
       saveState();
       renderAgents();
       renderGroups();
+      renderChat();
       const group = state.groups.find((entry) => entry.id === state.config.activeGroupId);
       setStatus("已进入群聊：" + (group?.name || "群聊"));
     });
@@ -575,7 +589,7 @@
     });
 
     els.newChat.addEventListener("click", function () {
-      createThread();
+      createThread(currentRoomId(), currentRoomTitle());
       saveState();
       renderThreads();
       renderChat();
@@ -585,8 +599,17 @@
     els.threadList.addEventListener("click", function (event) {
       const button = event.target.closest("[data-thread-id]");
       if (!button) return;
-      state.activeThreadId = button.dataset.threadId;
+      const id = button.dataset.threadId;
+      if (id.startsWith("agent:")) {
+        state.config.mode = "single";
+        state.config.activeAgentId = id.slice(6);
+      } else if (id.startsWith("group:")) {
+        state.config.mode = "group";
+        state.config.activeGroupId = id.slice(6);
+      }
       saveState();
+      renderAgents();
+      renderGroups();
       renderThreads();
       renderChat();
     });

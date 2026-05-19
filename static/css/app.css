@@ -2993,8 +2993,9 @@ samp {
 .openclaw-page .sidebar {
   padding: var(--space-4);
   display: grid;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(360px, auto) auto auto minmax(180px, auto);
   gap: var(--space-3);
+  align-content: start;
 }
 
 .openclaw-page .brand {
@@ -3317,7 +3318,7 @@ samp {
 }
 
 .openclaw-page .roster-list {
-  max-height: 360px;
+  max-height: clamp(320px, 44vh, 560px);
   overflow: auto;
 }
 
