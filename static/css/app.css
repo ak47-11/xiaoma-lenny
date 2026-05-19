@@ -3171,6 +3171,149 @@ samp {
   gap: var(--space-3);
 }
 
+.openclaw-page code {
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  background: var(--color-bg-muted);
+  padding: 1px 6px;
+  font-size: 0.92em;
+}
+
+.openclaw-page .agent-status {
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  background: var(--color-bg-muted);
+  color: var(--color-text-secondary);
+  min-height: 36px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+}
+
+.openclaw-page .pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-success);
+  box-shadow: 0 0 0 6px var(--color-success-soft);
+}
+
+.openclaw-page .file-drop {
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-bg-elevated) 70%, var(--color-bg-muted));
+  min-height: 78px;
+  padding: var(--space-3);
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.openclaw-page .file-drop span {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.openclaw-page .file-drop small {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-micro);
+}
+
+.openclaw-page .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.openclaw-page .doc-list {
+  display: grid;
+  gap: var(--space-2);
+  max-height: 156px;
+  overflow: auto;
+}
+
+.openclaw-page .doc-item {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  padding: var(--space-2) var(--space-3);
+  display: grid;
+  gap: 2px;
+}
+
+.openclaw-page .doc-item strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-caption);
+}
+
+.openclaw-page .doc-item span {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-micro);
+}
+
+.openclaw-page .compact-actions {
+  justify-content: flex-end;
+}
+
+.openclaw-page .thread-item.is-active {
+  border-color: color-mix(in srgb, var(--color-primary) 58%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-primary-soft) 52%, var(--color-bg-surface));
+}
+
+.openclaw-page .welcome h2 {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-title-3);
+}
+
+.openclaw-page .welcome p {
+  max-width: 82ch;
+}
+
+.openclaw-page .suggestion-grid {
+  margin-top: var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.openclaw-page .suggestion-grid button {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  min-height: 72px;
+  padding: var(--space-3);
+  text-align: left;
+  font: inherit;
+  font-size: var(--font-size-caption);
+  cursor: pointer;
+}
+
+.openclaw-page .prompt-field textarea {
+  min-height: 78px;
+}
+
+@media (max-width: 767px) {
+  .openclaw-page .topbar {
+    display: grid;
+  }
+
+  .openclaw-page .suggestion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /*
   ==============================
   Hub Shared (M / Mi / Lenny)
