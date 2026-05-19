@@ -230,7 +230,7 @@
 
   function renderGroupMemberList() {
     els.groupMemberList.innerHTML = state.agents.map(function (agent) {
-      return '<label><input type="checkbox" value="' + escapeHtml(agent.id) + '" checked /> <span>' + escapeHtml(agent.name) + ' · ' + escapeHtml(agent.model) + '</span></label>';
+      return '<label class="member-row" data-member-row="' + escapeHtml(agent.id) + '"><input type="checkbox" value="' + escapeHtml(agent.id) + '" checked /> <span>' + escapeHtml(agent.name) + ' · ' + escapeHtml(agent.model) + '</span><button type="button" data-member-up="' + escapeHtml(agent.id) + '">上移</button><button type="button" data-member-down="' + escapeHtml(agent.id) + '">下移</button></label>';
     }).join("");
   }
 
@@ -492,6 +492,17 @@
       if (event.target === els.groupForm) closeModal(els.groupForm);
     });
 
+    els.groupMemberList.addEventListener("click", function (event) {
+      const up = event.target.closest("[data-member-up]");
+      const down = event.target.closest("[data-member-down]");
+      if (!up && !down) return;
+      event.preventDefault();
+      const row = event.target.closest("[data-member-row]");
+      if (!row) return;
+      if (up && row.previousElementSibling) els.groupMemberList.insertBefore(row, row.previousElementSibling);
+      if (down && row.nextElementSibling) els.groupMemberList.insertBefore(row.nextElementSibling, row);
+    });
+
     els.agentList.addEventListener("click", function (event) {
       const toggleMember = event.target.closest("[data-toggle-member]");
       if (toggleMember) {
@@ -570,7 +581,7 @@
 
     els.addGroup.addEventListener("click", function () {
       const name = els.groupName.value.trim();
-      const memberIds = Array.from(els.groupMemberList.querySelectorAll("input:checked")).map((input) => input.value);
+      const memberIds = Array.from(els.groupMemberList.querySelectorAll("[data-member-row]")).filter((row) => row.querySelector("input")?.checked).map((row) => row.dataset.memberRow);
       if (!name || !memberIds.length) return setStatus("请填写群名称并至少选择一个模型好友。");
       const group = { id: "group-" + Date.now(), name, memberIds };
       state.groups.push(group);
