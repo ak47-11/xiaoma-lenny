@@ -1,5 +1,5 @@
 (function () {
-  const SUPABASE_URL = "https://vtplvtwbkyydxmcxgctn.supabase.co";
+  const SUPABASE_URL = window.location.origin + "/api/supabase";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU";
 
   const viewerTextEl = document.getElementById("viewerText");

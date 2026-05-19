@@ -157,7 +157,8 @@
   }
 
   function createClient(storage) {
-    return window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+    const url = supabaseUrl.startsWith("/") ? window.location.origin + supabaseUrl : supabaseUrl;
+    return window.supabase.createClient(url, supabaseAnonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,

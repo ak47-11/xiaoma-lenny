@@ -1,5 +1,11 @@
 {
   "buildCommand": "hugo --gc --minify",
   "outputDirectory": "public",
-  "installCommand": "hugo version"
+  "installCommand": "hugo version",
+  "rewrites": [
+    {
+      "source": "/api/supabase/:path*",
+      "destination": "/api/supabase?path=:path*"
+    }
+  ]
 }
