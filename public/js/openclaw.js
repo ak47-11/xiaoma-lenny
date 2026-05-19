@@ -156,7 +156,6 @@
     try {
       const saved = JSON.parse(localStorage.getItem(state.userStoreKey) || "{}");
       applySavedState(saved);
-      saveState();
     } catch (error) {
       ensureActiveThread();
     }
@@ -201,6 +200,10 @@
     state.cloudSaveTimer = setTimeout(saveCloudState, 650);
   }
 
+  function syncErrorMessage(error) {
+    return error?.message || error?.error_description || error?.details || "未知错误";
+  }
+
   async function saveCloudState() {
     if (!state.client || !state.session?.user) return;
     let tableSaved = false;
@@ -227,7 +230,7 @@
       state.cloudReady = tableSaved;
       if (!state.syncWarningShown) {
         state.syncWarningShown = true;
-        setStatus(tableSaved ? "云同步已保存到数据库，账号元数据备份失败。" : "云同步保存失败：当前仅保存在本浏览器。");
+        setStatus(tableSaved ? "云同步已保存到数据库，账号元数据备份失败：" + syncErrorMessage(error) : "云同步保存失败：" + syncErrorMessage(error));
       }
     }
   }
@@ -394,7 +397,9 @@
     renderThreads();
     renderChat();
     els.userHint.textContent = "当前账号：" + (state.session.user.email || state.session.user.id);
-    setStatus(state.cloudReady ? "已登录：模型好友和聊天记录会跨浏览器同步。" : "已登录：云同步未启用，当前仍只保存在本浏览器。");
+    saveCloudState().then(function () {
+      if (state.cloudReady) setStatus("已登录：模型好友和聊天记录会跨浏览器同步。");
+    });
     els.mode.textContent = "Signed In";
     els.send.disabled = false;
   }
