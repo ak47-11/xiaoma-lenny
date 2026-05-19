@@ -2,9 +2,6 @@
   const STORE_KEY = "xiaoma.openclaw.agent.v1";
   const USER_STORE_PREFIX = "xiaoma.openclaw.agent.user.";
   const CLOUD_TABLE = "openclaw_states";
-  const METADATA_KEY = "openclawState";
-  const METADATA_MAX_THREADS = 8;
-  const METADATA_MAX_MESSAGES = 24;
   const MAX_DOC_CHARS = 28000;
   const MAX_DOCS = 12;
 
@@ -103,20 +100,6 @@
     };
   }
 
-  function metadataSnapshot() {
-    const snapshot = snapshotState();
-    return {
-      ...snapshot,
-      docs: [],
-      threads: snapshot.threads.slice(0, METADATA_MAX_THREADS).map(function (thread) {
-        return {
-          ...thread,
-          messages: Array.isArray(thread.messages) ? thread.messages.slice(-METADATA_MAX_MESSAGES) : []
-        };
-      })
-    };
-  }
-
   function applySavedState(saved) {
     if (!saved || typeof saved !== "object") return;
     if (saved.config) state.config = { ...state.config, ...saved.config };
@@ -181,17 +164,22 @@
       state.cloudReady = false;
     }
 
-    const loadedFromMetadata = loadedFromTable ? false : loadMetadataState();
-    if (!loadedFromTable && !loadedFromMetadata) await saveCloudState();
-    return loadedFromTable || loadedFromMetadata || state.cloudReady;
+    const loadedFromProfile = loadedFromTable ? false : await loadProfileState();
+    if (!loadedFromTable && !loadedFromProfile) await saveCloudState();
+    return loadedFromTable || loadedFromProfile || state.cloudReady;
   }
 
-  function loadMetadataState() {
-    const saved = state.session?.user?.user_metadata?.[METADATA_KEY];
-    if (!saved || typeof saved !== "object") return false;
-    const applied = applyRemoteState(saved);
-    state.cloudReady = true;
-    return applied;
+  async function loadProfileState() {
+    try {
+      const result = await state.client.from("profiles").select("openclaw_state").eq("id", state.session.user.id).maybeSingle();
+      if (result.error) throw result.error;
+      if (!result.data?.openclaw_state || typeof result.data.openclaw_state !== "object") return false;
+      const applied = applyRemoteState(result.data.openclaw_state);
+      state.cloudReady = true;
+      return applied;
+    } catch (error) {
+      return false;
+    }
   }
 
   function queueCloudSave() {
@@ -219,19 +207,29 @@
       tableSaved = false;
     }
 
+    let profileSaved = false;
     try {
-      const metadata = { ...(state.session.user.user_metadata || {}), [METADATA_KEY]: metadataSnapshot() };
-      const result = await state.client.auth.updateUser({ data: metadata });
+      const result = await state.client.from("profiles").upsert({
+        id: state.session.user.id,
+        openclaw_state: snapshotState(),
+        updated_at: new Date().toISOString()
+      }, { onConflict: "id" });
       if (result.error) throw result.error;
-      if (result.data?.user) state.session.user = result.data.user;
+      profileSaved = true;
+    } catch (error) {
+      profileSaved = false;
+    }
+
+    if (tableSaved || profileSaved) {
       state.cloudReady = true;
       state.syncWarningShown = false;
-    } catch (error) {
-      state.cloudReady = tableSaved;
-      if (!state.syncWarningShown) {
-        state.syncWarningShown = true;
-        setStatus(tableSaved ? "云同步已保存到数据库，账号元数据备份失败：" + syncErrorMessage(error) : "云同步保存失败：" + syncErrorMessage(error));
-      }
+      return;
+    }
+
+    state.cloudReady = false;
+    if (!state.syncWarningShown) {
+      state.syncWarningShown = true;
+      setStatus("云同步保存失败：请执行 supabase/community_admin_setup.sql 初始化 openclaw_states 或 profiles.openclaw_state。当前仅保存在本浏览器。");
     }
   }
 

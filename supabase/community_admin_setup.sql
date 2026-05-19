@@ -19,6 +19,7 @@ alter table profiles add column if not exists display_name text;
 alter table profiles add column if not exists bio text;
 alter table profiles add column if not exists contact text;
 alter table profiles add column if not exists role text default 'user';
+alter table profiles add column if not exists openclaw_state jsonb default '{}'::jsonb;
 alter table profiles add column if not exists created_at timestamptz default now();
 alter table profiles add column if not exists updated_at timestamptz default now();
 
