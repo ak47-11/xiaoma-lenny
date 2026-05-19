@@ -3364,6 +3364,13 @@ samp {
   font-size: var(--font-size-micro);
 }
 
+.openclaw-page .roster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
 .openclaw-page .roster-item button {
   min-height: 28px;
   border: 1px solid var(--color-border-default);

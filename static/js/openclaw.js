@@ -161,11 +161,14 @@
   function renderAgents() {
     if (!state.agents.length) state.agents = [createDefaultAgent()];
     if (!state.agents.some((agent) => agent.id === state.config.activeAgentId)) state.config.activeAgentId = state.agents[0].id;
+    const activeGroup = state.groups.find((group) => group.id === state.config.activeGroupId) || state.groups[0] || createDefaultGroup();
 
     els.agentList.innerHTML = state.agents.map(function (agent) {
       const active = state.config.mode === "single" && agent.id === state.config.activeAgentId ? " is-active" : "";
       const remove = state.agents.length > 1 ? '<button type="button" data-remove-agent="' + escapeHtml(agent.id) + '">删除</button>' : "";
-      return '<article class="roster-item agent-item' + active + '" data-agent-id="' + escapeHtml(agent.id) + '"><div class="avatar-dot">AI</div><div class="roster-meta"><strong>' + escapeHtml(agent.name) + '</strong><span>' + escapeHtml(agent.model) + '</span><p>' + escapeHtml(agent.prompt).slice(0, 72) + '</p></div>' + remove + '</article>';
+      const inGroup = activeGroup.memberIds.includes(agent.id);
+      const groupAction = state.config.mode === "group" ? '<button type="button" data-toggle-member="' + escapeHtml(agent.id) + '">' + (inGroup ? '移出群' : '拉入群') + '</button>' : "";
+      return '<article class="roster-item agent-item' + active + '" data-agent-id="' + escapeHtml(agent.id) + '"><div class="avatar-dot">AI</div><div class="roster-meta"><strong>' + escapeHtml(agent.name) + '</strong><span>' + escapeHtml(agent.model) + '</span><p>' + escapeHtml(agent.prompt).slice(0, 72) + '</p></div><div class="roster-actions">' + groupAction + remove + '</div></article>';
     }).join("");
     renderGroupMemberList();
   }
@@ -380,7 +383,11 @@
     const answers = [];
     for (const agent of agents) {
       setStatus("群聊中：" + agent.name + " 正在回答...");
-      const answer = await callAgentModel(agent, buildMessages(value, agent));
+      const discussion = answers.length ? "\n\n目前群内已有观点：\n" + answers.map(function (item) {
+        return "[" + item.agent.name + "]\n" + item.answer;
+      }).join("\n\n---\n\n") : "";
+      const prompt = answers.length ? value + discussion + "\n\n请你基于用户问题和前面成员观点继续讨论：补充、反驳或给出更优方案。" : value;
+      const answer = await callAgentModel(agent, buildMessages(prompt, agent));
       answers.push({ agent, answer });
       appendMessage("assistant", "[" + agent.name + " / " + agent.model + "]\n" + answer, new Date().toISOString(), false, true);
     }
@@ -445,6 +452,24 @@
     });
 
     els.agentList.addEventListener("click", function (event) {
+      const toggleMember = event.target.closest("[data-toggle-member]");
+      if (toggleMember) {
+        const group = state.groups.find((entry) => entry.id === state.config.activeGroupId) || state.groups[0];
+        if (!group) return;
+        const agentId = toggleMember.dataset.toggleMember;
+        if (group.memberIds.includes(agentId)) {
+          if (group.memberIds.length <= 1) return setStatus("群聊至少保留一个模型好友。");
+          group.memberIds = group.memberIds.filter((id) => id !== agentId);
+        } else {
+          group.memberIds.push(agentId);
+        }
+        saveState();
+        renderAgents();
+        renderGroups();
+        setStatus("已更新群聊成员：" + group.name);
+        return;
+      }
+
       const remove = event.target.closest("[data-remove-agent]");
       if (remove) {
         state.agents = state.agents.filter((agent) => agent.id !== remove.dataset.removeAgent);
