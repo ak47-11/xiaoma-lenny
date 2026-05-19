@@ -1,10 +1,13 @@
 (function () {
   const STORE_KEY = "xiaoma.openclaw.agent.v1";
+  const USER_STORE_PREFIX = "xiaoma.openclaw.agent.user.";
   const MAX_DOC_CHARS = 28000;
   const MAX_DOCS = 12;
 
   const state = {
     config: {
+      endpoint: "",
+      apiKey: "",
       mode: "single",
       activeAgentId: "agent-default",
       systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
@@ -14,10 +17,13 @@
     threads: [],
     activeThreadId: null,
     session: null,
+    userStoreKey: "",
     abortController: null
   };
 
   const els = {
+    endpoint: document.getElementById("endpointInput"),
+    apiKey: document.getElementById("apiKeyInput"),
     chatMode: document.getElementById("chatModeSelect"),
     activeAgent: document.getElementById("activeAgentSelect"),
     agentList: document.getElementById("agentList"),
@@ -56,8 +62,9 @@
   }
 
   function loadState() {
+    if (!state.userStoreKey) return;
     try {
-      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+      const saved = JSON.parse(localStorage.getItem(state.userStoreKey) || "{}");
       if (saved.config) state.config = { ...state.config, ...saved.config };
       if (Array.isArray(saved.agents) && saved.agents.length) state.agents = saved.agents;
       if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
@@ -70,7 +77,8 @@
   }
 
   function saveState() {
-    localStorage.setItem(STORE_KEY, JSON.stringify({
+    if (!state.userStoreKey) return;
+    localStorage.setItem(state.userStoreKey, JSON.stringify({
       config: state.config,
       agents: state.agents,
       docs: state.docs,
@@ -117,6 +125,8 @@
   }
 
   function renderConfig() {
+    els.endpoint.value = state.config.endpoint || "";
+    els.apiKey.value = state.config.apiKey || "";
     els.chatMode.value = state.config.mode || "single";
     els.systemPrompt.value = state.config.systemPrompt || "";
     renderAgents();
@@ -157,6 +167,24 @@
       els.send.disabled = true;
       return;
     }
+    state.userStoreKey = USER_STORE_PREFIX + state.session.user.id;
+    localStorage.removeItem(STORE_KEY);
+    state.config = {
+      endpoint: "",
+      apiKey: "",
+      mode: "single",
+      activeAgentId: "agent-default",
+      systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
+    };
+    state.agents = [createDefaultAgent()];
+    state.docs = [];
+    state.threads = [];
+    state.activeThreadId = null;
+    loadState();
+    renderConfig();
+    renderDocs();
+    renderThreads();
+    renderChat();
     els.userHint.textContent = "当前账号：" + (state.session.user.email || state.session.user.id);
     setStatus("已登录：可以使用服务端代理调用模型。 ");
     els.mode.textContent = "Signed In";
@@ -254,6 +282,10 @@
       signal: state.abortController.signal,
       body: JSON.stringify({
         model: agent?.model || "openclaw-agent",
+        provider: {
+          endpoint: state.config.endpoint,
+          apiKey: state.config.apiKey
+        },
         messages,
         temperature: 0.7,
         stream: false
@@ -335,12 +367,14 @@
 
   function bindEvents() {
     els.saveConfig.addEventListener("click", function () {
+      state.config.endpoint = els.endpoint.value.trim();
+      state.config.apiKey = els.apiKey.value.trim();
       state.config.mode = els.chatMode.value;
       state.config.activeAgentId = els.activeAgent.value;
       state.config.systemPrompt = els.systemPrompt.value.trim();
       saveState();
       renderAgents();
-      setStatus("模型角色和系统 Prompt 已保存。");
+      setStatus("API、模型角色和系统 Prompt 已保存。");
     });
 
     els.chatMode.addEventListener("change", function () {

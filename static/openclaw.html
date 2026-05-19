@@ -27,6 +27,14 @@
       <section class="config-card panel" aria-label="接口设置">
         <strong>Agent Access</strong>
         <p id="userHint" class="hint">正在检查登录状态...</p>
+        <div class="field">
+          <label for="endpointInput">API 请求地址</label>
+          <input id="endpointInput" placeholder="https://your-relay.example.com/v1/chat/completions" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="apiKeyInput">API 密钥</label>
+          <input id="apiKeyInput" type="password" placeholder="sk-...（仅当前账号本地保存）" autocomplete="off" />
+        </div>
         <div class="tool-row agent-mode-row">
           <select id="chatModeSelect" aria-label="聊天模式">
             <option value="single">单模型聊天</option>
@@ -35,7 +43,7 @@
           <select id="activeAgentSelect" aria-label="当前模型角色"></select>
         </div>
         <button id="saveConfigBtn" class="btn" type="button">保存设置</button>
-        <p class="hint">请求地址和中转站密钥只在服务端环境变量中保存。登录用户可直接使用，不会在网页源码或浏览器里暴露密钥。</p>
+        <p class="hint">配置按登录账号隔离保存，不写入仓库。请求必须通过登录鉴权的服务端代理转发，其他账号不能读取你的配置。</p>
       </section>
 
       <section class="config-card panel" aria-label="模型角色">

@@ -13,11 +13,6 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: { message: "Method not allowed" } });
   }
 
-  const endpoint = process.env.OPENCLAW_ENDPOINT;
-  if (!endpoint) {
-    return res.status(500).json({ error: { message: "Missing OPENCLAW_ENDPOINT. Set your relay API URL in Vercel." } });
-  }
-
   const bridgeToken = String(process.env.OPENCLAW_BRIDGE_TOKEN || "").trim();
   const allowUnauthenticated = String(process.env.OPENCLAW_ALLOW_UNAUTHENTICATED || "").trim() === "1";
   const authHeader = String(req.headers.authorization || "").trim();
@@ -33,6 +28,19 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  const provider = req.body?.provider && typeof req.body.provider === "object" ? req.body.provider : {};
+  const endpoint = String(provider.endpoint || "").trim();
+  const apiKey = String(provider.apiKey || "").trim();
+  if (!endpoint) {
+    return res.status(400).json({ error: { message: "Missing model API endpoint. Set it in your account settings." } });
+  }
+  if (!apiKey) {
+    return res.status(400).json({ error: { message: "Missing model API key. Set it in your account settings." } });
+  }
+  if (!/^https?:\/\//i.test(endpoint)) {
+    return res.status(400).json({ error: { message: "Model API endpoint must start with http:// or https://" } });
+  }
+
   const timeout = Number(process.env.OPENCLAW_TIMEOUT_MS || 30000);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
@@ -40,12 +48,13 @@ module.exports = async function handler(req, res) {
   try {
     const payload = {
       ...req.body,
+      provider: undefined,
       model: req.body?.model || process.env.OPENCLAW_MODEL || "openclaw-agent",
       stream: false
     };
 
     const headers = { "Content-Type": "application/json" };
-    if (process.env.OPENCLAW_API_KEY) headers.Authorization = "Bearer " + process.env.OPENCLAW_API_KEY;
+    headers.Authorization = "Bearer " + apiKey.replace(/^Bearer\s+/i, "");
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -68,7 +77,7 @@ module.exports = async function handler(req, res) {
 
 async function verifySupabaseUser(accessToken) {
   const supabaseUrl = String(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "https://vtplvtwbkyydxmcxgctn.supabase.co").trim();
-  const supabaseAnonKey = String(process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
+  const supabaseAnonKey = String(process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cGx2dHdia3l5ZHhtY3hnY3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDI1NDYsImV4cCI6MjA4ODE3ODU0Nn0.JmmCCDbv9rkVSSCOfhrFwUgwzNMTvsDda_C956EjatU").trim();
   if (!accessToken || !supabaseUrl || !supabaseAnonKey) return null;
 
   try {
