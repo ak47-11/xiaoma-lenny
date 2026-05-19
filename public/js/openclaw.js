@@ -595,6 +595,7 @@
   }
 
   function openModal(modal) {
+    if (modal.parentElement !== document.body) document.body.appendChild(modal);
     modal.classList.remove("hidden");
   }
 
