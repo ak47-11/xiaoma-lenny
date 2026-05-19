@@ -33,15 +33,15 @@
           <input id="modelInput" placeholder="qwen2.5:7b / llama3.1 / openclaw-agent" autocomplete="off" />
         </div>
         <div class="field">
-          <label for="apiKeyInput">API Key（可选，仅本机保存）</label>
+          <label for="apiKeyInput">API Key（可选，仅本会话保存）</label>
           <input id="apiKeyInput" type="password" placeholder="Bearer Token / sk-..." autocomplete="off" />
         </div>
         <div class="field">
-          <label for="bridgeTokenInput">代理口令（可选）</label>
+          <label for="bridgeTokenInput">代理口令（必填，除非服务端显式放行）</label>
           <input id="bridgeTokenInput" type="password" placeholder="OPENCLAW_BRIDGE_TOKEN" autocomplete="off" />
         </div>
         <button id="saveConfigBtn" class="btn" type="button">保存接口设置</button>
-        <p class="hint">留空请求地址时，会调用站点代理 <code>/api/openclaw</code>，如部署环境配置了 Bridge Token，需要填写代理口令。</p>
+        <p class="hint">留空请求地址时，会调用站点代理 <code>/api/openclaw</code>。中转站密钥请只放服务端环境变量，前端只填写代理口令。</p>
       </section>
 
       <section class="config-card panel" aria-label="文档资料">

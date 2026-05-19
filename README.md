@@ -54,8 +54,10 @@ cloudflared tunnel run xiaoma-openclaw
 - `OPENCLAW_ENDPOINT`：例如 `https://ai.your-domain.com/v1/chat/completions`
 - `OPENCLAW_MODEL`：例如 `openclaw`
 - `OPENCLAW_API_KEY`：如你的 OpenClaw 网关需要 Bearer Token
-- `OPENCLAW_BRIDGE_TOKEN`：前端按钮调用时的二次鉴权口令（必填）
+- `OPENCLAW_BRIDGE_TOKEN`：前端调用 `/api/openclaw` 时的代理口令（必填，防止中转站密钥被刷）
 - `OPENCLAW_TIMEOUT_MS`：可选，默认 `25000`
+- `OPENCLAW_ALLOWED_ORIGIN`：可选，限制浏览器来源，例如 `https://xiaoma.cyou`
+- `OPENCLAW_ALLOW_UNAUTHENTICATED`：可选，仅测试时设为 `1` 才允许无代理口令调用
 
 ### 4) 前端入口使用
 
@@ -71,6 +73,9 @@ cloudflared tunnel run xiaoma-openclaw
 ### 5) 安全注意
 
 - 不要把 `OPENCLAW_API_KEY` 和 `OPENCLAW_BRIDGE_TOKEN` 写进前端代码。
+- 使用中转站时，推荐把中转站 API Key 放在 `OPENCLAW_API_KEY`，网页请求地址留空，只填写代理口令。
+- `OPENCLAW_BRIDGE_TOKEN` 应设置成长随机字符串，不要使用常见密码；泄露后立即在部署平台更换。
+- 前端不会长期保存 API Key 和代理口令，只保存在当前浏览器会话中，关闭标签页后需要重新填写。
 - 仅在需要时开启本机 OpenClaw 与 cloudflared，关机/休眠时服务不可用属正常。
 - 定期更新本机系统、OpenClaw 和 cloudflared 版本。
 

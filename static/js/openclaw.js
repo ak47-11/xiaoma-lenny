@@ -1,5 +1,6 @@
 (function () {
   const STORE_KEY = "xiaoma.openclaw.agent.v1";
+  const SECRET_STORE_KEY = "xiaoma.openclaw.agent.secrets.v1";
   const MAX_DOC_CHARS = 28000;
   const MAX_DOCS = 12;
 
@@ -46,6 +47,11 @@
     try {
       const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
       if (saved.config) state.config = { ...state.config, ...saved.config };
+      delete state.config.apiKey;
+      delete state.config.bridgeToken;
+      const secrets = JSON.parse(sessionStorage.getItem(SECRET_STORE_KEY) || "{}");
+      state.config.apiKey = secrets.apiKey || "";
+      state.config.bridgeToken = secrets.bridgeToken || "";
       if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
       if (Array.isArray(saved.threads)) state.threads = saved.threads;
       state.activeThreadId = saved.activeThreadId || state.threads[0]?.id || createThread().id;
@@ -55,11 +61,18 @@
   }
 
   function saveState() {
+    const safeConfig = { ...state.config };
+    delete safeConfig.apiKey;
+    delete safeConfig.bridgeToken;
     localStorage.setItem(STORE_KEY, JSON.stringify({
-      config: state.config,
+      config: safeConfig,
       docs: state.docs,
       threads: state.threads.slice(0, 20),
       activeThreadId: state.activeThreadId
+    }));
+    sessionStorage.setItem(SECRET_STORE_KEY, JSON.stringify({
+      apiKey: state.config.apiKey || "",
+      bridgeToken: state.config.bridgeToken || ""
     }));
   }
 

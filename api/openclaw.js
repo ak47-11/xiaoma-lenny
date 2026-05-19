@@ -1,5 +1,6 @@
 module.exports = async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const allowedOrigin = String(process.env.OPENCLAW_ALLOWED_ORIGIN || "*").trim();
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin || "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-OpenClaw-Bridge-Token");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
 
@@ -18,11 +19,14 @@ module.exports = async function handler(req, res) {
   }
 
   const bridgeToken = String(process.env.OPENCLAW_BRIDGE_TOKEN || "").trim();
-  if (bridgeToken) {
-    const incomingToken = String(req.headers["x-openclaw-bridge-token"] || "").trim();
-    if (incomingToken !== bridgeToken) {
-      return res.status(401).json({ error: { message: "Bridge token invalid" } });
-    }
+  const allowUnauthenticated = String(process.env.OPENCLAW_ALLOW_UNAUTHENTICATED || "").trim() === "1";
+  if (!bridgeToken && !allowUnauthenticated) {
+    return res.status(500).json({ error: { message: "Missing OPENCLAW_BRIDGE_TOKEN. Set a proxy password to protect your model API key." } });
+  }
+
+  const incomingToken = String(req.headers["x-openclaw-bridge-token"] || "").trim();
+  if (bridgeToken && incomingToken !== bridgeToken) {
+    return res.status(401).json({ error: { message: "Bridge token invalid" } });
   }
 
   const timeout = Number(process.env.OPENCLAW_TIMEOUT_MS || 30000);
