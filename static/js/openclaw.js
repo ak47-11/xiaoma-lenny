@@ -23,6 +23,8 @@
     abortController: null
   };
 
+  let editingAgentId = "";
+
   const els = {
     endpoint: document.getElementById("endpointInput"),
     apiKey: document.getElementById("apiKeyInput"),
@@ -208,7 +210,8 @@
       const remove = state.agents.length > 1 ? '<button type="button" data-remove-agent="' + escapeHtml(agent.id) + '">删除</button>' : "";
       const inGroup = activeGroup.memberIds.includes(agent.id);
       const groupAction = state.config.mode === "group" ? '<button type="button" data-toggle-member="' + escapeHtml(agent.id) + '">' + (inGroup ? '移出群' : '拉入群') + '</button>' : "";
-      return '<article class="roster-item agent-item' + active + '" data-agent-id="' + escapeHtml(agent.id) + '"><div class="avatar-dot">AI</div><div class="roster-meta"><strong>' + escapeHtml(agent.name) + '</strong><span>' + escapeHtml(agent.model) + '</span><p>' + escapeHtml(agent.prompt).slice(0, 72) + '</p></div><div class="roster-actions">' + groupAction + remove + '</div></article>';
+      const settings = '<button type="button" data-edit-agent="' + escapeHtml(agent.id) + '">设置</button>';
+      return '<article class="roster-item agent-item' + active + '" data-agent-id="' + escapeHtml(agent.id) + '"><div class="avatar-dot">AI</div><div class="roster-meta"><strong>' + escapeHtml(agent.name) + '</strong><span>' + escapeHtml(agent.model) + '</span><p>' + escapeHtml(agent.prompt).slice(0, 72) + '</p></div><div class="roster-actions">' + settings + groupAction + remove + '</div></article>';
     }).join("");
     renderGroupMemberList();
   }
@@ -458,6 +461,14 @@
     });
 
     els.toggleAgentForm.addEventListener("click", function () {
+      editingAgentId = "";
+      document.getElementById("agentFormTitle").textContent = "添加模型好友";
+      els.addAgent.textContent = "保存模型好友";
+      els.agentName.value = "";
+      els.agentModel.value = "";
+      els.endpoint.value = "";
+      els.apiKey.value = "";
+      els.agentPrompt.value = "";
       openModal(els.agentForm);
       els.agentName.focus();
     });
@@ -522,6 +533,23 @@
         return;
       }
 
+      const edit = event.target.closest("[data-edit-agent]");
+      if (edit) {
+        const agent = state.agents.find((item) => item.id === edit.dataset.editAgent);
+        if (!agent) return;
+        editingAgentId = agent.id;
+        document.getElementById("agentFormTitle").textContent = "设置模型好友";
+        els.addAgent.textContent = "保存修改";
+        els.agentName.value = agent.name || "";
+        els.agentModel.value = agent.model || "";
+        els.endpoint.value = agent.endpoint || "";
+        els.apiKey.value = agent.apiKey || "";
+        els.agentPrompt.value = agent.prompt || "";
+        openModal(els.agentForm);
+        els.agentName.focus();
+        return;
+      }
+
       const remove = event.target.closest("[data-remove-agent]");
       if (remove) {
         state.agents = state.agents.filter((agent) => agent.id !== remove.dataset.removeAgent);
@@ -558,25 +586,37 @@
       const apiKey = els.apiKey.value.trim();
       const prompt = els.agentPrompt.value.trim();
       if (!name || !model || !endpoint || !apiKey) return setStatus("请填写角色名称、模型名、API 地址和密钥。");
-      const agent = { id: "agent-" + Date.now(), name, model, endpoint, apiKey, prompt: prompt || "你是" + name + "，请从你的专业角度回答。" };
-      state.agents.push(agent);
-      state.config.activeAgentId = agent.id;
-      state.config.mode = "single";
-      if (!state.groups.length) state.groups = [createDefaultGroup()];
-      state.groups.forEach(function (group) {
-        if (!group.memberIds.includes(agent.id)) group.memberIds.push(agent.id);
-      });
+      const agent = editingAgentId ? state.agents.find((item) => item.id === editingAgentId) : null;
+      if (agent) {
+        agent.name = name;
+        agent.model = model;
+        agent.endpoint = endpoint;
+        agent.apiKey = apiKey;
+        agent.prompt = prompt || "你是" + name + "，请从你的专业角度回答。";
+        state.config.activeAgentId = agent.id;
+        state.config.mode = "single";
+      } else {
+        const newAgent = { id: "agent-" + Date.now(), name, model, endpoint, apiKey, prompt: prompt || "你是" + name + "，请从你的专业角度回答。" };
+        state.agents.push(newAgent);
+        state.config.activeAgentId = newAgent.id;
+        state.config.mode = "single";
+        if (!state.groups.length) state.groups = [createDefaultGroup()];
+        state.groups.forEach(function (group) {
+          if (!group.memberIds.includes(newAgent.id)) group.memberIds.push(newAgent.id);
+        });
+      }
       els.agentName.value = "";
       els.agentModel.value = "";
       els.endpoint.value = "";
       els.apiKey.value = "";
       els.agentPrompt.value = "";
+      editingAgentId = "";
       closeModal(els.agentForm);
       saveState();
       renderAgents();
       renderGroups();
       renderGroupMemberList();
-      setStatus("已添加角色模型：" + name);
+      setStatus((agent ? "已更新模型好友：" : "已添加模型好友：") + name);
     });
 
     els.addGroup.addEventListener("click", function () {
