@@ -3272,10 +3272,33 @@ samp {
 
 .openclaw-page .roster-panel,
 .openclaw-page .roster-list,
-.openclaw-page .member-list,
-.openclaw-page .roster-form {
+.openclaw-page .member-list {
   display: grid;
   gap: var(--space-2);
+}
+
+.openclaw-page .roster-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(15, 23, 42, 0.38);
+  backdrop-filter: blur(8px);
+  padding: var(--space-4);
+  display: grid;
+  place-items: center;
+}
+
+.openclaw-page .roster-modal-card {
+  width: min(520px, 94vw);
+  max-height: min(760px, 92vh);
+  overflow: auto;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
 }
 
 .openclaw-page .roster-list {

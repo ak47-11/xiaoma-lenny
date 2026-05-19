@@ -33,6 +33,8 @@
     groupForm: document.getElementById("groupForm"),
     toggleAgentForm: document.getElementById("toggleAgentFormBtn"),
     toggleGroupForm: document.getElementById("toggleGroupFormBtn"),
+    closeAgentForm: document.getElementById("closeAgentFormBtn"),
+    closeGroupForm: document.getElementById("closeGroupFormBtn"),
     agentName: document.getElementById("agentNameInput"),
     agentModel: document.getElementById("agentModelInput"),
     agentPrompt: document.getElementById("agentPromptInput"),
@@ -416,12 +418,30 @@
     });
 
     els.toggleAgentForm.addEventListener("click", function () {
-      els.agentForm.classList.toggle("hidden");
+      openModal(els.agentForm);
+      els.agentName.focus();
     });
 
     els.toggleGroupForm.addEventListener("click", function () {
       renderGroupMemberList();
-      els.groupForm.classList.toggle("hidden");
+      openModal(els.groupForm);
+      els.groupName.focus();
+    });
+
+    els.closeAgentForm.addEventListener("click", function () {
+      closeModal(els.agentForm);
+    });
+
+    els.closeGroupForm.addEventListener("click", function () {
+      closeModal(els.groupForm);
+    });
+
+    els.agentForm.addEventListener("click", function (event) {
+      if (event.target === els.agentForm) closeModal(els.agentForm);
+    });
+
+    els.groupForm.addEventListener("click", function (event) {
+      if (event.target === els.groupForm) closeModal(els.groupForm);
     });
 
     els.agentList.addEventListener("click", function (event) {
@@ -465,7 +485,7 @@
       els.endpoint.value = "";
       els.apiKey.value = "";
       els.agentPrompt.value = "";
-      els.agentForm.classList.add("hidden");
+      closeModal(els.agentForm);
       saveState();
       renderAgents();
       renderGroups();
@@ -481,7 +501,7 @@
       state.config.mode = "group";
       state.config.activeGroupId = group.id;
       els.groupName.value = "";
-      els.groupForm.classList.add("hidden");
+      closeModal(els.groupForm);
       saveState();
       renderGroups();
       renderAgents();
@@ -566,6 +586,20 @@
       els.prompt.value = button.dataset.prompt;
       els.prompt.focus();
     });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+      closeModal(els.agentForm);
+      closeModal(els.groupForm);
+    });
+  }
+
+  function openModal(modal) {
+    modal.classList.remove("hidden");
+  }
+
+  function closeModal(modal) {
+    modal.classList.add("hidden");
   }
 
   async function extractFileText(file) {

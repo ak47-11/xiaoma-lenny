@@ -37,7 +37,12 @@
           <button id="toggleAgentFormBtn" class="mini-btn" type="button">添加</button>
         </div>
         <div id="agentList" class="roster-list"></div>
-        <div id="agentForm" class="roster-form hidden">
+        <div id="agentForm" class="roster-modal hidden" role="dialog" aria-modal="true" aria-labelledby="agentFormTitle">
+          <div class="roster-modal-card">
+            <div class="threads-head">
+              <strong id="agentFormTitle">添加模型好友</strong>
+              <button id="closeAgentFormBtn" class="mini-btn" type="button">关闭</button>
+            </div>
         <div class="field">
           <label for="agentNameInput">角色名称</label>
           <input id="agentNameInput" placeholder="策略顾问 / 技术专家 / 文案编辑" autocomplete="off" />
@@ -61,6 +66,7 @@
         <div class="actions compact-actions">
           <button id="addAgentBtn" type="button">添加角色模型</button>
         </div>
+          </div>
         </div>
 
         <div class="threads-head group-head">
@@ -68,7 +74,12 @@
           <button id="toggleGroupFormBtn" class="mini-btn" type="button">建群</button>
         </div>
         <div id="groupList" class="roster-list"></div>
-        <div id="groupForm" class="roster-form hidden">
+        <div id="groupForm" class="roster-modal hidden" role="dialog" aria-modal="true" aria-labelledby="groupFormTitle">
+          <div class="roster-modal-card">
+            <div class="threads-head">
+              <strong id="groupFormTitle">创建模型群聊</strong>
+              <button id="closeGroupFormBtn" class="mini-btn" type="button">关闭</button>
+            </div>
           <div class="field">
             <label for="groupNameInput">群名称</label>
             <input id="groupNameInput" placeholder="产品讨论组 / 代码评审组 / 内容策划组" autocomplete="off" />
@@ -76,6 +87,7 @@
           <div id="groupMemberList" class="member-list"></div>
           <div class="actions compact-actions">
             <button id="addGroupBtn" type="button">创建群聊</button>
+          </div>
           </div>
         </div>
       </section>
