@@ -2969,13 +2969,13 @@ samp {
     radial-gradient(980px 420px at 94% -8%, rgba(47, 109, 246, 0.16), transparent 62%),
     radial-gradient(860px 420px at -10% 116%, rgba(47, 109, 246, 0.08), transparent 64%),
     var(--color-bg-canvas);
-  overflow: auto;
+  overflow: hidden;
 }
 
 .openclaw-page .chat-shell {
   width: min(1360px, calc(100% - 24px));
   margin: 12px auto;
-  min-height: calc(100vh - 24px);
+  height: calc(100vh - 24px);
   display: grid;
   gap: var(--space-3);
   grid-template-columns: 300px minmax(0, 1fr);
@@ -3144,7 +3144,7 @@ samp {
 }
 
 .openclaw-page .chat-feed {
-  overflow: visible;
+  overflow: auto;
   padding: var(--space-5);
   display: grid;
   gap: var(--space-3);
@@ -3198,8 +3198,7 @@ samp {
 }
 
 .openclaw-page .composer {
-  position: sticky;
-  bottom: 0;
+  position: relative;
   z-index: 30;
   border-top: 1px solid var(--color-border-default);
   padding: var(--space-3) var(--space-4) var(--space-4);
