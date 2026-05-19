@@ -3266,6 +3266,108 @@ samp {
   grid-template-columns: 1fr;
 }
 
+.openclaw-page .hidden {
+  display: none !important;
+}
+
+.openclaw-page .roster-panel,
+.openclaw-page .roster-list,
+.openclaw-page .member-list,
+.openclaw-page .roster-form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.openclaw-page .roster-list {
+  max-height: 220px;
+  overflow: auto;
+}
+
+.openclaw-page .roster-item {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  padding: var(--space-2);
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.openclaw-page .roster-item.is-active {
+  border-color: color-mix(in srgb, var(--color-primary) 58%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-primary-soft) 52%, var(--color-bg-surface));
+}
+
+.openclaw-page .avatar-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 44%, #111827));
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+}
+
+.openclaw-page .group-dot {
+  background: linear-gradient(135deg, #14b8a6, #2563eb);
+}
+
+.openclaw-page .roster-meta {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.openclaw-page .roster-meta strong,
+.openclaw-page .roster-meta span,
+.openclaw-page .roster-meta p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.openclaw-page .roster-meta strong {
+  font-size: var(--font-size-caption);
+}
+
+.openclaw-page .roster-meta span,
+.openclaw-page .roster-meta p,
+.openclaw-page .member-list label {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-micro);
+}
+
+.openclaw-page .roster-item button {
+  min-height: 28px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  background: var(--color-bg-muted);
+  color: var(--color-text-tertiary);
+  padding: 0 10px;
+  font: inherit;
+  font-size: var(--font-size-micro);
+  cursor: pointer;
+}
+
+.openclaw-page .group-head {
+  margin-top: var(--space-2);
+}
+
+.openclaw-page .member-list label {
+  min-height: 32px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  padding: 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .openclaw-page .agent-item p {
   color: var(--color-text-secondary);
   font-size: var(--font-size-micro);

@@ -27,32 +27,29 @@
       <section class="config-card panel" aria-label="接口设置">
         <strong>Agent Access</strong>
         <p id="userHint" class="hint">正在检查登录状态...</p>
-        <div class="field">
-          <label for="endpointInput">API 请求地址</label>
-          <input id="endpointInput" placeholder="https://your-relay.example.com/v1/chat/completions" autocomplete="off" />
-        </div>
-        <div class="field">
-          <label for="apiKeyInput">API 密钥</label>
-          <input id="apiKeyInput" type="password" placeholder="sk-...（仅当前账号本地保存）" autocomplete="off" />
-        </div>
-        <div class="tool-row agent-mode-row">
-          <select id="chatModeSelect" aria-label="聊天模式">
-            <option value="single">单模型聊天</option>
-            <option value="group">多模型群聊</option>
-          </select>
-          <select id="activeAgentSelect" aria-label="当前模型角色"></select>
-        </div>
         <button id="saveConfigBtn" class="btn" type="button">保存设置</button>
-        <p class="hint">配置按登录账号隔离保存，不写入仓库。请求必须通过登录鉴权的服务端代理转发，其他账号不能读取你的配置。</p>
+        <p class="hint">像 QQ 一样点击模型好友单聊，点击群聊进入多模型协同。API 地址和密钥只在添加模型时填写，列表中不会展示。</p>
       </section>
 
-      <section class="config-card panel" aria-label="模型角色">
-        <strong>Model Roles</strong>
-        <div id="agentList" class="doc-list"></div>
+      <section class="config-card panel roster-panel" aria-label="模型联系人">
+        <div class="threads-head">
+          <strong>模型好友</strong>
+          <button id="toggleAgentFormBtn" class="mini-btn" type="button">添加</button>
+        </div>
+        <div id="agentList" class="roster-list"></div>
+        <div id="agentForm" class="roster-form hidden">
         <div class="field">
           <label for="agentNameInput">角色名称</label>
           <input id="agentNameInput" placeholder="策略顾问 / 技术专家 / 文案编辑" autocomplete="off" />
         </div>
+          <div class="field">
+            <label for="endpointInput">API 请求地址</label>
+            <input id="endpointInput" placeholder="https://your-relay.example.com/v1/chat/completions" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="apiKeyInput">API 密钥</label>
+            <input id="apiKeyInput" type="password" placeholder="sk-...（保存后隐藏显示）" autocomplete="off" />
+          </div>
         <div class="field">
           <label for="agentModelInput">模型名</label>
           <input id="agentModelInput" placeholder="gpt-4o-mini / deepseek-chat / qwen-plus" autocomplete="off" />
@@ -63,6 +60,23 @@
         </div>
         <div class="actions compact-actions">
           <button id="addAgentBtn" type="button">添加角色模型</button>
+        </div>
+        </div>
+
+        <div class="threads-head group-head">
+          <strong>群聊</strong>
+          <button id="toggleGroupFormBtn" class="mini-btn" type="button">建群</button>
+        </div>
+        <div id="groupList" class="roster-list"></div>
+        <div id="groupForm" class="roster-form hidden">
+          <div class="field">
+            <label for="groupNameInput">群名称</label>
+            <input id="groupNameInput" placeholder="产品讨论组 / 代码评审组 / 内容策划组" autocomplete="off" />
+          </div>
+          <div id="groupMemberList" class="member-list"></div>
+          <div class="actions compact-actions">
+            <button id="addGroupBtn" type="button">创建群聊</button>
+          </div>
         </div>
       </section>
 

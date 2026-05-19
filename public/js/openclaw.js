@@ -10,9 +10,11 @@
       apiKey: "",
       mode: "single",
       activeAgentId: "agent-default",
+      activeGroupId: "group-default",
       systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
     },
     agents: [createDefaultAgent()],
+    groups: [createDefaultGroup()],
     docs: [],
     threads: [],
     activeThreadId: null,
@@ -24,13 +26,19 @@
   const els = {
     endpoint: document.getElementById("endpointInput"),
     apiKey: document.getElementById("apiKeyInput"),
-    chatMode: document.getElementById("chatModeSelect"),
-    activeAgent: document.getElementById("activeAgentSelect"),
     agentList: document.getElementById("agentList"),
+    groupList: document.getElementById("groupList"),
+    groupMemberList: document.getElementById("groupMemberList"),
+    agentForm: document.getElementById("agentForm"),
+    groupForm: document.getElementById("groupForm"),
+    toggleAgentForm: document.getElementById("toggleAgentFormBtn"),
+    toggleGroupForm: document.getElementById("toggleGroupFormBtn"),
     agentName: document.getElementById("agentNameInput"),
     agentModel: document.getElementById("agentModelInput"),
     agentPrompt: document.getElementById("agentPromptInput"),
     addAgent: document.getElementById("addAgentBtn"),
+    groupName: document.getElementById("groupNameInput"),
+    addGroup: document.getElementById("addGroupBtn"),
     systemPrompt: document.getElementById("systemPromptInput"),
     saveConfig: document.getElementById("saveConfigBtn"),
     docInput: document.getElementById("docInput"),
@@ -57,7 +65,17 @@
       id: "agent-default",
       name: "默认助手",
       model: "openclaw-agent",
+      endpoint: "",
+      apiKey: "",
       prompt: "你是一个可靠的中文 AI 助手，回答要清晰、直接、可执行。"
+    };
+  }
+
+  function createDefaultGroup() {
+    return {
+      id: "group-default",
+      name: "默认群聊",
+      memberIds: ["agent-default"]
     };
   }
 
@@ -67,6 +85,7 @@
       const saved = JSON.parse(localStorage.getItem(state.userStoreKey) || "{}");
       if (saved.config) state.config = { ...state.config, ...saved.config };
       if (Array.isArray(saved.agents) && saved.agents.length) state.agents = saved.agents;
+      if (Array.isArray(saved.groups) && saved.groups.length) state.groups = saved.groups;
       if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
       if (Array.isArray(saved.threads)) state.threads = saved.threads;
       state.activeThreadId = saved.activeThreadId || state.threads[0]?.id || createThread().id;
@@ -81,6 +100,7 @@
     localStorage.setItem(state.userStoreKey, JSON.stringify({
       config: state.config,
       agents: state.agents,
+      groups: state.groups,
       docs: state.docs,
       threads: state.threads.slice(0, 20),
       activeThreadId: state.activeThreadId
@@ -127,9 +147,9 @@
   function renderConfig() {
     els.endpoint.value = state.config.endpoint || "";
     els.apiKey.value = state.config.apiKey || "";
-    els.chatMode.value = state.config.mode || "single";
     els.systemPrompt.value = state.config.systemPrompt || "";
     renderAgents();
+    renderGroups();
   }
 
   function activeAgent() {
@@ -140,15 +160,33 @@
     if (!state.agents.length) state.agents = [createDefaultAgent()];
     if (!state.agents.some((agent) => agent.id === state.config.activeAgentId)) state.config.activeAgentId = state.agents[0].id;
 
-    els.activeAgent.innerHTML = state.agents.map(function (agent) {
-      return '<option value="' + escapeHtml(agent.id) + '">' + escapeHtml(agent.name) + ' · ' + escapeHtml(agent.model) + '</option>';
-    }).join("");
-    els.activeAgent.value = state.config.activeAgentId;
-
     els.agentList.innerHTML = state.agents.map(function (agent) {
-      const selected = agent.id === state.config.activeAgentId ? " · 当前" : "";
+      const active = state.config.mode === "single" && agent.id === state.config.activeAgentId ? " is-active" : "";
       const remove = state.agents.length > 1 ? '<button type="button" data-remove-agent="' + escapeHtml(agent.id) + '">删除</button>' : "";
-      return '<article class="doc-item agent-item"><strong>' + escapeHtml(agent.name) + selected + '</strong><span>' + escapeHtml(agent.model) + '</span><p>' + escapeHtml(agent.prompt).slice(0, 120) + '</p>' + remove + '</article>';
+      return '<article class="roster-item agent-item' + active + '" data-agent-id="' + escapeHtml(agent.id) + '"><div class="avatar-dot">AI</div><div class="roster-meta"><strong>' + escapeHtml(agent.name) + '</strong><span>' + escapeHtml(agent.model) + '</span><p>' + escapeHtml(agent.prompt).slice(0, 72) + '</p></div>' + remove + '</article>';
+    }).join("");
+    renderGroupMemberList();
+  }
+
+  function renderGroups() {
+    if (!state.groups.length) state.groups = [createDefaultGroup()];
+    state.groups.forEach(function (group) {
+      group.memberIds = group.memberIds.filter((id) => state.agents.some((agent) => agent.id === id));
+      if (!group.memberIds.length && state.agents[0]) group.memberIds = [state.agents[0].id];
+    });
+    if (!state.groups.some((group) => group.id === state.config.activeGroupId)) state.config.activeGroupId = state.groups[0].id;
+
+    els.groupList.innerHTML = state.groups.map(function (group) {
+      const active = state.config.mode === "group" && group.id === state.config.activeGroupId ? " is-active" : "";
+      const members = group.memberIds.map((id) => state.agents.find((agent) => agent.id === id)?.name).filter(Boolean).join("、");
+      const remove = state.groups.length > 1 ? '<button type="button" data-remove-group="' + escapeHtml(group.id) + '">删除</button>' : "";
+      return '<article class="roster-item group-item' + active + '" data-group-id="' + escapeHtml(group.id) + '"><div class="avatar-dot group-dot">群</div><div class="roster-meta"><strong>' + escapeHtml(group.name) + '</strong><span>' + group.memberIds.length + ' 个模型</span><p>' + escapeHtml(members || "暂无成员") + '</p></div>' + remove + '</article>';
+    }).join("");
+  }
+
+  function renderGroupMemberList() {
+    els.groupMemberList.innerHTML = state.agents.map(function (agent) {
+      return '<label><input type="checkbox" value="' + escapeHtml(agent.id) + '" checked /> <span>' + escapeHtml(agent.name) + ' · ' + escapeHtml(agent.model) + '</span></label>';
     }).join("");
   }
 
@@ -174,9 +212,11 @@
       apiKey: "",
       mode: "single",
       activeAgentId: "agent-default",
+      activeGroupId: "group-default",
       systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
     };
     state.agents = [createDefaultAgent()];
+    state.groups = [createDefaultGroup()];
     state.docs = [];
     state.threads = [];
     state.activeThreadId = null;
@@ -283,8 +323,8 @@
       body: JSON.stringify({
         model: agent?.model || "openclaw-agent",
         provider: {
-          endpoint: state.config.endpoint,
-          apiKey: state.config.apiKey
+          endpoint: agent?.endpoint || "",
+          apiKey: agent?.apiKey || ""
         },
         messages,
         temperature: 0.7,
@@ -333,7 +373,8 @@
   }
 
   async function sendGroupPrompt(value) {
-    const agents = state.agents.slice(0, 6);
+    const activeGroup = state.groups.find((group) => group.id === state.config.activeGroupId) || state.groups[0] || createDefaultGroup();
+    const agents = activeGroup.memberIds.map((id) => state.agents.find((agent) => agent.id === id)).filter(Boolean).slice(0, 6);
     const answers = [];
     for (const agent of agents) {
       setStatus("群聊中：" + agent.name + " 正在回答...");
@@ -367,52 +408,105 @@
 
   function bindEvents() {
     els.saveConfig.addEventListener("click", function () {
-      state.config.endpoint = els.endpoint.value.trim();
-      state.config.apiKey = els.apiKey.value.trim();
-      state.config.mode = els.chatMode.value;
-      state.config.activeAgentId = els.activeAgent.value;
       state.config.systemPrompt = els.systemPrompt.value.trim();
       saveState();
       renderAgents();
-      setStatus("API、模型角色和系统 Prompt 已保存。");
+      renderGroups();
+      setStatus("全局系统 Prompt 已保存。");
     });
 
-    els.chatMode.addEventListener("change", function () {
-      state.config.mode = els.chatMode.value;
-      saveState();
-      setStatus(state.config.mode === "group" ? "已切换为多模型群聊。" : "已切换为单模型聊天。");
+    els.toggleAgentForm.addEventListener("click", function () {
+      els.agentForm.classList.toggle("hidden");
     });
 
-    els.activeAgent.addEventListener("change", function () {
-      state.config.activeAgentId = els.activeAgent.value;
+    els.toggleGroupForm.addEventListener("click", function () {
+      renderGroupMemberList();
+      els.groupForm.classList.toggle("hidden");
+    });
+
+    els.agentList.addEventListener("click", function (event) {
+      const remove = event.target.closest("[data-remove-agent]");
+      if (remove) {
+        state.agents = state.agents.filter((agent) => agent.id !== remove.dataset.removeAgent);
+        if (!state.agents.length) state.agents = [createDefaultAgent()];
+        state.groups.forEach((group) => {
+          group.memberIds = group.memberIds.filter((id) => id !== remove.dataset.removeAgent);
+          if (!group.memberIds.length) group.memberIds = [state.agents[0].id];
+        });
+        state.config.activeAgentId = state.agents[0].id;
+        saveState();
+        renderAgents();
+        renderGroups();
+        return;
+      }
+      const item = event.target.closest("[data-agent-id]");
+      if (!item) return;
+      state.config.mode = "single";
+      state.config.activeAgentId = item.dataset.agentId;
       saveState();
       renderAgents();
+      renderGroups();
+      setStatus("已切换单聊：" + activeAgent().name);
     });
 
     els.addAgent.addEventListener("click", function () {
       const name = els.agentName.value.trim();
       const model = els.agentModel.value.trim();
+      const endpoint = els.endpoint.value.trim();
+      const apiKey = els.apiKey.value.trim();
       const prompt = els.agentPrompt.value.trim();
-      if (!name || !model) return setStatus("请填写角色名称和模型名。");
-      const agent = { id: "agent-" + Date.now(), name, model, prompt: prompt || "你是" + name + "，请从你的专业角度回答。" };
+      if (!name || !model || !endpoint || !apiKey) return setStatus("请填写角色名称、模型名、API 地址和密钥。");
+      const agent = { id: "agent-" + Date.now(), name, model, endpoint, apiKey, prompt: prompt || "你是" + name + "，请从你的专业角度回答。" };
       state.agents.push(agent);
       state.config.activeAgentId = agent.id;
+      state.config.mode = "single";
       els.agentName.value = "";
       els.agentModel.value = "";
+      els.endpoint.value = "";
+      els.apiKey.value = "";
       els.agentPrompt.value = "";
+      els.agentForm.classList.add("hidden");
       saveState();
       renderAgents();
+      renderGroups();
       setStatus("已添加角色模型：" + name);
     });
 
-    els.agentList.addEventListener("click", function (event) {
-      const remove = event.target.closest("[data-remove-agent]");
-      if (!remove) return;
-      state.agents = state.agents.filter((agent) => agent.id !== remove.dataset.removeAgent);
-      if (!state.agents.length) state.agents = [createDefaultAgent()];
-      state.config.activeAgentId = state.agents[0].id;
+    els.addGroup.addEventListener("click", function () {
+      const name = els.groupName.value.trim();
+      const memberIds = Array.from(els.groupMemberList.querySelectorAll("input:checked")).map((input) => input.value);
+      if (!name || !memberIds.length) return setStatus("请填写群名称并至少选择一个模型好友。");
+      const group = { id: "group-" + Date.now(), name, memberIds };
+      state.groups.push(group);
+      state.config.mode = "group";
+      state.config.activeGroupId = group.id;
+      els.groupName.value = "";
+      els.groupForm.classList.add("hidden");
+      saveState();
+      renderGroups();
+      renderAgents();
+      setStatus("已创建群聊：" + name);
+    });
+
+    els.groupList.addEventListener("click", function (event) {
+      const remove = event.target.closest("[data-remove-group]");
+      if (remove) {
+        state.groups = state.groups.filter((group) => group.id !== remove.dataset.removeGroup);
+        if (!state.groups.length) state.groups = [createDefaultGroup()];
+        state.config.activeGroupId = state.groups[0].id;
+        saveState();
+        renderGroups();
+        return;
+      }
+      const item = event.target.closest("[data-group-id]");
+      if (!item) return;
+      state.config.mode = "group";
+      state.config.activeGroupId = item.dataset.groupId;
       saveState();
       renderAgents();
+      renderGroups();
+      const group = state.groups.find((entry) => entry.id === state.config.activeGroupId);
+      setStatus("已进入群聊：" + (group?.name || "群聊"));
     });
 
     els.systemPrompt.addEventListener("change", function () {
