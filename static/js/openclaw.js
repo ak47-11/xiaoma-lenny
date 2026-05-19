@@ -5,9 +5,11 @@
 
   const state = {
     config: {
-      model: "openclaw-agent",
+      mode: "single",
+      activeAgentId: "agent-default",
       systemPrompt: "你是一个本地 AI 智能体，代表用户阅读资料、拆解问题并给出清晰可执行的中文回答。回答时优先引用用户上传的资料；资料不足时明确说明不确定性。"
     },
+    agents: [createDefaultAgent()],
     docs: [],
     threads: [],
     activeThreadId: null,
@@ -16,7 +18,13 @@
   };
 
   const els = {
-    model: document.getElementById("modelInput"),
+    chatMode: document.getElementById("chatModeSelect"),
+    activeAgent: document.getElementById("activeAgentSelect"),
+    agentList: document.getElementById("agentList"),
+    agentName: document.getElementById("agentNameInput"),
+    agentModel: document.getElementById("agentModelInput"),
+    agentPrompt: document.getElementById("agentPromptInput"),
+    addAgent: document.getElementById("addAgentBtn"),
     systemPrompt: document.getElementById("systemPromptInput"),
     saveConfig: document.getElementById("saveConfigBtn"),
     docInput: document.getElementById("docInput"),
@@ -38,10 +46,20 @@
 
   const welcomeTemplate = els.chatFeed.querySelector(".welcome")?.outerHTML || "";
 
+  function createDefaultAgent() {
+    return {
+      id: "agent-default",
+      name: "默认助手",
+      model: "openclaw-agent",
+      prompt: "你是一个可靠的中文 AI 助手，回答要清晰、直接、可执行。"
+    };
+  }
+
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
       if (saved.config) state.config = { ...state.config, ...saved.config };
+      if (Array.isArray(saved.agents) && saved.agents.length) state.agents = saved.agents;
       if (Array.isArray(saved.docs)) state.docs = saved.docs.slice(0, MAX_DOCS);
       if (Array.isArray(saved.threads)) state.threads = saved.threads;
       state.activeThreadId = saved.activeThreadId || state.threads[0]?.id || createThread().id;
@@ -54,6 +72,7 @@
   function saveState() {
     localStorage.setItem(STORE_KEY, JSON.stringify({
       config: state.config,
+      agents: state.agents,
       docs: state.docs,
       threads: state.threads.slice(0, 20),
       activeThreadId: state.activeThreadId
@@ -98,8 +117,29 @@
   }
 
   function renderConfig() {
-    els.model.value = state.config.model || "";
+    els.chatMode.value = state.config.mode || "single";
     els.systemPrompt.value = state.config.systemPrompt || "";
+    renderAgents();
+  }
+
+  function activeAgent() {
+    return state.agents.find((agent) => agent.id === state.config.activeAgentId) || state.agents[0] || createDefaultAgent();
+  }
+
+  function renderAgents() {
+    if (!state.agents.length) state.agents = [createDefaultAgent()];
+    if (!state.agents.some((agent) => agent.id === state.config.activeAgentId)) state.config.activeAgentId = state.agents[0].id;
+
+    els.activeAgent.innerHTML = state.agents.map(function (agent) {
+      return '<option value="' + escapeHtml(agent.id) + '">' + escapeHtml(agent.name) + ' · ' + escapeHtml(agent.model) + '</option>';
+    }).join("");
+    els.activeAgent.value = state.config.activeAgentId;
+
+    els.agentList.innerHTML = state.agents.map(function (agent) {
+      const selected = agent.id === state.config.activeAgentId ? " · 当前" : "";
+      const remove = state.agents.length > 1 ? '<button type="button" data-remove-agent="' + escapeHtml(agent.id) + '">删除</button>' : "";
+      return '<article class="doc-item agent-item"><strong>' + escapeHtml(agent.name) + selected + '</strong><span>' + escapeHtml(agent.model) + '</span><p>' + escapeHtml(agent.prompt).slice(0, 120) + '</p>' + remove + '</article>';
+    }).join("");
   }
 
   async function loadSession() {
@@ -186,9 +226,9 @@
     }).filter(Boolean).join("\n\n---\n\n");
   }
 
-  function buildMessages(userPrompt) {
+  function buildMessages(userPrompt, agent) {
     const knowledge = buildKnowledgeContext();
-    const system = [state.config.systemPrompt, knowledge ? "以下是用户上传的 MCP/知识资料，请优先参考：\n" + knowledge : ""].filter(Boolean).join("\n\n");
+    const system = [state.config.systemPrompt, agent?.prompt, knowledge ? "以下是用户上传的 MCP/知识资料，请优先参考：\n" + knowledge : ""].filter(Boolean).join("\n\n");
     const history = activeThread().messages.filter(function (message) {
       return !message.error && (message.role === "user" || message.role === "assistant");
     }).slice(-10).map(function (message) {
@@ -199,6 +239,10 @@
   }
 
   async function callModel(messages) {
+    return callAgentModel(activeAgent(), messages);
+  }
+
+  async function callAgentModel(agent, messages) {
     if (!state.session?.access_token) throw new Error("请先登录账号后再使用智能体。");
     const endpoint = "/api/openclaw";
     const headers = { "Content-Type": "application/json" };
@@ -209,7 +253,7 @@
       headers,
       signal: state.abortController.signal,
       body: JSON.stringify({
-        model: state.config.model || "openclaw-agent",
+        model: agent?.model || "openclaw-agent",
         messages,
         temperature: 0.7,
         stream: false
@@ -234,8 +278,13 @@
     state.abortController = new AbortController();
 
     try {
-      const answer = await callModel(buildMessages(value));
-      appendMessage("assistant", answer, new Date().toISOString(), false, true);
+      if (state.config.mode === "group") {
+        await sendGroupPrompt(value);
+      } else {
+        const agent = activeAgent();
+        const answer = await callAgentModel(agent, buildMessages(value, agent));
+        appendMessage("assistant", "[" + agent.name + "]\n" + answer, new Date().toISOString(), false, true);
+      }
       setStatus("回答完成。继续输入问题或调整 Prompt。");
     } catch (error) {
       if (error.name === "AbortError") {
@@ -248,6 +297,27 @@
     } finally {
       state.abortController = null;
       setBusy(false);
+    }
+  }
+
+  async function sendGroupPrompt(value) {
+    const agents = state.agents.slice(0, 6);
+    const answers = [];
+    for (const agent of agents) {
+      setStatus("群聊中：" + agent.name + " 正在回答...");
+      const answer = await callAgentModel(agent, buildMessages(value, agent));
+      answers.push({ agent, answer });
+      appendMessage("assistant", "[" + agent.name + " / " + agent.model + "]\n" + answer, new Date().toISOString(), false, true);
+    }
+
+    if (answers.length > 1) {
+      const moderator = activeAgent();
+      const summaryPrompt = "请作为主持人，总结以下多个模型角色的观点，给出统一结论、分歧点和建议下一步：\n\n" + answers.map(function (item) {
+        return "[" + item.agent.name + "]\n" + item.answer;
+      }).join("\n\n---\n\n");
+      setStatus("群聊中：正在汇总多模型观点...");
+      const summary = await callAgentModel(moderator, buildMessages(summaryPrompt, moderator));
+      appendMessage("assistant", "[群聊总结]\n" + summary, new Date().toISOString(), false, true);
     }
   }
 
@@ -265,10 +335,50 @@
 
   function bindEvents() {
     els.saveConfig.addEventListener("click", function () {
-      state.config.model = els.model.value.trim() || "openclaw-agent";
+      state.config.mode = els.chatMode.value;
+      state.config.activeAgentId = els.activeAgent.value;
       state.config.systemPrompt = els.systemPrompt.value.trim();
       saveState();
-      setStatus("模型和系统 Prompt 已保存。");
+      renderAgents();
+      setStatus("模型角色和系统 Prompt 已保存。");
+    });
+
+    els.chatMode.addEventListener("change", function () {
+      state.config.mode = els.chatMode.value;
+      saveState();
+      setStatus(state.config.mode === "group" ? "已切换为多模型群聊。" : "已切换为单模型聊天。");
+    });
+
+    els.activeAgent.addEventListener("change", function () {
+      state.config.activeAgentId = els.activeAgent.value;
+      saveState();
+      renderAgents();
+    });
+
+    els.addAgent.addEventListener("click", function () {
+      const name = els.agentName.value.trim();
+      const model = els.agentModel.value.trim();
+      const prompt = els.agentPrompt.value.trim();
+      if (!name || !model) return setStatus("请填写角色名称和模型名。");
+      const agent = { id: "agent-" + Date.now(), name, model, prompt: prompt || "你是" + name + "，请从你的专业角度回答。" };
+      state.agents.push(agent);
+      state.config.activeAgentId = agent.id;
+      els.agentName.value = "";
+      els.agentModel.value = "";
+      els.agentPrompt.value = "";
+      saveState();
+      renderAgents();
+      setStatus("已添加角色模型：" + name);
+    });
+
+    els.agentList.addEventListener("click", function (event) {
+      const remove = event.target.closest("[data-remove-agent]");
+      if (!remove) return;
+      state.agents = state.agents.filter((agent) => agent.id !== remove.dataset.removeAgent);
+      if (!state.agents.length) state.agents = [createDefaultAgent()];
+      state.config.activeAgentId = state.agents[0].id;
+      saveState();
+      renderAgents();
     });
 
     els.systemPrompt.addEventListener("change", function () {

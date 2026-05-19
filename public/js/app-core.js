@@ -18,7 +18,14 @@
     if (local?.user) return { client: localClient, session: local };
 
     const sess = (await sessionClient.auth.getSession()).data.session;
-    if (sess?.user) return { client: sessionClient, session: sess };
+    if (sess?.user) {
+      await localClient.auth.setSession({
+        access_token: sess.access_token,
+        refresh_token: sess.refresh_token
+      });
+      const promoted = (await localClient.auth.getSession()).data.session;
+      return { client: localClient, session: promoted || sess };
+    }
 
     return { client: localClient, session: null };
   }

@@ -307,9 +307,9 @@
   }
 
   function getActiveClient() {
-    const remember = !!rememberMeEl.checked;
-    localStorage.setItem("xiaoma_remember_auth", remember ? "1" : "0");
-    return remember ? sbLocal : sbSession;
+    localStorage.setItem("xiaoma_remember_auth", "1");
+    if (rememberMeEl) rememberMeEl.checked = true;
+    return sbLocal;
   }
 
   function setAuthFormVisible(visible) {

@@ -27,12 +27,35 @@
       <section class="config-card panel" aria-label="接口设置">
         <strong>Agent Access</strong>
         <p id="userHint" class="hint">正在检查登录状态...</p>
-        <div class="field">
-          <label for="modelInput">模型名</label>
-          <input id="modelInput" placeholder="qwen2.5:7b / llama3.1 / openclaw-agent" autocomplete="off" />
+        <div class="tool-row agent-mode-row">
+          <select id="chatModeSelect" aria-label="聊天模式">
+            <option value="single">单模型聊天</option>
+            <option value="group">多模型群聊</option>
+          </select>
+          <select id="activeAgentSelect" aria-label="当前模型角色"></select>
         </div>
-        <button id="saveConfigBtn" class="btn" type="button">保存模型设置</button>
+        <button id="saveConfigBtn" class="btn" type="button">保存设置</button>
         <p class="hint">请求地址和中转站密钥只在服务端环境变量中保存。登录用户可直接使用，不会在网页源码或浏览器里暴露密钥。</p>
+      </section>
+
+      <section class="config-card panel" aria-label="模型角色">
+        <strong>Model Roles</strong>
+        <div id="agentList" class="doc-list"></div>
+        <div class="field">
+          <label for="agentNameInput">角色名称</label>
+          <input id="agentNameInput" placeholder="策略顾问 / 技术专家 / 文案编辑" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="agentModelInput">模型名</label>
+          <input id="agentModelInput" placeholder="gpt-4o-mini / deepseek-chat / qwen-plus" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="agentPromptInput">角色 Prompt</label>
+          <textarea id="agentPromptInput" rows="3" placeholder="定义这个模型在协同中的职责、语气和输出重点。"></textarea>
+        </div>
+        <div class="actions compact-actions">
+          <button id="addAgentBtn" type="button">添加角色模型</button>
+        </div>
       </section>
 
       <section class="config-card panel" aria-label="文档资料">
@@ -71,7 +94,7 @@
       <div id="chatFeed" class="chat-feed" aria-live="polite">
         <section class="welcome panel">
           <h2>你的本地 AI 智能体工作台</h2>
-          <p>登录后即可通过服务端代理调用你的中转站模型。上传资料后，智能体会把资料文本作为上下文，回答时优先参考这些内容。</p>
+          <p>登录后即可通过服务端代理调用你的中转站模型。你可以给自己配置多个模型角色，单独聊天，或把它们放进一个群里协同回答。</p>
           <div class="suggestion-grid">
             <button type="button" data-prompt="请先阅读我上传的资料，提炼核心结论，并列出我接下来应该追问的 5 个问题。">资料总结</button>
             <button type="button" data-prompt="你是我的执行型智能体。请基于资料给我一个可落地的行动计划，包含优先级、风险和下一步。">行动计划</button>

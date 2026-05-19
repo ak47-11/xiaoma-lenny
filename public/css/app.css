@@ -3262,6 +3262,29 @@ samp {
   font-size: var(--font-size-micro);
 }
 
+.openclaw-page .agent-mode-row {
+  grid-template-columns: 1fr;
+}
+
+.openclaw-page .agent-item p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-micro);
+  line-height: 1.5;
+}
+
+.openclaw-page .agent-item button {
+  width: fit-content;
+  min-height: 28px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  background: var(--color-bg-muted);
+  color: var(--color-text-tertiary);
+  padding: 0 10px;
+  font: inherit;
+  font-size: var(--font-size-micro);
+  cursor: pointer;
+}
+
 .openclaw-page .compact-actions {
   justify-content: flex-end;
 }
